@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="15">
+ <tileset firstgid="1" name="1" tilewidth="128" tileheight="128" tilecount="2" columns="0">
+  <tile id="0">
+   <image source="../../../GitHub/TDef_Web/public/textures/map/1.png"/>
+  </tile>
+  <tile id="1">
+   <image source="../../../GitHub/TDef_Web/public/textures/map/2.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="2" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="../../../../../../../../../GitHub/TDef_Web/public/textures/map/1.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="19" name="3" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="../../../../../../../../../GitHub/TDef_Web/public/textures/map/2.png" width="128" height="128"/>
+ </tileset>
+ <layer name="tiles" width="20" height="20">
+  <data encoding="csv">
+3,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+7,8,9,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+11,0,0,0,0,0,0,0,0,20,21,22,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,24,25,26,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup color="#ff0000" name="collision">
+  <object id="1" x="917.667" y="124.333">
+   <polygon points="0,0 101,12 96,82 33,108 -47,87 -45,24"/>
+  </object>
+  <object id="2" x="1105" y="137">
+   <polygon points="0,0 101,12 96,82 33,108 -47,87 -45,24"/>
+  </object>
+  <object id="4" x="416" y="66">
+   <polygon points="0,0 96,100 48,346 -10,442 -34,196"/>
+  </object>
+  <object id="6" x="118" y="356" width="170" height="242"/>
+  <object id="8" x="124" y="754">
+   <polygon points="0,0 202,202 360,14 120,-62"/>
+  </object>
+  <object id="9" x="650" y="466">
+   <polyline points="0,0 110,324 -12,582 -78,386 -24,158 0,186"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="areas">
+  <object id="12" x="814" y="350">
+   <polygon points="0,0 40,66 -4,100 -56,66 -106,2"/>
+  </object>
+  <object id="13" x="260" y="94">
+   <polygon points="0,0 -48,66 -26,130 26,168 82,76 116,12 86,-20 40,-44"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="lights">
+  <object id="14" x="87" y="69" width="61" height="61">
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>
