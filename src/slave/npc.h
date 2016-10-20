@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include "../share/system/time.h"
 #include "../share/system/mutex.h"
 #include "../share/network/packet.h"
 #include "point.h"
@@ -84,7 +85,7 @@ namespace clasteredServerSlave {
 			friend std::ostream& operator<<(std::ostream &stream, const npc &n);
 		protected:
 			float vel;
-			time_t timestamp;
+			timestamp_t timestamp;
 			
 			bool check_point(typeof(point::x) x, typeof(point::y) y);
 			bool update_cells();

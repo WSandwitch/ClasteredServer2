@@ -86,8 +86,6 @@ int main(int argc, char* argv[]){
 	if (argc>1)
 		sscanf(argv[1], "%d", &port);
 	
-	printf("%d\n", npc::shoots.size());
-	return 0;
 	processors::init();
 	srand(time(0));
 	//init map

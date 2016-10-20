@@ -8,6 +8,7 @@
 
 #include "storage.h"
 #include "chat.h"
+#include "../share/system/time.h"
 #include "../share/system/mutex.h"
 #include "../share/network/socket.h"
 #include "../share/network/packet.h"
@@ -45,7 +46,7 @@ namespace master {
 			share::mutex mutex;
 			std::list<client_message> messages;
 			std::map<int, void*> chats;
-			time_t timestamp;
+			timestamp_t timestamp;
 			char token[30];
 			
 			client(share::socket* sock);

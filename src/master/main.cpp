@@ -134,8 +134,8 @@ int main(int argc,char* argv[]){
 	struct timeval tv={0,0};
 	struct sigaction sa;
 	struct {
-		time_t start;
-		time_t servers_check;
+		timestamp_t start;
+		timestamp_t servers_check;
 	} timestamps={0};
 	
 	sigemptyset(&sa.sa_mask);
@@ -180,7 +180,7 @@ int main(int argc,char* argv[]){
 	//do some work
 	main_loop=1;
 //	printf("Start main loop\n");
-	time_t timestamp;
+	timestamp_t timestamp;
 	timestamps.start=time(0);
 	do{
 		timestamp=time(0);

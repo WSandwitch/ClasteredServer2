@@ -1,7 +1,5 @@
 #include <string.h>
 
-
-#include "../share/containers/worklist.h"
 #include "../share/network/listener.h"
 #include "../share/system/log.h"
 
@@ -13,22 +11,19 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
+namespace master{
+	
+	std::vector<listener*> listeners::all;
 
-static worklist listeners={0};
-
-void listenersInit(){
-	memset(&listeners, 0,sizeof(listeners));
-}
-
-void listenersClear(){
-	worklistErase(&listeners, (void(*)(void*))listenerClear);
-}
-
-listener* listenersAdd(listener* l){
-	worklistAdd(&listeners, l);
-	return l;
-}
-
-void listenersForEach(void*(f)(listener* l, void* arg)){
-	worklistForEachRemove(&listeners,(void*(*)(void*,void*))f,0);
+	listener* listeners::add(listener* l){
+		if (l)
+			all[l->id]=l;
+		return l;
+	}
+	
+	void listeners::clear(){
+		for (auto l:all){
+			delete l.second;
+		}
+	}
 }

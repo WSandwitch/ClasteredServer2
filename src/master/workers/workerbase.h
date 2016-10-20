@@ -6,6 +6,7 @@
 #include <exception>
 
 #include "../../share/system/mutex.h"
+#include "../../share/system/time.h"
 #include "../../share/system/sync.h"
 #include "../../share/system/log.h"
 
@@ -31,7 +32,7 @@ namespace master {
 			bool recheck;
 			pthread_t pid;
 			//dynamic vars
-			time_t timestamp;
+			timestamp_t timestamp;
 			short run;
 			short paused;
 			//inner vars

@@ -11,7 +11,8 @@ namespace master {
 			static std::vector<listener*> all;
 			static mutex m;
 		
-			static add(listener* l);
+			static listener* add(listener* l);
+			static void clear();
 	};
 }
 

@@ -3,6 +3,7 @@
 #include <unistd.h> 
 
 #include "log.h"
+#include "time.h"
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
@@ -22,8 +23,8 @@ log_config::log_config(): file({0}), debug(1){
 void printLog(const char* format, ...) {
 	char str[800];
 	char tstr[20]="";
-	time_t t=time(0);
-	strftime(tstr, sizeof(tstr), "%F %T", localtime(&t));
+	timestamp_t t=time(0);
+	strftime(tstr, sizeof(tstr), "%F %T", localtime((time_t*)&t));
 	va_list argptr;
 	va_start(argptr, format);
 		vsprintf(str, format, argptr);

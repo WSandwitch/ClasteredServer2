@@ -18,12 +18,12 @@
 
 #define SLAVES_FILE_DEFAULT "storage/slaves.txt"
 #define USERS_FILE_DEFAULT "storage/users.txt"
-typedef
-struct{
+
+struct files_config {
 	char users[100];
 	char slaves[100];
 	char attributes[100];
-} files_config;
+};
 
 static files_config files;
 
