@@ -3,8 +3,9 @@
 
 namespace share {
 	class base64{
-		static int decode(unsigned char in[], unsigned char out[], int len);
-		static int encode(unsigned char in[], unsigned char out[], int len, int newline_flag);
+		public:
+			static int decode(unsigned char in[], unsigned char out[], int len);
+			static int encode(unsigned char in[], unsigned char out[], int len, int newline_flag);
 	};
 }
 #endif

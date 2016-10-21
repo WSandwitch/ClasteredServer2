@@ -41,7 +41,7 @@ namespace master {
 			static server* get(int id);
 			static void remove(server* s);
 			static void check();
-			static int getId();
+			static int getIdAuto();
 			static void sendAll(packet& p);
 			static int idByAddress(std::string s, int port);
 	};

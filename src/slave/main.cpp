@@ -65,6 +65,15 @@ void start_slave(int port){
 		exit(1);
 }
 
+void start_slave_fork(int port){
+	static char ps[30];
+	sprintf(ps, "%d", port);
+	static const char* argv[]={"", ps};	
+	if (fork()==0){
+		slave_func((void*)argv);
+	}
+}
+
 #endif
 
 int main(int argc, char* argv[]){

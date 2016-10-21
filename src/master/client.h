@@ -44,26 +44,28 @@ namespace master {
 			int server_id;
 			share::socket* sock;
 			share::mutex mutex;
-			std::list<client_message> messages;
+			std::list<client_message*> messages;
 			std::map<int, void*> chats;
 			timestamp_t timestamp;
 			char token[30];
 			
 			client(share::socket* sock);
 			~client();
-			int proceed(packet& p);
-			void messagesAdd(client_message *m);
+			int proceed(packet* p);
+			void messages_add(client_message *m);
+			
 			void messages_proceed();
-			void set_info(user_info *u);
+			int set_info(user_info *u);
 			void	server_clear();
 		
 			static share::mutex m;
-			static std::map<int, client> all;
+			static std::map<int, client*> all;
 		
-			static void add(client& c);
-			static void get(int id);
-			static void remove(int id);
+			static int add(client* c);
+			static client* get(int id);
+			static void remove(client* c);
 			static void check();
+			static void broadcast(client_message *m);
 	};
 
 
