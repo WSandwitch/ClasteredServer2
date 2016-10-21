@@ -34,6 +34,8 @@ namespace share {
 			void unlockRead();
 			void lockWrite();
 			void unlockWrite();
+			void close();
+		
 			static socket* connect(char*, int);
 	};
 }

@@ -1,7 +1,8 @@
 
+#include <map>
+
 #include "messageprocessor.h"
 #include "client.h"
-#include "../share/containers/bintree.h"
 #include "../share/system/log.h"
 
 /*
@@ -14,26 +15,22 @@
 
 
 
-static bintree clients={0},servers={0};
+static std::map<int, void*> clients,servers;
 
 
 void* messageprocessorClient(int key){
-	return bintreeGet(&clients, key);
+	return clients[key];
 }
 
 void* messageprocessorServer(int key){
-	return bintreeGet(&servers, key);
+	return servers[key];
 }
 
-bintree_key messageprocessorClientAdd(bintree_key key, void* f){
-	return bintreeAdd(&clients, key, f);
+bintree_key messageprocessorClientAdd(int key, void* f){
+	return clients[key]=(void*)f;
 }
 
-bintree_key messageprocessorServerAdd(bintree_key key, void* f){
-	return bintreeAdd(&servers, key, f);
+bintree_key messageprocessorServerAdd(int key, void* f){
+	return servers[key]=(void*)f);
 }
 
-void messageprocessorClear(){
-	bintreeErase(&clients, 0);
-	bintreeErase(&servers, 0);
-}

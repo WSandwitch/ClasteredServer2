@@ -52,9 +52,11 @@ namespace master {
 	}
 
 	client* client::get(int id){
-		client *c;
+		client *c=0;
 		m.lock();
-			c=all[id];
+			auto i=all.find(id);
+			if (i!=all.end())
+				c=i.second;
 			if (c!=0 && c->broken)
 				c=0;
 		m.unlock();

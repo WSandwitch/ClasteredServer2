@@ -5,12 +5,9 @@
 #include "client.h"
 #include "messageprocessor.h"
 #include "workers/serverworkers.h"
-#include "../share/containers/bintree.h"
-#include "../share/containers/worklist.h"
 #include "../share/network/packet.h"
-#include "../share/system/types.h"
 #include "../share/system/log.h"
-#include "../share/crc32.h"
+#include "../share/crypt/crc32.h"
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
@@ -19,340 +16,234 @@
 ║ jun 2016									                       ║
 ╚══════════════════════════════════════════════════════════════╝
 */
+namespace master { 
+	
+	typedef void*(*server_processor)(server*, packet*);
 
-typedef void*(*server_processor)(server*, packet*);
+	std::map<int, server*> all;
+	share::mutex m;
 
-static short servers_total=0;
-static bintree servers={0};
-static t_mutex_t mutex=0;
-
-static void* serversSendPacket(bintree_key k, void* v, void * p);
-
-void serversInit(){
-	memset(&servers, 0,sizeof(servers));
-	if ((mutex=t_mutexGet())==0){
-		perror("t_mutexGet");
-		return;
+	
+	server::server(socket* sock, std::string host, int port):sock(sock), host(host), port(port){
+		id=idByAddress(host,port);
+		printf("server %d created\n", id);
 	}
-}
-
-void serversClear(){
-	t_mutexLock(mutex);
-		bintreeErase(&servers, (void(*)(void*))serverClear);
-	t_mutexUnlock(mutex);
-	t_mutexRemove(mutex);
-}
-
-server *serverNew(char* host, short port){
-	server * s;
-	if ((s=malloc(sizeof(*s)))==0){
-		perror("malloc");
-		return 0;
+	
+	server* server::create(std::string host, int port){
+		socket *sock;
+		if ((sock=socket::connect((char*)host.data(), port))==0){
+			perror("socketConnect");
+			return 0;
+		}
+		storageSlaveSetUnbroken((char*)host.data(), port);//maybe need not here
+		//TODO: add auth 
+		return new server(sock, host, port);
 	}
-	memset(s,0,sizeof(*s));
-	sprintf(s->host, "%s", host);
-	s->port=port;
-	if ((s->sock=socketConnect(s->host, s->port))==0){
-		perror("socketConnect");
-		serverClear(s);
-		return 0;
-	}
-	storageSlaveSetUnbroken(s->host, s->port);//maybe need not here
-	if ((s->mutex=t_mutexGet())==0){
-		perror("t_mutexGet");
-		serverClear(s);
-		return 0;
-	}
-	//TODO: add auth 
-	s->id=serverIdByAddress(host,port);
-	printf("server %d created\n", s->id);
-	return s;
-}
 
-//not used
-server* serverReconnect(server *s){
-	socketClear(s->sock);
-	if ((s->sock=socketConnect(s->host, s->port))==0){
-		return 0;
+	server::~server(){
+		
+		mutex.lock();
+			for (auto c:clients){
+				c.second->server_clear();
+			}
+//			bintreeErase(&s->clients, (void(*)(void*))clientServerClear);
+		mutex.unlock();
+		delete sock;
 	}
-	return s;
-}
 
-void serverClear(server* s){
-	if (s==0)
-		return;
-	if (s->mutex){
-		t_mutexLock(s->mutex);
-			bintreeErase(&s->clients, (void(*)(void*))clientServerClear);
-		t_mutexUnlock(s->mutex);
-		t_mutexRemove(s->mutex);
-	}
-	socketClear(s->sock);
-	free(s);
-}
-
-int serversAdd(server* s){
-	packet *p;
-	if (s->id!=0){
-		t_mutexLock(mutex);
-			servers_total++;
-			bintreeAdd(&servers, s->id, s);
-			if ((p=packetNew(100))!=0){
-				packetInitFast(p);
-				packetAddNumber(p, (char)MSG_S_SERVER_CONNECTED);
-				packetAddNumber(p, (char)2);
-				packetAddInt(p, s->id);
-				packetAddShort(p, servers_total);
-				packetAddNumber(p, (char)0);
-				packetAddNumber(p, (int)0);
+	int server::add(server* s){
+		if (s->id!=0){
+			m.lock();
+				all[s->id]=s;
+				packet p;
+				p.setType((char)MSG_S_SERVER_CONNECTED);
+				p.add(s->id);
+				p.add((short)all.size());
+				p.dest.type=0;
+				p.dest.id=0;
 				///send packet
-				bintreeForEach(&servers, serversSendPacket, p);
-				free(p);
-			}
-		t_mutexUnlock(mutex);
-		serverworkersAddWorkAuto(s);			
-	}
-	return s->id;
-}
-
-server *serversGet(int id){
-	server *s;
-//	printf("get server %d\n", id);
-	t_mutexLock(mutex);
-		s=bintreeGet(&servers, id);
-	t_mutexUnlock(mutex);
-	return s;
-}
-
-void serversRemove(server* s){
-	int id=s->id;
-	packet *p;
-	t_mutexLock(mutex);
-		servers_total--;
-		bintreeDel(&servers, s->id, (void(*)(void*))serverClear);
-	t_mutexUnlock(mutex);
-	printf("removed server %d\n", id);
-	if ((p=packetNew(100))!=0){
-		packetInitFast(p);
-		packetAddNumber(p, (char)MSG_S_SERVER_DISCONNECTED);
-		packetAddNumber(p, (char)2);
-		packetAddInt(p, id);
-		packetAddShort(p, serversTotal());
-		packetAddNumber(p, (char)0);
-		packetAddNumber(p, (int)0);
-		serversPacketSendAll(p);
-		free(p);
-	}
-}
-
-static void* setUncheck(bintree_key k, void *v, void *arg){
-	server *s=v;
-	s->checked=0;
-	return 0;
-}
-static int checkSlaves(slave_info *si, void *arg){
-	int id=serverIdByAddress(si->host, si->port);
-	server *s=serversGet(id);
-//	printf("check server %d, got %d\n", id, s);
-	if (s==0){
-		if ((s=serverNew(si->host, si->port))!=0){
-			serversAdd(s);
-			//fist message to serer is server_connected 
+				for (auto i:all){
+					i.second->sock->send(&p);
+				}
+//				bintreeForEach(&servers, serversSendPacket, p);
+			m.unlock();
+			serverworkers::addWorkAuto(s);			
 		}
+		return s->id;
 	}
-	if (s){
-		s->checked=1;
-		//add message server created
+
+	server *server::get(int id){
+		server *s=0;
+	//	printf("get server %d\n", id);
+		m.lock();
+			auto i=all.find(id);
+			if (i!=all.end())
+				s=i->second;
+		m.unlock();
+		return s;
 	}
-	return 0;
-}
-static void* checkS(bintree_key k, void *v, void *arg){
-	server *s=v;
-	if (s->checked==0){
-		worklistAdd(arg, v);
+
+	void server::remove(server* s){
+		int id=s->id;
+		packet p;
+		m.lock();
+			all.erase(id);
+			delete s;
+		m.unlock();
+		printf("removed server %d\n", id);
+		p.setType((char)MSG_S_SERVER_DISCONNECTED);
+		p.add(id);
+		p.add((short)all.size());
+		p.dest.type=(char)0;
+		p.dest.id=(int)0;
+		sendAll(&p);
 	}
-	return 0;
-}
-static void* checkR(void *v, void *arg){
-	server *s=v;
-	socketClose(s->sock);//it will be cleared lately
-	return v;
-}
-void serversCheck(){
-	worklist l;
-	memset(&l,0,sizeof(l));
-	t_mutexLock(mutex);
-		bintreeForEach(&servers, setUncheck, 0);
-	t_mutexUnlock(mutex);
-	storageSlaves(checkSlaves, 0);
-	t_mutexLock(mutex);
-		bintreeForEach(&servers, checkS, &l);
-	t_mutexUnlock(mutex);
-	worklistForEachRemove(&l, checkR, 0);
-}
 
-void serversForEach(void*(*f)(bintree_key k, void *v, void *arg), void* a){
-	t_mutexLock(mutex);
-		bintreeForEach(&servers, f, a);
-	t_mutexUnlock(mutex);
-
-}
-
-static void* findAuto(bintree_key k, void *v, void *arg){
-	int2_t *d=arg;
-	server *s=v;
-	if (s->ready &&(d->i1==0 || d->i2>=s->$clients)){
-		d->i1=s->id;
-		d->i2=s->$clients;
-//		return &s->id;
-	}
-	return 0;
-}
-int serversGetIdAuto(){
-	int2_t d={0,0};
-	t_mutexLock(mutex);
-		bintreeForEach(&servers, findAuto, &d);
-	t_mutexUnlock(mutex);
-	return d.i1;
-}
-
-short serversTotal(){
-	short o;
-	t_mutexLock(mutex);
-		o=servers_total;
-	t_mutexUnlock(mutex);
-	return o;
-}
-
-void serversTotalInc(){
-	t_mutexLock(mutex);
-		servers_total++;
-	t_mutexUnlock(mutex);
-}
-
-void serversTotalDec(){
-	t_mutexLock(mutex);
-		servers_total--;
-	t_mutexUnlock(mutex);
-}
-
-void serverPacketProceed(server *s, packet *p){
-	void* buf=packetGetData(p);
-	server_processor processor;
-//	printf("got server message %d\n", *((char*)buf));
-	if ((processor=messageprocessorServer(*((char*)buf)))==0){
-		//remove client data from the end
-		short size=packetGetSize(p);
-//		printf("got message size %d\n", size);
-		int _id=*((typeof(_id)*)(buf+(size-=sizeof(_id))));//check for write size size
-		char dir=*((typeof(dir)*)(buf+(size-=sizeof(dir))));
-		if (dir==MSG_CLIENT){ //redirect packet to client
-//			printf("redirect to client %d\n", _id);
-			client* c=0;
-			if (_id==0 || (c=clientsGet(_id))!=0){
-				clientMessagesAdd(c, clientMessageNew(buf, size));
-			}
-		}else if (dir==MSG_SERVER){ //redirect packet to server
-//			printf("redirect to server %d\n", _id);
-			server* sv=serversGet(_id);
-			packetSetSize(p, size);
-//			printf("set message size %d\n", size);
-			packetAddChar(p, MSG_SERVER);//message from server
-			packetAddNumber(p, s->id);
-			if (sv){
-				packetSend(p, sv->sock);
-			}else if (_id==0){
-				serversPacketSendAll(p);
+	static int checkSlaves(slave_info *si, void *arg){
+		int id=server::idByAddress(si->host, si->port);
+		server *s=server::get(id);
+	//	printf("check server %d, got %d\n", id, s);
+		if (s==0){
+			std::string host(si->host);
+			if ((s=server::create(host, si->port))!=0){
+				server::add(s);
+				//fist message to serer is server_connected 
 			}
 		}
-	}else{//proceed by self
-		processor(s, p);
+		if (s){
+			s->checked=1;
+			//add message server created
+		}
+		return 0;
+	}
+	void server::check(){
+		std::list<server*> l;
+		m.lock();
+			for (auto i:all){
+				i.second->checked=0;
+			}
+			storageSlaves(checkSlaves, 0);
+			for (auto i:all){
+				if (i.second->checked==0){
+					l.push_back(i.second);
+				}
+			}
+		m.lock();
+		for (auto s:l){
+			s->sock->close();
+		}
+	}
+
+	int server::getIdAuto(){
+		int i1=0;
+		int i2=0;
+		m.lock();
+			for (auto i:all){
+				server *s=i.second;
+				if (s->ready &&(i1==0 || i2>=s->clients.size())){
+					i1=s->id;
+					i2=s->clients.size();
+			//		return &s->id;
+				}
+			}
+		m.unlock();
+		return i1;
+	}
+
+	void server::proceed(packet *p){
+		void* buf=p->data();
+		server_processor processor;
+	//	printf("got server message %d\n", *((char*)buf));
+		if ((processor=(server_processor)messageprocessorServer(*((char*)buf)))==0){
+			//remove client data from the end
+			short size=p->size();
+	//		printf("got message size %d\n", size);
+			int _id=*((typeof(_id)*)((char*)buf+(size-=sizeof(_id))));//check for write size size
+			char dir=*((typeof(dir)*)((char*)buf+(size-=sizeof(dir))));
+			if (dir==MSG_CLIENT){ //redirect packet to client
+	//			printf("redirect to client %d\n", _id);
+				client* c=0;
+				if (_id==0 || (c=client::get(_id))!=0){
+					c->messages_add(new client_message(buf, size));
+				}
+			}else if (dir==MSG_SERVER){ //redirect packet to server
+	//			printf("redirect to server %d\n", _id);
+				server* sv=server::get(_id);
+	//			printf("set message size %d\n", size);
+				p->dest.type=MSG_SERVER;//message from server
+				p->dest.id=id;
+				if (sv){
+					sv->sock->send(p);
+				}else if (_id==0){
+					server::sendAll(p);
+				}
+			}
+		}else{//proceed by self
+			processor(this, p);
+		}
+	}
+
+	int server::idByAddress(std::string address, int port){ //return 6 bytes integer
+		std::string str=address;
+		address+=':';
+		address+=port;
+		return crc32((const void*)str.data(), (size_t)str.size());
+	}
+
+	void serversPacketSendAll(packet* p){
+		m.lock();
+			for (auto i:all){
+				i.second->sock->send(p);
+			}
+		m.unlock();
+	}
+
+	int server::clients_add(client *c){
+		packet p;
+		withLock(c->mutex, c->server_id=id);
+		mutex.lock();
+			clients[c->id]=c;
+		mutex.unlock();
+	//	printf("added client %d to server %d\n",c->id, s->id);
+		p.setType((char)MSG_S_CLIENT_CONNECTED);
+		p.add(c->id);
+		p.add((short)client::all.size());
+		p.add((char)0);
+		p.dest.id=(int)0;
+		sock->send(&p);
+		return 0;
+	}
+
+	client* server::clients_get(int id){
+		client* c=0;
+		mutex.lock();
+			auto i=clients.find(id);
+			if (i!=clients.end())
+				c=i->second;
+		mutex.unlock();
+		return c;
+	}
+
+	int server::clients_remove(client *c){
+		int id=c->id;
+		share::packet p;
+		mutex.lock();
+			clients.erase(c->id);
+			c->server_clear();
+		mutex.unlock();
+	//	printf("removed client %d to server %d\n", id, s->id);
+		p.setType((char)MSG_S_CLIENT_DISCONNECTED);
+		p.add(id);
+		p.add((short)client::all.size());
+		p.dest.type=(char)0;//must be here
+		p.dest.id=(int)0;//must be here
+		sock->send(&p);
+		return 0;
+	}
+
+	void server::set_ready(){
+		mutex.lock();
+			ready=1;
+		mutex.unlock();
 	}
 }
-
-int serverIdByAddress(char* address, short port){ //return 6 bytes integer
-	char str[400];
-	sprintf(str, "%s%d", address, port);
-	return crc32(str, strlen(str));
-}
-
-static void* serversSendPacket(bintree_key k, void* v, void * p){
-	server* s=v;
-	packetSend(p, s->sock);
-	return 0;
-}
-void serversPacketSendAll(packet* p){
-	t_mutexLock(mutex);
-		bintreeForEach(&servers, serversSendPacket, p);
-	t_mutexUnlock(mutex);
-}
-
-int serverClientsAdd(server *s, void *_c){
-	client *c=_c;
-	packet *p;
-	clientCritical(c,c->server_id=s->id);
-	t_mutexLock(s->mutex);
-		bintreeAdd(&s->clients, c->id, c);
-		s->$clients++;
-	t_mutexUnlock(s->mutex);
-//	printf("added client %d to server %d\n",c->id, s->id);
-	if ((p=packetNew(100))!=0){
-		packetAddNumber(p, (char)MSG_S_CLIENT_CONNECTED);
-		packetAddNumber(p, (char)2);
-		packetAddInt(p, c->id);
-		packetAddShort(p, s->$clients);
-		packetAddNumber(p, (char)0);
-		packetAddNumber(p, (int)0);
-		packetSend(p, s->sock);
-		free(p);
-	}
-	return 0;
-}
-
-void* serverClientsGet(server *s, int id){
-	void* c;
-	t_mutexLock(s->mutex);
-		c=bintreeGet(&s->clients, id);
-	t_mutexUnlock(s->mutex);
-	return c;
-}
-
-int serverClientsRemove(server *s, void *_c){
-	client *c=_c;
-	int id=c->id;
-	packet *p;
-	t_mutexLock(s->mutex);
-		bintreeDel(&s->clients, c->id, (void(*)(void*))clientServerClear);
-		s->$clients--;
-	t_mutexUnlock(s->mutex);
-//	printf("removed client %d to server %d\n", id, s->id);
-	if ((p=packetNew(100))!=0){
-		packetAddNumber(p, (char)MSG_S_CLIENT_DISCONNECTED);
-		packetAddNumber(p, (char)2);
-		packetAddInt(p, id);
-		packetAddShort(p, s->$clients);
-		packetAddNumber(p, (char)0);//must be here
-		packetAddNumber(p, (int)0);//must be here
-		packetSend(p, s->sock);
-		free(p);
-	}
-	return 0;
-}
-
-static void* serverClientsEraseEach(bintree_key k, void* v, void* arg){
-	clientServerClear(v);
-	return 0;
-}
-void serverClientsErase(server *s){
-	t_mutexLock(s->mutex);
-		bintreeForEach(&s->clients, serverClientsEraseEach,0);
-		s->$clients=0;
-	t_mutexUnlock(s->mutex);
-}
-
-void serverSetReady(server* s){
-	t_mutexLock(s->mutex);
-		s->ready=1;
-	t_mutexUnlock(s->mutex);
-}
-

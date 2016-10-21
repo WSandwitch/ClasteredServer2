@@ -21,28 +21,29 @@ namespace master {
 			bool ready;
 			share::socket* sock;
 			std::string host;
-			short port;
+			int port;
 			share::mutex mutex;
 			std::map<int, client*> clients;
 			
-			server(std::string host, short port);
+			server(share::socket* sock, std::string host, int port);
 			~server();
-			void proceed(packet& p);
+			void proceed(packet* p);
 			int clients_add(client* c);
 			client* clients_get(int id);
 			int clients_remove(client* c);
 			void server_clientsErase();
 			void set_ready();
 		
-			static std::map<int, server> all;
+			static std::map<int, server*> all;
 			static share::mutex access;
 			
+			static server* create(std::string host, int port);
 			static int add(server* s);
 			static server* get(int id);
 			static void remove(server* s);
 			static void check();
 			static int getIdAuto();
-			static void sendAll(packet& p);
+			static void sendAll(packet* p);
 			static int idByAddress(std::string s, int port);
 	};
 

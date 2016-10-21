@@ -40,6 +40,7 @@ namespace share {
 			void setType(char);
 			char type();
 			int size();
+			int resize();
 			void* data();
 			bool init();
 			bool init(void*, short);

@@ -56,22 +56,26 @@ void* slave_func(void* a){
 	return 0;
 }
 
-void start_slave(int port){
+int start_slave(int port){
 	static char ps[30];
 	sprintf(ps, "%d", port);
 	static const char* argv[]={"", ps};	
-	pthread_t pid;
+	pthread_t pid=0;
 	if(pthread_create(&pid, 0, slave_func, (void*)argv)!=0)
 		exit(1);
+	return pid;
 }
 
-void start_slave_fork(int port){
+int start_slave_fork(int port){
 	static char ps[30];
 	sprintf(ps, "%d", port);
 	static const char* argv[]={"", ps};	
-	if (fork()==0){
+	int pid=fork();
+	if (pid==0){
 		slave_func((void*)argv);
+		exit(0);
 	}
+	return pid;
 }
 
 #endif

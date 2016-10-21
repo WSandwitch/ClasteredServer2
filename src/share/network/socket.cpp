@@ -203,6 +203,10 @@ namespace share {
 		mutex.write.unlock();
 	}
 
+	void socket::close(){
+		close(sockfd);
+	}
+
 	socket* socket::connect(char* host, int port){
 		int sockfd;
 		struct sockaddr_in servaddr;

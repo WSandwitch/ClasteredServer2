@@ -9,6 +9,5 @@ void* messageprocessorServer(int key);
 int messageprocessorClientAdd(int, void* f);
 int messageprocessorServerAdd(int, void* f);
 
-void messageprocessorClear();
 
 #endif

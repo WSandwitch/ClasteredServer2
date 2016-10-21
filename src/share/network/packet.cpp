@@ -90,6 +90,10 @@ namespace share {
 		return buf.size();
 	}
 	
+	int packet::resize(){
+		return buf.resize();
+	}
+	
 	void* packet::data(){
 		return buf.data();
 	}
