@@ -9,7 +9,7 @@
 #define MSG_C_CHAT_QUITED 6
 #define MSG_C_CHAT_MESSAGE 7
 #define MSG_C_QUIT 8
-
-void clientMessageProcessorInit();
-
+namespace master {
+	void clientMessageProcessorInit();
+}
 #endif

@@ -13,6 +13,11 @@ using namespace share;
 namespace master {
 
 	class serverworkers : workerbase<server*>{
+		using workerbase::start;
+		using workerbase::stop;
+		using workerbase::pause;
+		using workerbase::unpause;
+				
 		public:		
 			void* proceed(server* s); //must clear data before nonzero return
 			void loop();
@@ -21,11 +26,6 @@ namespace master {
 		
 			serverworkers(){};
 			serverworkers(int id, int tps, std::string &name):workerbase<server*>(id, tps, name){};
-			void start();
-			void stop();
-			void pause();
-			void unpause();
-				
 			static int create(int num, int TPS);
 			static void addWork(int num, server* work);
 			static int addWorkAuto(server* work);

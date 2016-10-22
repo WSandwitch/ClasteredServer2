@@ -2,6 +2,7 @@
 #define CLASTERED_SERVER_PACKET_HEADER
 
 #include <vector>
+#include <cstdio>
 #include <string>
 
 extern "C"{
@@ -24,6 +25,7 @@ namespace share {
 		
 			int size();
 			void* data();
+			FILE* stream();
 	};
 	
 	class packet {
@@ -40,8 +42,9 @@ namespace share {
 			void setType(char);
 			char type();
 			int size();
-			int resize();
+			void resize(int s);
 			void* data();
+			FILE* stream();
 			bool init();
 			bool init(void*, short);
 			bool add(char);

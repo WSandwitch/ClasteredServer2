@@ -50,10 +50,10 @@ namespace master {
 				if(pthread_create(&pid, 0, workerbaseThread, this)!=0)
 					throw std::exception();
 			};
-			virtual void* proceed(T data){}; //must clear data if needed before nonzero return
+			virtual void* proceed(T data){return 0;}; //must clear data if needed before nonzero return
 			virtual void loop(){};
 			virtual void init(){};
-			virtual void* close(){};
+			virtual void* close(){return 0;};
 			void add_work(T obj){
 				mutex.lock();
 					works.push_back(obj);
@@ -98,9 +98,10 @@ namespace master {
 				w->mutex.unlock();
 				printLog("%s started\n",w->name.data());
 				
-				tv.timePassed();
+				
 				w->mutex.lock();
 					while(w->run){
+						tv.timePassed();
 						w->mutex.unlock();
 						w->mutex.lock();
 							if (w->paused){
@@ -134,7 +135,6 @@ namespace master {
 						w->mutex.unlock();
 						if (!w->recheck){
 							tv.syncTPS(w->TPS);
-							tv.timePassed();
 						}
 						w->recheck=0;
 						w->mutex.lock();

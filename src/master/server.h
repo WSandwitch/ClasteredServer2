@@ -35,7 +35,7 @@ namespace master {
 			void set_ready();
 		
 			static std::map<int, server*> all;
-			static share::mutex access;
+			static share::mutex m;
 			
 			static server* create(std::string host, int port);
 			static int add(server* s);

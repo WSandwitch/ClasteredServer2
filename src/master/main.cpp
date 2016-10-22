@@ -21,7 +21,6 @@
 #include "workers/socketworkers.h"
 #include "workers/serverworkers.h"
 #include "workers/listenworkers.h"
-#include "../share/containers/bintree.h"
 #include "../share/network/bytes_order.h"
 #include "../share/network/listener.h"
 #include "../share/network/packet.h"
@@ -30,11 +29,10 @@
 
 #define CONFIG_FILE "config.cfg"
 
-int main_loop;
+using namespace share;
 
-storage_config* mainStorageConfig(){
-	return &config.storage;
-}
+using namespace master; 
+int main_loop;
 
 log_config* mainLogConfig(){
 	return &config.log;
@@ -53,7 +51,7 @@ static int readConfig(){
 		fscanf(f, "%s", buf);
 		if (buf[0]=='#'){
 			size_t $str=400;
-			char *str=malloc($str);
+			char *str=(char*)malloc($str);
 			if (str){
 				getline(&str,&$str,f);
 				free(str);
@@ -61,9 +59,9 @@ static int readConfig(){
 		}else if (strcmp(buf, "port")==0){
 			short port;
 			fscanf(f, "%hd", &port);
-			listener* l=listenerStart(port);
+			listener* l=new listener(port);
 			if (l){
-				listenersAdd(l);
+				listeners::add(l);
 //				printf("Listener %d added\n",l->sockfd);
 			}
 		}else
@@ -118,20 +116,15 @@ static void segfault_sigaction(int sig){
 	exit(1);
 }
 
-static void* proceedListener(listener *l, void *arg){
-//	printf("added listener %d to listen workers\n", l->sockfd);
-	listenworkersAddWorkAll(l);
-	return 0;
-}
 
 //	FILE *f = fmemopen(&w, sizeof(w), "r+");
 
 #define startWorkers(type)\
-	type##workersCreate(config.type##workers.total,config.type##workers.tps)
+	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
 int main(int argc,char* argv[]){
 	int TPS=10;  //ticks per sec
-	struct timeval tv={0,0};
+	share::sync tv;
 	struct sigaction sa;
 	struct {
 		timestamp_t start;
@@ -153,15 +146,10 @@ int main(int argc,char* argv[]){
 	config.serverworkers.tps=1;
 	config.socketworkers.tps=1;
 	config.log.debug=1;
-	
-	listenersInit();
-	clientsInit();
-	serversInit();
-	
-	chatsInit();
-	
+		
 	readConfig();
-	storageInit();
+	storageInit(&config.storage);
+	log_config::config=config.log;
 	
 	clientMessageProcessorInit();
 	serverMessageProcessorInit();
@@ -170,12 +158,15 @@ int main(int argc,char* argv[]){
 	startWorkers(socket);
 	startWorkers(server);
 	
-	listenworkersStartAll();
-	socketworkersStartAll();
-	serverworkersStartAll();
+	listenworkers::startAll();
+	socketworkers::startAll();
+	serverworkers::startAll();
 	
 	//test
-	listenersForEach(proceedListener);
+//	listenersForEach(proceedListener);
+	for (auto l:listeners::all){
+		listenworkers::addWorkAll(l);
+	}
 //	listenworkersAddWorkAll(listenersAdd(listenerStart(8000)));
 	//do some work
 	main_loop=1;
@@ -184,17 +175,17 @@ int main(int argc,char* argv[]){
 	timestamps.start=time(0);
 	do{
 		timestamp=time(0);
-		timePassed(&tv); //start timer
+		tv.timePassed(); //start timer
 		//////test
 		
 		//////
 		if (timestamp-timestamps.servers_check>5){
-			serversCheck();
+			server::check();
 			timestamps.servers_check=timestamp;
 		}
-		clientsCheck();
+		client::check();
 		chatsCheck();
-		syncTPS(timePassed(&tv),TPS);
+		tv.syncTPS(TPS);
 //		if (timestamp-timestamps.start>25){//debug feature
 //			main_loop=0;
 //		}
@@ -202,21 +193,22 @@ int main(int argc,char* argv[]){
 	//clearing
 	sleep(2);
 	//deadlock here??
-	socketworkersStopAll();
+	socketworkers::stopAll();
 //	printf("Ask to stop client workers\n");
-	serverworkersStopAll();
+	serverworkers::stopAll();
 //	printf("Ask to stop server workers\n");
-	listenworkersClose();
+	listenworkers::stopAll();
 //	printf("Ask to stop listen workers\n");
 	sleep(1);
-	messageprocessorClear();
-	listenersClear();
+	listeners::clear();
 	printf("Listeners cleared\n");
 	chatsClear();
 	printf("Chats cleared\n");
-	serversClear();
+	for (auto i:server::all)
+		delete i.second;
 	printf("Servers cleared\n");
-	clientsClear();
+	for (auto i:client::all)
+		delete i.second;
 	printf("Clients cleared\n");
 	storageClear();
 	printf("Storage cleared\n");

@@ -13,24 +13,24 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
+namespace master{
+
+	static std::map<int, void*> clients,servers;
 
 
-static std::map<int, void*> clients,servers;
+	void* messageprocessorClient(int key){
+		return clients[key];
+	}
 
+	void* messageprocessorServer(int key){
+		return servers[key];
+	}
 
-void* messageprocessorClient(int key){
-	return clients[key];
+	int messageprocessorClientAdd(int key, void* f){
+		return (clients[key]=(void*)f)!=0;
+	}
+
+	int messageprocessorServerAdd(int key, void* f){
+		return (servers[key]=(void*)f)!=0;
+	}
 }
-
-void* messageprocessorServer(int key){
-	return servers[key];
-}
-
-bintree_key messageprocessorClientAdd(int key, void* f){
-	return clients[key]=(void*)f;
-}
-
-bintree_key messageprocessorServerAdd(int key, void* f){
-	return servers[key]=(void*)f);
-}
-

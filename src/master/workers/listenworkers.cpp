@@ -151,21 +151,19 @@ namespace master {
 	listenworkersAction(unpause)
 
 	void listenworkers::addWorkAll(listener* work){
-		int i;
-		for(i=0;i<all.size();i++)
+		for(int i=0, end=all.size();i<end;i++)
 			all[i].add_work(work);
 	}
 
 	void listenworkers::addWork(int n, listener* work){
-		if (n>0 && n<all.size())
+		if (n>0 && n<(int)all.size())
 			all[n].add_work(work);
 	}
 
 	int listenworkers::addWorkAuto(listener* work){
-		int i;
 		int n=0;
-		int $works=all[n].works.size();
-		for(i=0;i<all.size();i++){
+		unsigned $works=all[n].works.size();
+		for(int i=0, end=all.size();i<end;i++){
 			if (all[i].works.size()<$works){
 				$works=all[i].works.size();
 				n=i;
@@ -177,7 +175,8 @@ namespace master {
 
 	int listenworkers::create(int num, int TPS){
 		for(int i=0;i<num;i++){
-			std::string name="Listener worker "+std::to_string(i);
+			std::string name="Listener worker ";
+			name+=i;
 			listenworkers s(i, TPS, name);
 			all[i]=s;
 		}

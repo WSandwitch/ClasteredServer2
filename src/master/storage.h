@@ -20,9 +20,8 @@ namespace master {
 	};
 
 	//provided by main
-	storage_config* mainStorageConfig();
-
-	int storageInit();
+	
+	int storageInit(storage_config*);
 	int storageClear();
 
 	int storageSlaves(int(*f)(slave_info*,void*arg), void*arg);

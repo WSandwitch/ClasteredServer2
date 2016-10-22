@@ -1,3 +1,5 @@
+#include <string>
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -63,7 +65,7 @@ namespace master {
 				c->timestamp=time(0);
 				do{
 					if (c->sock->recv(&p)>0){
-						if (c->proceed(p)==0)
+						if (c->proceed(&p)==0)
 							break;
 					}
 					withLock(c->mutex, c->broken=1);
@@ -112,16 +114,16 @@ namespace master {
 	socketworkersAction(unpause)
 
 	void socketworkers::addWork(int n, client *work){
-		if (n<all.size())
+		if (n<(int)all.size())
 			all[n].add_work(work);
 	}
 
 	int socketworkers::addWorkAuto(client *work){
-		int i;
+		unsigned i;
 		int n=0;
 		if (all.size()==0)
 			return -1;
-		int $works=all[n].works.size();
+		unsigned $works=all[n].works.size();
 		for(i=0;i<all.size();i++){
 			if (all[i].works.size()<$works){
 				$works=all[i].works.size();
@@ -134,7 +136,8 @@ namespace master {
 
 	int socketworkers::create(int num, int TPS){
 		for(int i=0;i<num;i++){
-			std::string name="Client worker "+std::to_string(i);
+			std::string name="Client worker ";
+			name+=i;
 			socketworkers s(i, TPS, name);
 			all[i]=s;
 		}

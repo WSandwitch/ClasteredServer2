@@ -3,10 +3,13 @@
 
 #include <cstdio>
 
+struct log_config;
 struct log_config{
 	log_config();
 	char file[200];
 	short debug;
+	
+	static log_config config;
 };
 
 void printLog(const char* format, ...);

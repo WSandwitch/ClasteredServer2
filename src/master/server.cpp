@@ -20,8 +20,8 @@ namespace master {
 	
 	typedef void*(*server_processor)(server*, packet*);
 
-	std::map<int, server*> all;
-	share::mutex m;
+	std::map<int, server*> server::all;
+	share::mutex server::m;
 
 	
 	server::server(socket* sock, std::string host, int port):sock(sock), host(host), port(port){
@@ -140,7 +140,7 @@ namespace master {
 		m.lock();
 			for (auto i:all){
 				server *s=i.second;
-				if (s->ready &&(i1==0 || i2>=s->clients.size())){
+				if (s->ready &&(i1==0 || i2>=(int)s->clients.size())){
 					i1=s->id;
 					i2=s->clients.size();
 			//		return &s->id;
@@ -190,7 +190,7 @@ namespace master {
 		return crc32((const void*)str.data(), (size_t)str.size());
 	}
 
-	void serversPacketSendAll(packet* p){
+	void server::sendAll(packet* p){
 		m.lock();
 			for (auto i:all){
 				i.second->sock->send(p);

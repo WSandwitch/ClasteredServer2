@@ -12,6 +12,11 @@ using namespace share;
 namespace master {
 
 	class listenworkers : workerbase<listener*>{
+		using workerbase::start;
+		using workerbase::stop;
+		using workerbase::pause;
+		using workerbase::unpause;
+				
 		public:		
 			void* proceed(listener* s); //must clear data before nonzero return
 			void loop();
@@ -20,11 +25,6 @@ namespace master {
 		
 			listenworkers(){};
 			listenworkers(int id, int tps, std::string &name):workerbase<listener*>(id, tps, name){};
-			void start();
-			void stop();
-			void pause();
-			void unpause();
-				
 			static int create(int num, int TPS);
 			static void addWork(int num, listener* work);
 			static void addWorkAll(listener* work);

@@ -34,7 +34,7 @@ namespace share {
 	}
 
 	socket::~socket(){
-		close(sockfd);
+		::close(sockfd);
 	}
 
 	int socket::send(void* buf, int size){
@@ -204,7 +204,7 @@ namespace share {
 	}
 
 	void socket::close(){
-		close(sockfd);
+		::close(sockfd);
 	}
 
 	socket* socket::connect(char* host, int port){
@@ -229,7 +229,7 @@ namespace share {
 
 		if(::connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr))<0){
 			perror("connect");
-			close(sockfd);
+			::close(sockfd);
 			return 0;
 		}
 		printf("done\n");

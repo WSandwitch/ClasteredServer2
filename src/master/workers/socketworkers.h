@@ -9,7 +9,12 @@ using namespace share;
 
 namespace master {
 
-	class socketworkers : workerbase<client*>{
+	class socketworkers : public workerbase<client*>{
+		using workerbase::start;
+		using workerbase::stop;
+		using workerbase::pause;
+		using workerbase::unpause;
+				
 		public:		
 			void* proceed(client* s); //must clear data before nonzero return
 			void loop();
@@ -18,11 +23,6 @@ namespace master {
 		
 			socketworkers(){};
 			socketworkers(int id, int tps, std::string &name):workerbase<client*>(id, tps, name){};
-			void start();
-			void stop();
-			void pause();
-			void unpause();
-				
 			static int create(int num, int TPS);
 			static void addWork(int num, client* work);
 			static int addWorkAuto(client* work);
@@ -41,13 +41,6 @@ namespace master {
 	};
 		
 }
-
-struct soketworker_data {
-	//some worker params
-//	char buf[PACKET_SIZE];
-	share::packet packet;
-	short checks;
-} soketworker_data;
 
 
 void socketworkersStartAll();

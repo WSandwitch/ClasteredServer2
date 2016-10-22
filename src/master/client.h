@@ -68,38 +68,6 @@ namespace master {
 			static void broadcast(client_message *m);
 	};
 
-
-	void clientsInit();
-	void clientsClear();
-
-	client* clientNew(share::socket *sock);
-	void clientClear(client* c);
-
-	//work with clients container
-	int clientsAdd(client* c);
-	client* clientsGet(int id);
-	void clientsRemove(client* c);
-	void clientsCheck();
-
-	//processor for packet from client
-	int clientPacketProceed(client *c, packet* p);
-
-	//work with client message queue
-	void clientMessagesAdd(client *c, client_message *m);
-	client_message* clientMessageNew(void* buf, short size);
-	void clientMessageClear(client_message* m);
-
-	//chats
-	void clientChatsAdd(client* cl, void* chat);
-	void* clientChatsGet(client* cl, int id);
-	void clientChatsRemove(client* cl, void* chat);
-
-	//processor for client message queue
-	void clientMessagesProceed(client *c, void* (*me)(void* d, void * _c), void * arg);
-
-	int clientSetInfo(client *c, user_info *u);
-
-	void clientServerClear(client* c);
 }
 #define clientCritical(_$_c, action)\
 	if(_$_c)\

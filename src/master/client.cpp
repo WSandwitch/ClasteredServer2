@@ -1,5 +1,7 @@
 ﻿#include <string.h>
 
+#include <cstdlib>
+
 #include "client.h"
 #include "chat.h"
 #include "server.h"
@@ -56,7 +58,7 @@ namespace master {
 		m.lock();
 			auto i=all.find(id);
 			if (i!=all.end())
-				c=i.second;
+				c=i->second;
 			if (c!=0 && c->broken)
 				c=0;
 		m.unlock();
@@ -202,34 +204,26 @@ namespace master {
 		t_mutexUnlock(cl->mutex);
 		chatClientsRemove(found, cl);
 */	}
-/*
-	static void* clientMessageEach(void* d, void * _arg){
-		client_message* m=d;
-		voidp2_t *arg=_arg;
-		client *c=arg->p1;
-		packet *p=arg->p2;
-		t_mutexLock(m->mutex);
-		if (m->ready){
-			t_mutexUnlock(m->mutex);
-			packetInitFast(p);
-			packetAddData(p, m->data,m->$data);
-			packetSend(p, c->sock);
-			clientMessageClear(m);
-			return d;
-		}
-		t_mutexUnlock(m->mutex);
-		return 0;
+
+	void client::messages_proceed(){
+		mutex.lock();
+			for (auto i=messages.begin(), end=messages.end();i!=end;){
+				client_message *m=*i;
+				m->mutex.lock();
+					if (m->ready){
+						packet p;
+						p.init(m->data, m->$data);
+						sock->send(&p);
+						messages.erase(i++);
+						delete m;
+					}else{
+						i++;
+					}
+				m->mutex.unlock();
+			}
+		mutex.unlock();
 	}
 
-	void clientMessagesProceed(client *c, void* (*me)(void* d, void * _c), void *a){
-		voidp2_t arg;
-		arg.p1=c;
-		arg.p2=a;
-		t_mutexLock(c->mutex);
-			worklistForEachRemove(&c->messages, me, &arg);
-		t_mutexUnlock(c->mutex);
-	}
-*/
 	
 	int client::set_info(user_info *u){
 		id=u->id;

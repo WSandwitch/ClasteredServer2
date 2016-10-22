@@ -11,7 +11,7 @@
 #define MSG_S_CLIENT_ATTRIBUTES_UNSET 8
 #define MSG_S_NEW_ID 9
 #define MSG_S_SERVER_READY 10
-
-void serverMessageProcessorInit();
-
+namespace master {
+	void serverMessageProcessorInit();
+}
 #endif

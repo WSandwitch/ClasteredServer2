@@ -35,9 +35,9 @@ namespace master {
 		int i;
 		packet p;
 		for(i=0;i<checks;i++){
-			if (s->sock.recv_check()!=0){
-				if (s->sock.recv(&p)>0){
-					s->proceed(p);//proceed packet
+			if (s->sock->recv_check()!=0){
+				if (s->sock->recv(&p)>0){
+					s->proceed(&p);//proceed packet
 				}else{
 					printf("Server %d connection lost\n", s->id);
 					storageSlaveSetBroken((char*)s->host.data(), s->port);//??
@@ -80,15 +80,14 @@ namespace master {
 	serverworkersAction(unpause)
 
 	void serverworkers::addWork(int n, server* work){
-		if (n>=0 && n<all.size())
+		if (n>=0 && n<(int)all.size())
 			all[n].add_work(work);
 	}
 
 	int serverworkers::addWorkAuto(server* work){
-		int i;
 		int n=0;
-		int $works=all[n].works.size();
-		for(i=0;i<all.size();i++){
+		unsigned $works=all[n].works.size();
+		for(int i=0, end=all.size();i<end;i++){
 			if (all[i].works.size()<$works){
 				$works=all[i].works.size();
 				n=i;
@@ -100,7 +99,8 @@ namespace master {
 
 	int serverworkers::create(int num, int TPS){
 		for(int i=0;i<num;i++){
-			std::string name="Server worker "+std::to_string(i);
+			std::string name="Server worker ";
+			name+=i;
 			serverworkers s(i, TPS, name);
 			all[i]=s;
 		}

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "../share/network/listener.h"
+#include "listeners.h"
 #include "../share/system/log.h"
 
 /*
@@ -10,6 +10,7 @@
 ║ jul 2016									                       ║
 ╚══════════════════════════════════════════════════════════════╝
 */
+using namespace share;
 
 namespace master{
 	
@@ -17,13 +18,13 @@ namespace master{
 
 	listener* listeners::add(listener* l){
 		if (l)
-			all[l->id]=l;
+			all.push_back(l);
 		return l;
 	}
 	
 	void listeners::clear(){
 		for (auto l:all){
-			delete l.second;
+			delete l;
 		}
 	}
 }

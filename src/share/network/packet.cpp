@@ -90,12 +90,16 @@ namespace share {
 		return buf.size();
 	}
 	
-	int packet::resize(){
-		return buf.resize();
+	void packet::resize(int s){
+		buf.resize(s);
 	}
 	
 	void* packet::data(){
 		return buf.data();
+	}
+	
+	FILE* packet::stream(){
+		return fmemopen(buf.data(), buf.size(), "r");
 	}
 	
 	bool packet::init(){
