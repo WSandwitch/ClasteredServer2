@@ -12,7 +12,9 @@ using namespace share;
 
 namespace master {
 
-	class serverworkers : workerbase<server*>{
+	class serverworkers;
+
+	class serverworkers : public workerbase<server*, serverworkers>{
 		using workerbase::start;
 		using workerbase::stop;
 		using workerbase::pause;
@@ -25,7 +27,7 @@ namespace master {
 			void* close();
 		
 			serverworkers(){};
-			serverworkers(int id, int tps, std::string &name):workerbase<server*>(id, tps, name){};
+			serverworkers(int id, int tps, std::string &name):workerbase<server*, serverworkers>(id, tps, name){};
 			static int create(int num, int TPS);
 			static void addWork(int num, server* work);
 			static int addWorkAuto(server* work);
@@ -40,7 +42,7 @@ namespace master {
 		private:
 			static int checks;
 		
-			static std::map<int, serverworkers> all;
+			static std::map<int, serverworkers*> all;
 	};
 }
 

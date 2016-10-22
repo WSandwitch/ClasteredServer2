@@ -11,7 +11,9 @@ using namespace share;
 
 namespace master {
 
-	class listenworkers : workerbase<listener*>{
+	class listenworkers;
+	
+	class listenworkers : public workerbase<listener*, listenworkers>{
 		using workerbase::start;
 		using workerbase::stop;
 		using workerbase::pause;
@@ -24,7 +26,7 @@ namespace master {
 			void* close();
 		
 			listenworkers(){};
-			listenworkers(int id, int tps, std::string &name):workerbase<listener*>(id, tps, name){};
+			listenworkers(int id, int tps, std::string name):workerbase<listener*, listenworkers>(id, tps, name){};
 			static int create(int num, int TPS);
 			static void addWork(int num, listener* work);
 			static void addWorkAll(listener* work);
@@ -43,7 +45,7 @@ namespace master {
 
 			static int checks;
 			
-			static std::map<int, listenworkers> all;
+			static std::map<int, listenworkers*> all;
 	};
 
 

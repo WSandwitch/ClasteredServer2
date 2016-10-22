@@ -23,7 +23,7 @@ using namespace share;
 
 namespace master {
 	
-	std::map<int, socketworkers> socketworkers::all;
+	std::map<int, socketworkers*> socketworkers::all;
 	int socketworkers::checks=10;
 
 	void socketworkers::init(){

@@ -9,7 +9,9 @@ using namespace share;
 
 namespace master {
 
-	class socketworkers : public workerbase<client*>{
+	class socketworkers;
+	
+	class socketworkers : public workerbase<client*, socketworkers>{
 		using workerbase::start;
 		using workerbase::stop;
 		using workerbase::pause;
@@ -22,7 +24,7 @@ namespace master {
 			void* close();
 		
 			socketworkers(){};
-			socketworkers(int id, int tps, std::string &name):workerbase<client*>(id, tps, name){};
+			socketworkers(int id, int tps, std::string name):workerbase<client*, socketworkers>(id, tps, name){};
 			static int create(int num, int TPS);
 			static void addWork(int num, client* work);
 			static int addWorkAuto(client* work);
@@ -37,7 +39,7 @@ namespace master {
 		private:
 			static int checks;
 		
-			static std::map<int, socketworkers> all;
+			static std::map<int, socketworkers*> all;
 	};
 		
 }

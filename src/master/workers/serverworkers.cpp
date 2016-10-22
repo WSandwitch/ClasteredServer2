@@ -20,7 +20,7 @@
 namespace master {
 	
 	int serverworkers::checks=10;
-	std::map<int, serverworkers> serverworkers::all;
+	std::map<int, serverworkers*> serverworkers::all;
 	
 	void serverworkers::init(){
 		//add some actions for every work elemens

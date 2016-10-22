@@ -28,12 +28,13 @@ using namespace share;
 
 namespace master {
 
-	std::map<int, listenworkers> listenworkers::all;
+	std::map<int, listenworkers*> listenworkers::all;
 	int listenworkers::checks=10;
 
 	void listenworkers::init(){
 		//add some actions for every work element
-		printLog("%s created\n",name.data());
+		printf("qwdasd\n");
+		printf("%s created\n",name.data());
 		memset(&set,0,sizeof(set));
 		FD_ZERO(&set);
 		maxfd=0;
@@ -131,7 +132,7 @@ namespace master {
 	#define listenworkersActionAll(action)\
 		void listenworkers::action ## All(){\
 			for(auto w:all)\
-				w.second.action();\
+				w.second->action();\
 		}
 
 	listenworkersActionAll(start)
@@ -142,7 +143,7 @@ namespace master {
 	#define listenworkersAction(action)\
 		void listenworkers::action(int n){\
 			if (n<(int)all.size() && n>=0)\
-				all[n].action();\
+				all[n]->action();\
 		}
 
 	listenworkersAction(start)
@@ -152,33 +153,34 @@ namespace master {
 
 	void listenworkers::addWorkAll(listener* work){
 		for(int i=0, end=all.size();i<end;i++)
-			all[i].add_work(work);
+			all[i]->add_work(work);
 	}
 
 	void listenworkers::addWork(int n, listener* work){
 		if (n>0 && n<(int)all.size())
-			all[n].add_work(work);
+			all[n]->add_work(work);
 	}
 
 	int listenworkers::addWorkAuto(listener* work){
 		int n=0;
-		unsigned $works=all[n].works.size();
+		unsigned $works=all[n]->works.size();
 		for(int i=0, end=all.size();i<end;i++){
-			if (all[i].works.size()<$works){
-				$works=all[i].works.size();
+			if (all[i]->works.size()<$works){
+				$works=all[i]->works.size();
 				n=i;
 			}
 		}
-		all[n].add_work(work);
+		all[n]->add_work(work);
 		return n;
 	}
 
 	int listenworkers::create(int num, int TPS){
+		char s[100];
 		for(int i=0;i<num;i++){
-			std::string name="Listener worker ";
-			name+=i;
-			listenworkers s(i, TPS, name);
-			all[i]=s;
+			sprintf(s,"Listener worker %d", i);
+			std::string name=s;
+			printf("qwqwq    %s\n", name.data());
+			all[i]=new listenworkers(i, TPS, name);
 		}
 		return 0;
 	}
