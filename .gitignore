@@ -1,3 +1,7 @@
+/master
+/slave
+/client/export
+
 # Compiled Object files
 *.slo
 *.lo

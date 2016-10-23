@@ -46,7 +46,8 @@ namespace master {
 				id(id), 
 				TPS(tps), 
 				recheck(0),
-				run(0)
+				run(0),
+				paused(0)
 			{
 				name=n;
 				if(pthread_create(&pid, 0, workerbaseThread, this)!=0)
@@ -87,10 +88,6 @@ namespace master {
 				share::sync tv;
 				short paused=0;
 				void* out=0;
-				
-				printf("%d\n",w->id);
-				printf("%d\n",w->name.data());
-				printf("%s\n\n",w->name.data());
 				w->init();
 				///set thread name
 				//pthread_setname_np(w->pid, w->name);

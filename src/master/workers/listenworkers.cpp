@@ -78,7 +78,7 @@ namespace master {
 					if (c==1){
 						s->recv(&c);//element type
 						if (c==6){
-							size=s->recv(&size);
+							s->recv(&size);
 							s->recv(buf, size);
 							buf[size]=0;
 							//check buf as client key
@@ -179,7 +179,6 @@ namespace master {
 		for(int i=0;i<num;i++){
 			sprintf(s,"Listener worker %d", i);
 			std::string name=s;
-			printf("qwqwq    %s\n", name.data());
 			all[i]=new listenworkers(i, TPS, name);
 		}
 		return 0;

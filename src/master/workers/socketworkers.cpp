@@ -60,6 +60,7 @@ namespace master {
 		packet p;
 //		clientMessagesProceed(c, clientMessageEach, &wd->packet);
 		c->messages_proceed();
+		printf("after messages\n");
 		for(i=0;i<checks;i++){
 			if (c->sock->recv_check()){
 				c->timestamp=time(0);
