@@ -27,7 +27,7 @@ namespace master {
 			void* close();
 		
 			serverworkers(){};
-			serverworkers(int id, int tps, std::string &name):workerbase<server*, serverworkers>(id, tps, name){};
+			serverworkers(int id, int tps, std::string name):workerbase<server*, serverworkers>(id, tps, name){};
 			static int create(int num, int TPS);
 			static void addWork(int num, server* work);
 			static int addWorkAuto(server* work);

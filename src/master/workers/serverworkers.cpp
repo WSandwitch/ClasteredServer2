@@ -60,7 +60,7 @@ namespace master {
 	#define serverworkersActionAll(action)\
 		void serverworkers::action ## All(){\
 			for(auto w:all)\
-				w.second.action();\
+				w.second->action();\
 		}
 
 	serverworkersActionAll(start)
@@ -71,7 +71,7 @@ namespace master {
 	#define serverworkersAction(action)\
 		void serverworkers::action(int n){\
 			if (n<(int)all.size() && n>=0)\
-				all[n].action();\
+				all[n]->action();\
 		}
 
 	serverworkersAction(start)
@@ -81,28 +81,27 @@ namespace master {
 
 	void serverworkers::addWork(int n, server* work){
 		if (n>=0 && n<(int)all.size())
-			all[n].add_work(work);
+			all[n]->add_work(work);
 	}
 
 	int serverworkers::addWorkAuto(server* work){
 		int n=0;
-		unsigned $works=all[n].works.size();
+		unsigned $works=all[n]->works.size();
 		for(int i=0, end=all.size();i<end;i++){
-			if (all[i].works.size()<$works){
-				$works=all[i].works.size();
+			if (all[i]->works.size()<$works){
+				$works=all[i]->works.size();
 				n=i;
 			}
 		}
-		all[n].add_work(work);
+		all[n]->add_work(work);
 		return n;
 	}
 
 	int serverworkers::create(int num, int TPS){
+		char str[100];
 		for(int i=0;i<num;i++){
-			std::string name="Server worker ";
-			name+=i;
-			serverworkers s(i, TPS, name);
-			all[i]=s;
+			sprintf(str,"Server worker %d", i);
+			all[i]=new serverworkers(i, TPS, std::string(str));
 		}
 		return 0;
 	}

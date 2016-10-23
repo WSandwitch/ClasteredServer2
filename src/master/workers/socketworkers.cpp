@@ -94,7 +94,7 @@ namespace master {
 	#define socketworkersActionAll(action)\
 		void socketworkers::action ## All(){\
 			for(auto w:all)\
-				w.second.action();\
+				w.second->action();\
 		}
 
 	socketworkersActionAll(start)
@@ -105,7 +105,7 @@ namespace master {
 	#define socketworkersAction(action)\
 		void socketworkers::action(int n){\
 			if (n<(int)all.size() && n>=0)\
-				all[n].action();\
+				all[n]->action();\
 		}
 
 	socketworkersAction(start)
@@ -115,7 +115,7 @@ namespace master {
 
 	void socketworkers::addWork(int n, client *work){
 		if (n<(int)all.size())
-			all[n].add_work(work);
+			all[n]->add_work(work);
 	}
 
 	int socketworkers::addWorkAuto(client *work){
@@ -123,23 +123,22 @@ namespace master {
 		int n=0;
 		if (all.size()==0)
 			return -1;
-		unsigned $works=all[n].works.size();
+		unsigned $works=all[n]->works.size();
 		for(i=0;i<all.size();i++){
-			if (all[i].works.size()<$works){
-				$works=all[i].works.size();
+			if (all[i]->works.size()<$works){
+				$works=all[i]->works.size();
 				n=i;
 			}
 		}
-		all[n].add_work(work);
+		all[n]->add_work(work);
 		return n;
 	}
 
 	int socketworkers::create(int num, int TPS){
+		char str[100];
 		for(int i=0;i<num;i++){
-			std::string name="Client worker ";
-			name+=i;
-			socketworkers s(i, TPS, name);
-			all[i]=s;
+			sprintf(str, "Client worker %d", i);
+			all[i]=new socketworkers(i, TPS, std::string(str));
 		}
 		return 0;
 	}
