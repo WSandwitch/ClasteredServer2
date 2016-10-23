@@ -128,7 +128,7 @@ namespace master {
 						w->mutex.lock();
 							for (auto i=w->works.begin(), end=w->works.end();i!=end;){
 								if (w->proceed(*i)){
-									i=w->works.erase(i);
+									w->works.erase(i++);
 								}else{
 									++i;
 								}

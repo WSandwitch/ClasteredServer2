@@ -84,8 +84,7 @@ namespace master {
 							//check buf as client key
 							//send answer
 							c=1;
-							p.add(c);
-							p.add(c);
+							p.setType(c);
 							p.add(c);
 							p.add(c);
 							s->send(&p);//[1,1,1,1]

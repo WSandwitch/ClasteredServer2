@@ -121,6 +121,7 @@ namespace master {
 					s->clients_add(this);
 				}else{
 					delete sock;
+					sock=0;
 					printf("client %d server %d error\n", id, withLock(mutex, server_id));
 					return 1;
 				}

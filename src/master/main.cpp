@@ -32,7 +32,7 @@
 using namespace share;
 
 using namespace master; 
-int main_loop;
+static int main_loop;
 
 log_config* mainLogConfig(){
 	return &config.log;

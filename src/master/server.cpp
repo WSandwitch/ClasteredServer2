@@ -24,7 +24,7 @@ namespace master {
 	share::mutex server::m;
 
 	
-	server::server(socket* sock, std::string host, int port):sock(sock), host(host), port(port){
+	server::server(socket* sock, std::string host, int port):checked(0), ready(0), sock(sock), host(host), port(port){
 		id=idByAddress(host,port);
 		printf("server %d created\n", id);
 	}

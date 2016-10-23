@@ -13,6 +13,9 @@ port = 8000#gets.to_i
 #login="qwer"
 
 def auth(s, login)
+	au="ruby test"
+	s.write [au.size+2+3,0,1,6,au.size].pack("vcccv")
+	s.write au
 	#puts connected
 	s.write [9,0,1,6,login.size].pack("vcccv")
 	s.write login

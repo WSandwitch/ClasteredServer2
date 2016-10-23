@@ -236,7 +236,7 @@ namespace share {
 	}
 	
 	bool socket::recv_check(){//TODO: check why it doesn't work
-/*		pollfd poll_set;
+		pollfd poll_set;
 		poll_set.fd = sockfd;
 		poll_set.events = POLLIN;
 		poll_set.revents = 0;
@@ -249,8 +249,8 @@ namespace share {
 			return 1;
 		}
 		return 0;
-*/		
-		char $;
+		
+/*		char $;
 		if (withLock(mutex.read, ::recv(sockfd, &$, sizeof($), MSG_PEEK|MSG_DONTWAIT))<0){
 			if (errno!=EAGAIN){
 				return 1;
@@ -259,6 +259,7 @@ namespace share {
 			}
 		}
 		return 1;
+*/
 	}
 	
 }
