@@ -50,7 +50,7 @@ namespace master {
 			if(select(maxfd+1, &set, 0, 0, &t)>0){
 				for (auto l:works){
 					if (FD_ISSET(l->listenerfd, &set)){
-						if ((sockfd = accept(l->listenerfd, 0, 0))<0){
+						if ((sockfd = ::accept(l->listenerfd, 0, 0))<0){
 							perror("accept");
 							l->broken=1;
 						}else{

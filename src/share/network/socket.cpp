@@ -29,8 +29,7 @@ extern "C"{
 
 namespace share {
 	
-	socket::socket(int sock){
-		sockfd=sock;
+	socket::socket(int sock):sockfd(sock){
 	}
 
 	socket::~socket(){
@@ -236,14 +235,30 @@ namespace share {
 		return new socket(sockfd);
 	}
 	
-	bool socket::recv_check(){
-		struct pollfd poll_set;
+	bool socket::recv_check(){//TODO: check why it doesn't work
+/*		pollfd poll_set;
 		poll_set.fd = sockfd;
 		poll_set.events = POLLIN;
 		poll_set.revents = 0;
-		if (::poll(&poll_set, 1, 1)>0)
+		printf("%d\n", sockfd);
+		int res;
+		if ((res=::poll(&poll_set, 1, 1))!=0){
+			if (res<0){
+				perror("poll");
+			}
 			return 1;
+		}
 		return 0;
+*/		
+		char $;
+		if (withLock(mutex.read, ::recv(sockfd, &$, sizeof($), MSG_PEEK|MSG_DONTWAIT))<0){
+			if (errno!=EAGAIN){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
+		return 1;
 	}
 	
 }

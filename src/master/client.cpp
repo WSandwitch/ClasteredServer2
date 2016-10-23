@@ -29,7 +29,16 @@ namespace master {
 
 
 
-	client::client(socket *sock):sock(sock){}
+	client::client(socket *sock):
+		id(0),	
+		broken(0),
+		sock(sock),
+		timestamp(0)
+	{
+		name[0]=0;
+		login[0]=0;
+		passwd[0]=0;
+	}
 	
 	client::~client(){
 		mutex.lock();
