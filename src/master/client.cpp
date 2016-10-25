@@ -165,7 +165,7 @@ namespace master {
 		}
 	}
 
-	client_message::client_message(void* buf, short size){
+	client_message::client_message(void* buf, short size):ready(0){
 		$data=size;
 		if ((data=(char*)malloc(sizeof(*data)*($data+1)))==0){
 			perror("malloc");

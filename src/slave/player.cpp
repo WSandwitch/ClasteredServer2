@@ -12,7 +12,7 @@ namespace clasteredServerSlave{
 
 	player::player(int id): id(id), connected(0), npc(0){
 		//add position get, check and redirest to write server
-		for(std::map<int, clasteredServerSlave::npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+		for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 			clasteredServerSlave::npc* n=it->second;
 			if (n && n->owner_id==id){
 				npc=n;
@@ -45,7 +45,7 @@ namespace clasteredServerSlave{
 	}		
 	
 	void player::sendUpdates(){
-		for(std::map<int, clasteredServerSlave::npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+		for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 			clasteredServerSlave::npc* n=it->second;
 			if (n){
 				n->m.lock();

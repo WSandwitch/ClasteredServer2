@@ -24,7 +24,13 @@ namespace master {
 	share::mutex server::m;
 
 	
-	server::server(socket* sock, std::string host, int port):checked(0), ready(0), sock(sock), host(host), port(port){
+	server::server(socket* sock, std::string host, int port):
+		checked(0), 	
+		ready(0), 
+		sock(sock), 
+		host(host), 
+		port(port)
+	{
 		id=idByAddress(host,port);
 		printf("server %d created\n", id);
 	}
@@ -101,10 +107,16 @@ namespace master {
 
 	static int checkSlaves(slave_info *si, void *arg){
 		int id=server::idByAddress(si->host, si->port);
-		server *s=server::get(id);
+		server *s=0;
+		try{
+			s=server::all.at(id);
+		}catch(...){
+			s=0;
+		}
 	//	printf("check server %d, got %d\n", id, s);
 		if (s==0){
 			std::string host(si->host);
+			
 			if ((s=server::create(host, si->port))!=0){
 				server::add(s);
 				//fist message to serer is server_connected 
@@ -128,7 +140,7 @@ namespace master {
 					l.push_back(i.second);
 				}
 			}
-		m.lock();
+		m.unlock();
 		for (auto s:l){
 			s->sock->close();
 		}

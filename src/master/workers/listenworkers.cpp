@@ -33,7 +33,6 @@ namespace master {
 
 	void listenworkers::init(){
 		//add some actions for every work element
-		printf("qwdasd\n");
 		printf("%s created\n",name.data());
 		memset(&set,0,sizeof(set));
 		FD_ZERO(&set);

@@ -161,7 +161,6 @@ int main(int argc,char* argv[]){
 	listenworkers::startAll();
 	socketworkers::startAll();
 	serverworkers::startAll();
-	
 	//test
 //	listenersForEach(proceedListener);
 	for (auto l:listeners::all){

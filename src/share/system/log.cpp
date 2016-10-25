@@ -14,8 +14,8 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
-log_config::log_config(): debug(1){
-	memset(file, 0, sizeof(file));
+log_config::log_config():debug(1){
+	file[0]=0;
 	//Add fopen...
 }
 log_config log_config::config;

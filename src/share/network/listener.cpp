@@ -21,7 +21,7 @@ extern "C"{
 
 namespace share {
 	
-	listener::listener(int port){
+	listener::listener(int port): broken(0){
 		struct sockaddr_in addr;
 //		printf("listener start on %d\n", port);
 		if((listenerfd = ::socket(AF_INET, SOCK_STREAM, 0))<0){

@@ -2,11 +2,8 @@
 #define LISTENERS_HEADER
 
 #include <vector>
-
 #include "../share/system/mutex.h"
 #include "../share/network/listener.h"
-
-using namespace share;
 
 namespace master {
 	class listeners{
@@ -14,17 +11,17 @@ namespace master {
 			static std::vector<share::listener*> all;
 			static share::mutex m;
 		
-			static listener* add(share::listener* l);
+			static share::listener* add(share::listener* l);
 			static void clear();
 	};
 }
 
-void listenersInit();
+//void listenersInit();
 
-void listenersClear();
+//void listenersClear();
 
-listener* listenersAdd(share::listener* l);
+//listener* listenersAdd(share::listener* l);
 
-void listenersForEach(void*(f)(listener *l, void *arg));
+//void listenersForEach(void*(f)(share::listener *l, void *arg));
 
 #endif

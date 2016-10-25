@@ -118,7 +118,7 @@ int main(int argc, char* argv[]){
 		syncer.timePassed();
 		//now move
 		world::m.lock();
-			for(std::map<int, npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+			for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 				npc* n=it->second;
 //				printf("n %d\n",n);
 				if (n){
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]){
 //		world::m.unlock();
 		//attack
 //		world::m.lock();
-			for(std::map<int, npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+			for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 				npc* n=it->second;
 //				printf("n %d\n",n);
 				if (n){
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]){
 //		world::m.unlock();
 		//send data to players
 //		world::m.lock();
-			for(std::map<int, player*>::iterator it = world::players.begin(), end = world::players.end();it != end; ++it){
+			for(auto it = world::players.begin(), end = world::players.end();it != end; ++it){
 				player *p=it->second;
 				if (p && withLock(p->m, p->connected)){
 					p->sendUpdates();
@@ -157,7 +157,7 @@ int main(int argc, char* argv[]){
 //		world::m.unlock();
 		//check areas
 //		world::m.lock();
-			for(std::map<int, npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+			for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 				npc *n=it->second;
 				if (n){
 					int oid=n->gridOwner();
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]){
 //		world::m.unlock();
 		//clear flags
 //		world::m.lock();
-			for(std::map<int, npc*>::iterator it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
+			for(auto it = world::npcs.begin(), end = world::npcs.end();it != end; ++it){
 				npc* n=it->second;
 				if (n){
 					if (withLock(n->m, n->clear())){
