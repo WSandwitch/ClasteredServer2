@@ -63,7 +63,7 @@ namespace share {
 	}
 	
 	int socket::send(packet* p){
-		short size=byteSwap(p->size()-sizeof(short));
+		short size=p->size()-sizeof(short);
 		if (!p->client)
 			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
 		size=byteSwap(size);
@@ -173,13 +173,13 @@ namespace share {
 		}else{
 			if (recv(buf, size)<=0)
 				return 0;
-			
-/*			printf("recv ");
-			for(int i=0;i<size;i++){
-				printf("%d,", buf[i]);
-			} 
-			printf("\n");
-*/
+/////			
+//		printf("recv \n");
+//			for(int i=0;i<size;i++){
+//				printf("%d,\n", buf[i]);
+//			} 
+//			printf("\n");
+/////
 			p->init(buf,size);
 			if (!p->client){//TODO:remove
 				if (recv(&p->dest.type, sizeof(p->dest.type))<=0)
@@ -189,7 +189,7 @@ namespace share {
 			}
 			free(buf);
 		}
-		return size+sizeof(short)+sizeof(char)+sizeof(int);
+		return size;
 	}
 
 	void socket::lockRead(){

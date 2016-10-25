@@ -49,12 +49,12 @@ namespace master {
 		printf("client auth\n");
 		if (f){	
 			size=fread(&c,1,sizeof(c),f);//
-	//		printf("%d\n",c);
+//			printf("%d\n",c);
 			size=fread(&c,1,sizeof(c),f);
-	//		printf("%d\n",c);
+//			printf("%d\n",c);
 			size=fread(&c,1,sizeof(c),f);
 			size=fread(&c,1,sizeof(c),f);
-	//		printf("%d\n",c);
+//			printf("%d\n",c);
 			do{
 				if (c==1){
 					user_info u;
@@ -89,13 +89,13 @@ namespace master {
 							client::add(cl);
 							share::MD5::create((char*)&tokenbase, sizeof(tokenbase), cl->token); //add normal token
 							s=share::base64::encode((unsigned char*)cl->token, (unsigned char*)token,16, 0);
-							packet p;
-							p.setType((char)MSG_C_AUTH_TOKEN);
+							packet p(1);
+							p.setType(MSG_C_AUTH_TOKEN);
 		//					packetAddNumber(p,s);
-		//					packetAddData(p,token,s);
-							std::string ts(token);
-							p.add(ts); 
-							cl->messages_add(new client_message(p.data(), p.size()));
+							p.add((char*)token, s);
+//							std::string ts(token);
+//							p.add(ts); 
+							cl->messages_add(new client_message((char*)p.data(), p.size()));
 							break;
 						}
 					}
@@ -117,8 +117,8 @@ namespace master {
 						if (strcmp(buf,token)==0){//add normal token check
 							//auth ok
 							fclose(f);
-							packet p;
-							p.setType((char)MSG_C_USER_INFO);
+							packet p(1);
+							p.setType(MSG_C_USER_INFO);
 							p.add(cl->id);
 							//packetAddString(p, cl->name);
 							//add other params

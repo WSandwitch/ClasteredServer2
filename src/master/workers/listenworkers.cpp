@@ -85,7 +85,6 @@ namespace master {
 							c=1;
 							p.setType(c);
 							p.add(c);
-							p.add(c);
 							s->send(&p);//[1,1,1,1]
 							printf("%s: got %s, client go to worker\n", name.data(), buf);
 							socketworkers::addWorkAuto(new client(s));//after that client must get id

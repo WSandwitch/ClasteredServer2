@@ -29,6 +29,23 @@ namespace master {
 
 
 
+	client_message::client_message(void* buf, short size):ready(0){
+		$data=size;
+		if ((data=(char*)malloc(sizeof(*data)*($data+1)))==0){
+			perror("malloc");
+		}
+		memcpy(data, buf, $data);
+		data[$data]=0;
+		//packetAddData(&m->packet,buf,size);
+	}
+
+	client_message::~client_message(){
+		withLock(mutex, num--);
+		if (withLock(mutex, num==0)){	
+			free(data);
+		}
+	}
+
 	client::client(socket *sock):
 		id(0),	
 		broken(0),
@@ -165,23 +182,6 @@ namespace master {
 		}
 	}
 
-	client_message::client_message(void* buf, short size):ready(0){
-		$data=size;
-		if ((data=(char*)malloc(sizeof(*data)*($data+1)))==0){
-			perror("malloc");
-		}
-		memcpy(data, buf, $data);
-		data[$data]=0;
-		//packetAddData(&m->packet,buf,size);
-	}
-
-	client_message::~client_message(){
-		withLock(mutex, num--);
-		if (withLock(mutex, num==0)){	
-			free(data);
-		}
-	}
-
 	void clientChatsAdd(client* cl, void* _c){
 /*		chat *c=_c;
 		t_mutexLock(cl->mutex);
@@ -221,7 +221,7 @@ namespace master {
 				client_message *m=*i;
 				m->mutex.lock();
 					if (m->ready){
-						packet p;
+						packet p(1);
 						p.init(m->data, m->$data);
 						sock->send(&p);
 						messages.erase(i++);
