@@ -66,6 +66,7 @@ namespace master {
 				c->timestamp=time(0);
 				do{
 					if (c->sock->recv(&p)){
+						printf("got message %d\n", ((char*)p.data())[0]);
 						if (c->proceed(&p)==0)
 							break;
 					}

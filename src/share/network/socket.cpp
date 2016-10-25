@@ -1,6 +1,7 @@
 
 #include "socket.h"
 #include "bytes_order.h"
+#include "../system/log.h"
 extern "C"{
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -62,7 +63,10 @@ namespace share {
 	}
 	
 	int socket::send(packet* p){
-		short size=byteSwap(p->size()+sizeof(p->dest.type)+sizeof(p->dest.id));
+		short size=byteSwap(p->size()-sizeof(short));
+		if (!p->client)
+			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
+		size=byteSwap(size);
 		int flag=1;
 		int result=1;
 		char* data=(char*)malloc(p->size()+sizeof(p->dest.type)+sizeof(p->dest.id)+sizeof(size));
@@ -156,10 +160,12 @@ namespace share {
 
 	int socket::recv(packet* p){
 		short size;
-		if (recv(&size, sizeof(size))<=0)
+		if (recv(&size)<=0)
 			return 0;
-		size=byteSwap(size);
-		size-=sizeof(char)+sizeof(int);
+		printf("packet size %d\n", size);
+		if (!p->client){
+			size-=sizeof(char)+sizeof(int);
+		}
 		char* buf=(char*)malloc(size);
 		memset(buf, 0, size);
 		if (!buf){
@@ -240,7 +246,6 @@ namespace share {
 		poll_set.fd = sockfd;
 		poll_set.events = POLLIN;
 		poll_set.revents = 0;
-		printf("%d\n", sockfd);
 		int res;
 		if ((res=::poll(&poll_set, 1, 1))!=0){
 			if (res<0){
