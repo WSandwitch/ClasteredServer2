@@ -134,7 +134,9 @@ namespace master {
 			for (auto i:all){
 				i.second->checked=0;
 			}
-			storageSlaves(checkSlaves, 0);
+		m.unlock();
+		storageSlaves(checkSlaves, 0);
+		m.lock();
 			for (auto i:all){
 				if (i.second->checked==0){
 					l.push_back(i.second);
