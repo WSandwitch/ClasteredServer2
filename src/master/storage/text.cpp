@@ -85,6 +85,7 @@
 					printf("error in %s on line %d\n", files.slaves, i);
 					continue;
 				}
+
 				$(&s, arg);
 			}
 			fclose(f);

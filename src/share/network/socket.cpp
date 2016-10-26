@@ -1,6 +1,7 @@
 
 #include "socket.h"
 #include "bytes_order.h"
+#include "../system/log.h"
 extern "C"{
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -29,8 +30,7 @@ extern "C"{
 
 namespace share {
 	
-	socket::socket(int sock){
-		sockfd=sock;
+	socket::socket(int sock):sockfd(sock){
 	}
 
 	socket::~socket(){
@@ -63,7 +63,10 @@ namespace share {
 	}
 	
 	int socket::send(packet* p){
-		short size=byteSwap(p->size()+sizeof(p->dest.type)+sizeof(p->dest.id));
+		short size=p->size();
+		if (!p->client)
+			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
+		size=byteSwap(size);
 		int flag=1;
 		int result=1;
 		char* data=(char*)malloc(p->size()+sizeof(p->dest.type)+sizeof(p->dest.id)+sizeof(size));
@@ -122,7 +125,7 @@ namespace share {
 			if((got=::recv(sockfd,(char*)buf+(size-need),need,0))<=0)
 				if (errno!=EAGAIN)
 					return -1;
-	//		printf("got %d\n", got);
+//			printf("got %d\n", got);
 		}while(need>0);
 		return size;
 	}
@@ -157,24 +160,27 @@ namespace share {
 
 	int socket::recv(packet* p){
 		short size;
-		if (recv(&size, sizeof(size))<=0)
+		if (recv(&size)<=0)
 			return 0;
-		size=byteSwap(size);
-		size-=sizeof(char)+sizeof(int);
+//		printf("packet size %d\n", size);
+		if (!p->client){
+			size-=sizeof(char)+sizeof(int);
+		}
 		char* buf=(char*)malloc(size);
-		memset(buf, 0, size);
 		if (!buf){
 			return 0;
 		}else{
+			memset(buf, 0, size);
+//			printf("try to recv\n");
 			if (recv(buf, size)<=0)
 				return 0;
-			
-/*			printf("recv ");
-			for(int i=0;i<size;i++){
-				printf("%d,", buf[i]);
-			} 
-			printf("\n");
-*/
+/////			
+//		printf("recv \n");
+//			for(int i=0;i<size;i++){
+//				printf("%d,\n", buf[i]);
+//			} 
+//			printf("\n");
+/////
 			p->init(buf,size);
 			if (!p->client){//TODO:remove
 				if (recv(&p->dest.type, sizeof(p->dest.type))<=0)
@@ -184,7 +190,7 @@ namespace share {
 			}
 			free(buf);
 		}
-		return size+sizeof(short)+sizeof(char)+sizeof(int);
+		return size;
 	}
 
 	void socket::lockRead(){
@@ -236,14 +242,30 @@ namespace share {
 		return new socket(sockfd);
 	}
 	
-	bool socket::recv_check(){
-		struct pollfd poll_set;
+	bool socket::recv_check(){//TODO: check why it doesn't work
+		pollfd poll_set;
 		poll_set.fd = sockfd;
 		poll_set.events = POLLIN;
 		poll_set.revents = 0;
-		if (::poll(&poll_set, 1, 1)>0)
+		int res;
+		if ((res=::poll(&poll_set, 1, 1))!=0){
+			if (res<0){
+				perror("poll");
+			}
 			return 1;
+		}
 		return 0;
+		
+/*		char $;
+		if (withLock(mutex.read, ::recv(sockfd, &$, sizeof($), MSG_PEEK|MSG_DONTWAIT))<0){
+			if (errno!=EAGAIN){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
+		return 1;
+*/
 	}
 	
 }

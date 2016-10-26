@@ -38,7 +38,7 @@ namespace clasteredServerSlave {
 	clasteredServerSlave::map world::map(10,10);
 	std::queue<int> world::ids;
 	std::list<npc*>world:: new_npcs;
-	std::map<int, npc*>world:: npcs;
+	std::unordered_map<int, npc*>world:: npcs;
 	std::map<int, player*> world::players;
 
 	void world::init(){

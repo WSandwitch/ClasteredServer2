@@ -33,7 +33,6 @@ namespace master {
 
 	void listenworkers::init(){
 		//add some actions for every work element
-		printf("qwdasd\n");
 		printf("%s created\n",name.data());
 		memset(&set,0,sizeof(set));
 		FD_ZERO(&set);
@@ -50,7 +49,7 @@ namespace master {
 			if(select(maxfd+1, &set, 0, 0, &t)>0){
 				for (auto l:works){
 					if (FD_ISSET(l->listenerfd, &set)){
-						if ((sockfd = accept(l->listenerfd, 0, 0))<0){
+						if ((sockfd = ::accept(l->listenerfd, 0, 0))<0){
 							perror("accept");
 							l->broken=1;
 						}else{
@@ -84,9 +83,7 @@ namespace master {
 							//check buf as client key
 							//send answer
 							c=1;
-							p.add(c);
-							p.add(c);
-							p.add(c);
+							p.setType(c);
 							p.add(c);
 							s->send(&p);//[1,1,1,1]
 							printf("%s: got %s, client go to worker\n", name.data(), buf);

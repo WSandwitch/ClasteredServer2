@@ -32,7 +32,7 @@
 using namespace share;
 
 using namespace master; 
-int main_loop;
+static int main_loop;
 
 log_config* mainLogConfig(){
 	return &config.log;
@@ -161,7 +161,6 @@ int main(int argc,char* argv[]){
 	listenworkers::startAll();
 	socketworkers::startAll();
 	serverworkers::startAll();
-	
 	//test
 //	listenersForEach(proceedListener);
 	for (auto l:listeners::all){

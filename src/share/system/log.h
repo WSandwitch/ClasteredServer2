@@ -15,6 +15,7 @@ struct log_config{
 void printLog(const char* format, ...);
 
 #define printf printLog
+#define printRaw printf
 
 #define perror(str) printLog("%s at %s <%s:%d>\n",str,__FUNCTION__,__FILE__,__LINE__)
 

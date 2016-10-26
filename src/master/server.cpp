@@ -24,7 +24,13 @@ namespace master {
 	share::mutex server::m;
 
 	
-	server::server(socket* sock, std::string host, int port):sock(sock), host(host), port(port){
+	server::server(socket* sock, std::string host, int port):
+		checked(0), 	
+		ready(0), 
+		sock(sock), 
+		host(host), 
+		port(port)
+	{
 		id=idByAddress(host,port);
 		printf("server %d created\n", id);
 	}
@@ -101,10 +107,16 @@ namespace master {
 
 	static int checkSlaves(slave_info *si, void *arg){
 		int id=server::idByAddress(si->host, si->port);
-		server *s=server::get(id);
+		server *s=0;
+		try{
+			s=server::all.at(id);
+		}catch(...){
+			s=0;
+		}
 	//	printf("check server %d, got %d\n", id, s);
 		if (s==0){
 			std::string host(si->host);
+			
 			if ((s=server::create(host, si->port))!=0){
 				server::add(s);
 				//fist message to serer is server_connected 
@@ -122,13 +134,15 @@ namespace master {
 			for (auto i:all){
 				i.second->checked=0;
 			}
-			storageSlaves(checkSlaves, 0);
+		m.unlock();
+		storageSlaves(checkSlaves, 0);
+		m.lock();
 			for (auto i:all){
 				if (i.second->checked==0){
 					l.push_back(i.second);
 				}
 			}
-		m.lock();
+		m.unlock();
 		for (auto s:l){
 			s->sock->close();
 		}
@@ -158,8 +172,8 @@ namespace master {
 			//remove client data from the end
 			short size=p->size();
 	//		printf("got message size %d\n", size);
-			int _id=*((typeof(_id)*)((char*)buf+(size-=sizeof(_id))));//check for write size size
-			char dir=*((typeof(dir)*)((char*)buf+(size-=sizeof(dir))));
+			int _id=p->dest.id;
+			char dir=p->dest.type;
 			if (dir==MSG_CLIENT){ //redirect packet to client
 	//			printf("redirect to client %d\n", _id);
 				client* c=0;

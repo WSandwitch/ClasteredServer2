@@ -53,6 +53,7 @@ namespace share {
 			bool add(float);
 			bool add(double);
 			bool add(std::string);
+			bool add(char*, short);
 			bool add(void*, short size);
 		private: 
 			std::vector<char> buf;

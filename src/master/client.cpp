@@ -29,7 +29,33 @@ namespace master {
 
 
 
-	client::client(socket *sock):sock(sock){}
+	client_message::client_message(void* buf, short size):ready(0){
+		$data=size;
+		if ((data=(char*)malloc(sizeof(*data)*($data+1)))==0){
+			perror("malloc");
+		}
+		memcpy(data, buf, $data);
+		data[$data]=0;
+		//packetAddData(&m->packet,buf,size);
+	}
+
+	client_message::~client_message(){
+		withLock(mutex, num--);
+		if (withLock(mutex, num==0)){	
+			free(data);
+		}
+	}
+
+	client::client(socket *sock):
+		id(0),	
+		broken(0),
+		sock(sock),
+		timestamp(0)
+	{
+		name[0]=0;
+		login[0]=0;
+		passwd[0]=0;
+	}
 	
 	client::~client(){
 		mutex.lock();
@@ -105,6 +131,7 @@ namespace master {
 			//add client data to the end
 			p->dest.type=MSG_CLIENT;
 			p->dest.id=id;
+			p->client=0;
 			server* s=server::get(withLock(mutex, server_id));
 			if (s==0){
 				int id=server::getIdAuto();
@@ -112,6 +139,7 @@ namespace master {
 					s->clients_add(this);
 				}else{
 					delete sock;
+					sock=0;
 					printf("client %d server %d error\n", id, withLock(mutex, server_id));
 					return 1;
 				}
@@ -155,23 +183,6 @@ namespace master {
 		}
 	}
 
-	client_message::client_message(void* buf, short size){
-		$data=size;
-		if ((data=(char*)malloc(sizeof(*data)*($data+1)))==0){
-			perror("malloc");
-		}
-		memcpy(data, buf, $data);
-		data[$data]=0;
-		//packetAddData(&m->packet,buf,size);
-	}
-
-	client_message::~client_message(){
-		withLock(mutex, num--);
-		if (withLock(mutex, num==0)){	
-			free(data);
-		}
-	}
-
 	void clientChatsAdd(client* cl, void* _c){
 /*		chat *c=_c;
 		t_mutexLock(cl->mutex);
@@ -209,17 +220,15 @@ namespace master {
 		mutex.lock();
 			for (auto i=messages.begin(), end=messages.end();i!=end;){
 				client_message *m=*i;
-				m->mutex.lock();
-					if (m->ready){
-						packet p;
-						p.init(m->data, m->$data);
-						sock->send(&p);
-						messages.erase(i++);
-						delete m;
-					}else{
-						i++;
-					}
-				m->mutex.unlock();
+				if (withLock(m->mutex, m->ready)){
+					packet p(1);
+					p.init(m->data, m->$data);
+					sock->send(&p);
+					messages.erase(i++);
+					delete m;
+				}else{
+					i++;
+				}
 			}
 		mutex.unlock();
 	}

@@ -1,6 +1,7 @@
 #ifndef CLASTERED_SERVER_GRID_HEADER
 #define CLASTERED_SERVER_GRID_HEADER
 
+#include <map>
 
 extern "C" {
 

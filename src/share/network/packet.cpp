@@ -185,12 +185,17 @@ namespace share {
 	}
 	
 	bool packet::add(std::string a){
-		if (size()+sizeof(char)+sizeof(short)+a.size()>MAX_SIZE)
+		add((char*)a.data(), a.size());
+		return 0;
+	}
+	
+	bool packet::add(char* data, short s){
+		if (size()+sizeof(char)+sizeof(short)+s>MAX_SIZE)
 			return 1;
-		short size=byteSwap(a.size());
+		short size=byteSwap(s);
 		buf.push_back(6);
 		buf.insert(buf.end(), (char*)&size, (char*)(&size+1));
-		buf.insert(buf.end(), a.begin(), a.end());
+		buf.insert(buf.end(), data, data+s);
 		buf[1]=buf[1]+1>125?-1:buf[1]+1;
 		return 0;
 	}

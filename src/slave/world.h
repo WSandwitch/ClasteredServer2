@@ -2,6 +2,7 @@
 #define CLASTERED_SERVER_SLAVE_WORLD_HEADER
 
 #include <map>
+#include <unordered_map>
 #include <list>
 #include <queue>
 #include <vector>
@@ -52,7 +53,7 @@ namespace clasteredServerSlave {
 		static clasteredServerSlave::map map;
 		static std::queue<int> ids;
 		static std::list<npc*> new_npcs;
-		static std::map<int, npc*> npcs;
+		static std::unordered_map<int, npc*> npcs;
 		static std::map<int, player*> players;
 		
 		static void init();

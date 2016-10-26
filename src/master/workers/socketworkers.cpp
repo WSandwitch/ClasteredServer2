@@ -57,15 +57,16 @@ namespace master {
 	void* socketworkers::proceed(client *c){
 		server *s;
 		int i;
-		packet p;
+		packet p(1);
 //		clientMessagesProceed(c, clientMessageEach, &wd->packet);
 		c->messages_proceed();
-		printf("after messages\n");
 		for(i=0;i<checks;i++){
-			if (c->sock->recv_check()){
+			if (c->sock->recv_check()){//WHY it doesn't enter here?
+//				printf("can read\n");
 				c->timestamp=time(0);
 				do{
-					if (c->sock->recv(&p)>0){
+					if (c->sock->recv(&p)){
+						printf("got message %d\n", ((char*)p.data())[0]);
 						if (c->proceed(&p)==0)
 							break;
 					}
@@ -79,8 +80,10 @@ namespace master {
 					printf("error with client\n");
 					return c;
 				}while(0);
-			}else
+			}else{
+//				printf("can't read\n");
 				break;
+			}
 		}
 		if (i>=checks)
 			recheck=1;
