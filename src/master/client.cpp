@@ -131,6 +131,7 @@ namespace master {
 			//add client data to the end
 			p->dest.type=MSG_CLIENT;
 			p->dest.id=id;
+			p->client=0;
 			server* s=server::get(withLock(mutex, server_id));
 			if (s==0){
 				int id=server::getIdAuto();
@@ -219,17 +220,15 @@ namespace master {
 		mutex.lock();
 			for (auto i=messages.begin(), end=messages.end();i!=end;){
 				client_message *m=*i;
-				m->mutex.lock();
-					if (m->ready){
-						packet p(1);
-						p.init(m->data, m->$data);
-						sock->send(&p);
-						messages.erase(i++);
-						delete m;
-					}else{
-						i++;
-					}
-				m->mutex.unlock();
+				if (withLock(m->mutex, m->ready)){
+					packet p(1);
+					p.init(m->data, m->$data);
+					sock->send(&p);
+					messages.erase(i++);
+					delete m;
+				}else{
+					i++;
+				}
 			}
 		mutex.unlock();
 	}

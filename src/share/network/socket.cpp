@@ -162,7 +162,7 @@ namespace share {
 		short size;
 		if (recv(&size)<=0)
 			return 0;
-		printf("packet size %d\n", size);
+//		printf("packet size %d\n", size);
 		if (!p->client){
 			size-=sizeof(char)+sizeof(int);
 		}

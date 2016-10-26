@@ -172,8 +172,8 @@ namespace master {
 			//remove client data from the end
 			short size=p->size();
 	//		printf("got message size %d\n", size);
-			int _id=*((typeof(_id)*)((char*)buf+(size-=sizeof(_id))));//check for write size size
-			char dir=*((typeof(dir)*)((char*)buf+(size-=sizeof(dir))));
+			int _id=p->dest.id;
+			char dir=p->dest.type;
 			if (dir==MSG_CLIENT){ //redirect packet to client
 	//			printf("redirect to client %d\n", _id);
 				client* c=0;
