@@ -63,6 +63,7 @@ namespace share {
 	}
 	
 	int socket::send(packet* p){
+		short size=p->size();
 		if (!p->client)
 			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
 		size=byteSwap(size);
