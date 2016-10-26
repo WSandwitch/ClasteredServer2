@@ -34,6 +34,7 @@ namespace share {
 		if(::bind(listenerfd, (struct sockaddr *)&addr, sizeof(addr)) < 0){
 			perror("bind");
 			close(listenerfd);
+			exit(1);
 		}
 		
 		if(::listen(listenerfd, 1)<0){

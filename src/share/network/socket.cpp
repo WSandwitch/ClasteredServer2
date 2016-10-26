@@ -63,7 +63,6 @@ namespace share {
 	}
 	
 	int socket::send(packet* p){
-		short size=p->size()-sizeof(short);
 		if (!p->client)
 			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
 		size=byteSwap(size);
@@ -125,7 +124,7 @@ namespace share {
 			if((got=::recv(sockfd,(char*)buf+(size-need),need,0))<=0)
 				if (errno!=EAGAIN)
 					return -1;
-	//		printf("got %d\n", got);
+//			printf("got %d\n", got);
 		}while(need>0);
 		return size;
 	}
@@ -167,10 +166,11 @@ namespace share {
 			size-=sizeof(char)+sizeof(int);
 		}
 		char* buf=(char*)malloc(size);
-		memset(buf, 0, size);
 		if (!buf){
 			return 0;
 		}else{
+			memset(buf, 0, size);
+//			printf("try to recv\n");
 			if (recv(buf, size)<=0)
 				return 0;
 /////			
