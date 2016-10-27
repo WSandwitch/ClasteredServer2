@@ -26,8 +26,11 @@
 	return 0;\
 }
 
+using namespace share;
+
 ///get client attributes 
-	namespace master {
+namespace master {
+		
 	static void *message1(server *sv, packet *p_){
 
 		return 0;//check for error return

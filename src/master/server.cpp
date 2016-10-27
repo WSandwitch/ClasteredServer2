@@ -16,6 +16,9 @@
 ║ jun 2016									                       ║
 ╚══════════════════════════════════════════════════════════════╝
 */
+
+using namespace share;
+
 namespace master { 
 	
 	typedef void*(*server_processor)(server*, packet*);

@@ -20,6 +20,8 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
+using namespace share;
+
 namespace master {
 
 	typedef void*(*client_processor)(client*, packet*);

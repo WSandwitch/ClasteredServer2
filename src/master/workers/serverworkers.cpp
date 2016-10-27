@@ -17,6 +17,8 @@
 
 #define MAX_WORKERS 400
 
+using namespace share;
+
 namespace master {
 	
 	int serverworkers::checks=10;

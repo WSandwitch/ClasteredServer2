@@ -7,30 +7,28 @@
 #include "../../share/network/packet.h"
 #include "../../share/network/listener.h"
 
-using namespace share;
-
 namespace master {
 
 	class listenworkers;
 	
-	class listenworkers : public workerbase<listener*, listenworkers>{
+	class listenworkers : public workerbase<share::listener*, listenworkers>{
 		using workerbase::start;
 		using workerbase::stop;
 		using workerbase::pause;
 		using workerbase::unpause;
 				
 		public:		
-			void* proceed(listener* s); //must clear data before nonzero return
+			void* proceed(share::listener* s); //must clear data before nonzero return
 			void loop();
 			void init();
 			void* close();
 		
 			listenworkers(){};
-			listenworkers(int id, int tps, std::string name):workerbase<listener*, listenworkers>(id, tps, name){};
+			listenworkers(int id, int tps, std::string name):workerbase<share::listener*, listenworkers>(id, tps, name){};
 			static int create(int num, int TPS);
-			static void addWork(int num, listener* work);
-			static void addWorkAll(listener* work);
-			static int addWorkAuto(listener* work);
+			static void addWork(int num, share::listener* work);
+			static void addWorkAll(share::listener* work);
+			static int addWorkAuto(share::listener* work);
 			static void start(int n);
 			static void stop(int n);
 			static void pause(int n);
@@ -48,7 +46,7 @@ namespace master {
 			static std::map<int, listenworkers*> all;
 	};
 
-
+/*
 	void listenworkersStartAll();
 	void listenworkersStopAll();
 	void listenworkersPauseAll();
@@ -69,7 +67,7 @@ namespace master {
 	int listenworkersCreate(int num, int TPS);
 
 	void listenworkersClose();
-		
+*/	
 }
 
 #endif

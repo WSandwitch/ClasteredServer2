@@ -11,8 +11,6 @@
 
 #define MSG_SERVER 2
 
-using namespace share;
-
 namespace master { 
 	class server{
 		public:
@@ -27,7 +25,7 @@ namespace master {
 			
 			server(share::socket* sock, std::string host, int port);
 			~server();
-			void proceed(packet* p);
+			void proceed(share::packet* p);
 			int clients_add(client* c);
 			client* clients_get(int id);
 			int clients_remove(client* c);
@@ -43,10 +41,10 @@ namespace master {
 			static void remove(server* s);
 			static void check();
 			static int getIdAuto();
-			static void sendAll(packet* p);
+			static void sendAll(share::packet* p);
 			static int idByAddress(std::string s, int port);
 	};
-
+/*
 //initialization
 void serversInit();
 void serversClear();
@@ -83,6 +81,6 @@ int serverClientsRemove(server *s, void* c);
 void serverClientsErase(server *s);
 
 void serverSetReady(server *s);
-
+*/
 }
 #endif

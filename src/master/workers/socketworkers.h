@@ -5,8 +5,6 @@
 #include "workerbase.h"
 #include "../../share/network/socket.h"
 
-using namespace share;
-
 namespace master {
 
 	class socketworkers;

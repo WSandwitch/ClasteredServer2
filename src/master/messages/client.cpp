@@ -36,7 +36,9 @@
 		withLock(c->mutex,c->broken=1);\
 		printf("unauthorized client\n");\
 		return c;\
-	}\
+	}
+	
+using namespace share;
 
 namespace master {
 	//AUTH

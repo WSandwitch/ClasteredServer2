@@ -8,8 +8,6 @@
 #include "../server.h"
 #include "../../share/network/packet.h"
 
-using namespace share;
-
 namespace master {
 
 	class serverworkers;

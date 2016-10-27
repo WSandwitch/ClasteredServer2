@@ -7,6 +7,8 @@
 #define t_mutexUnlock(mutex) mutex.unlock()
 #define t_mutexRemove(mutex) mutex
 
+using namespace share;
+
 namespace master {
 	static std::map<int, void*> chats;
 	static t_mutex_t mutex;

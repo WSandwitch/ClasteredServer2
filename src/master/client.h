@@ -16,7 +16,6 @@
 #define CLIENT_CONN_SOCKET 1
 #define MSG_CLIENT 1
 
-using namespace share;
 
 namespace master {
 	
@@ -51,7 +50,7 @@ namespace master {
 			
 			client(share::socket* sock);
 			~client();
-			int proceed(packet* p);
+			int proceed(share::packet* p);
 			void messages_add(client_message *m);
 			
 			void messages_proceed();
