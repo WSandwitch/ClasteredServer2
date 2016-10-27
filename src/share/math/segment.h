@@ -1,6 +1,8 @@
 #ifndef CLASTERED_SERVER_SLAVE_SEGMENT_HEADER
 #define CLASTERED_SERVER_SLAVE_SEGMENT_HEADER
 
+#include <iostream>
+
 #include "point.h"
 
 namespace share {

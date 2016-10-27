@@ -10,49 +10,34 @@ extern "C"{
 using namespace share;
 using namespace slave;
 
+#define world slave::world
+
 static void* threadFunc(void *arg){
 	packet p;
-	int bots=4;
 	
-	world::sock->recv(&p);
-	world::id=p.chanks[0].value.i;
-	world::grid->setId(world::id);
-	world::grid->add(world::id, 0);
-	printf("server id %d\n", world::id);
+	world.sock->recv(&p);
+	world.id=p.chanks[0].value.i;
+	printf("server id %d\n", world.id);
 	//get information about world
 	
 	p.init();
 	p.setType(6);//get new id
 	for(int i =0;i<10;i++)
-		world::sock->send(&p);//send ready
+		world.sock->send(&p);//send ready
 	p.setType(3);//get info about servers
-	world::sock->send(&p);
-	
-	while(!withLock(world::m, world::main_loop)){
-		processor f;
-		if (world::sock->recv(&p)<=0)
-			break;
-//		printf("packet %d\n", p.type());
-		//some work
-		if((f=processors::messages[p.type()])!=0)
-			f(&p);
-		else
-			printf("unknown message\n");
-		if (p.type()==4)//got info about servers
-			break;
-	}
+	world.sock->send(&p);
 	
 	p.init();
 	p.setType(5);
-	p.add(world::id);
+	p.add(world.id);
 	//dest already 0,0
-	world::sock->send(&p);//send ready
+	world.sock->send(&p);//send ready
 	
-	withLock(world::m, world::main_loop=1);
+	withLock(world.m, world.main_loop=1);
 
-	while(withLock(world::m, world::main_loop)){
+	while(withLock(world.m, world.main_loop)){
 		processor f;
-		if (world::sock->recv(&p)<=0)
+		if (world.sock->recv(&p)<=0)
 			break;
 		printf("packet %d\n", p.type());
 		//some work
@@ -60,12 +45,8 @@ static void* threadFunc(void *arg){
 			f(&p);
 		else
 			printf("unknown message\n");
-		if (bots>0 && world::ids.size()>0){
-			npc::addBot(world::map_size[0]/2,world::map_size[1]/2);
-			bots--;
-		}
 	}
-	world::main_loop=0;
+	world.main_loop=0;
 	return 0;
 }
 

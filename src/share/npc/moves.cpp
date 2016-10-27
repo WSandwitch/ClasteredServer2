@@ -4,7 +4,7 @@
 #include "../npc.h"
 #include "../world.h"
 
-namespace clasteredServerSlave{
+namespace share{
 	
 	std::map<short, move_func> npc::moves;
 	npc_moves npc::_moves;
@@ -35,8 +35,8 @@ namespace clasteredServerSlave{
 		if (bot.used){
 //			printf("bot %d on %g %g -> %g %g\n", id, position.x, position.y, bot.goal.x, bot.goal.y);
 			if (position.distanse2(bot.goal)<=3*vel){
-				bot.goal.x=(rand()%(((int)world::map_size[0]-20)*100))/100.0+10;
-				bot.goal.y=(rand()%(((int)world::map_size[1]-20)*100))/100.0+10;
+				bot.goal.x=(rand()%(((int)world->map_size[0]-20)*100))/100.0+10;
+				bot.goal.y=(rand()%(((int)world->map_size[1]-20)*100))/100.0+10;
 //				printf("new goal on %d -> %g %g\n", id, bot.goal.x, bot.goal.y);
 				set_dir();
 			}

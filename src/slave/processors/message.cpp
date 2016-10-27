@@ -14,6 +14,13 @@ namespace slave {
 	
 	std::map<char, processor> processors::messages;
 	
+	
+	static void* message2(packet* p){
+		return 0;
+	}
+	
+
+/*	
 	//server connected
 	//[id, $servers]
 	static void* message2(packet* p){
@@ -158,17 +165,17 @@ namespace slave {
 		}
 		return 0;
 	}
-	
-	void processors::init(){
+*/	
+	processors::processors(){
 		addProcessor(2);
-		addProcessor(3);
-		addProcessor(4);
-		addProcessor(5);
-		addProcessor(6);
-		addProcessor(9);
-		addProcessor(10);
-		addProcessor(40);
-		addProcessor(41);
-		addProcessor(42);
+//		addProcessor(3);
+//		addProcessor(4);
+//		addProcessor(5);
+//		addProcessor(6);
+//		addProcessor(9);
+//		addProcessor(10);
+//		addProcessor(40);
+//		addProcessor(41);
+//		addProcessor(42);
 	}
 }

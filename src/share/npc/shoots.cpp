@@ -4,7 +4,7 @@
 #include "../npc.h"
 #include "../world.h"
 
-namespace clasteredServerSlave{
+namespace share{
 	
 	std::map<short, shoot_func> npc::shoots;
 	npc_shoots npc::_shoots;
@@ -21,10 +21,13 @@ namespace clasteredServerSlave{
 	//common shoot
 	void npc_shoots::shoot0(typeof(point::x) x, typeof(point::y) y){
 		//spawn bullet npcs
-		npc* n=npc::addBot(position.x, position.y, 1);
+		//ask master to spawn
+/*
+		npc* n=npc::addBot(world, world->getId, position.x, position.y, 1);
 		n->keys[3]=(x || y)? point(x,y).to_angle() : keys[3];
 		point&& p=point::from_angle(n->keys[3]);
 		n->set_dir(p.x, p.y);
+*/
 	}
 	
 	//bullet shoot

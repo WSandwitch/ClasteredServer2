@@ -40,8 +40,8 @@ namespace share {
 	std::map<int, player*> world::players;
 */	
 	world::world():
-		id=0,
-		map_size[2]({320, 320}),
+		id(0),
+		map_size({320, 320}),
 		map_offset(32),
 		main_loop(0),
 		sock(0)
@@ -49,7 +49,7 @@ namespace share {
 	
 	world::~world(){
 		if (sock)
-			delete sock
+			delete sock;
 	}
 	
 }

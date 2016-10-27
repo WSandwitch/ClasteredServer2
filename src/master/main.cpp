@@ -30,9 +30,10 @@
 #define CONFIG_FILE "config.cfg"
 
 using namespace share;
-
 using namespace master; 
+
 static int main_loop;
+share::world master::world
 
 log_config* mainLogConfig(){
 	return &config.log;

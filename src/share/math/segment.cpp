@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <math.h>
 
-#include "world.h"
 #include "point.h"
 #include "segment.h"
 

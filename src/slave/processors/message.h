@@ -11,9 +11,14 @@ extern "C"{
 
 namespace slave {
 	typedef void*(*processor)(share::packet*);
-	struct processors{
-		static std::map<char, processor> messages;
-		static void init();
+	class processors;
+	
+	class processors{
+			processors();
+		public:
+			static processors init;
+		
+			static std::map<char, processor> messages;
 	};
 }
 

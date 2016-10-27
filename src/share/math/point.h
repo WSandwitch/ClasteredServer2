@@ -1,6 +1,8 @@
 #ifndef CLASTERED_SERVER_SLAVE_POINT_HEADER
 #define CLASTERED_SERVER_SLAVE_POINT_HEADER
 
+#include <iostream>
+
 namespace share {
 	
 	template <class T>
