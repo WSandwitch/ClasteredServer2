@@ -12,17 +12,18 @@ extern "C"{
 
 using namespace share;
 
-namespace clasteredServerSlave{
+namespace share {
 	
-	npc::npc(int id, int slave, short type): 
+	npc::npc(share::world *w, int id, int slave, short type): 
 		id(id), 
 		state(0), 
 		health(1),
 		type(type), 
 		bot({0}), 
+		world(w),
 		cell_id(0)
 	{
-		slave_id=slave?:world::id;
+		slave_id=slave?:world->id;
 //		memset(&bot,0,sizeof(bot));
 		memset(keys,0,sizeof(keys));
 //		memset(&direction,0,sizeof(direction));
@@ -52,16 +53,14 @@ namespace clasteredServerSlave{
 	}
 	
 	npc::~npc(){
-		player *p=world::players[owner_id];
-		if (p)
-			p->npc=0;
+
 		//add returning of id
 	}
 		
 	bool npc::clear(){
-		if (health<=0 || (time(0)-timestamp>15 && (gridOwner()!=world::id || (!bot.used && !world::players[owner_id])))){
-			return 1;
-		}
+//		if (health<=0 || (time(0)-timestamp>15 && (gridOwner()!=world->id || (!bot.used)))){
+//			return 1;
+//		}
 		
 		for(unsigned i=0;i<attrs.size();i++){
 			attrs[i]=0;
@@ -87,7 +86,7 @@ namespace clasteredServerSlave{
 			(this->*shootf)(0, 0);//add useful coordinates
 	}
 	
-#define m world::map
+#define m world->map
 	bool npc::update_cells(){//TODO:improve performance
 		int _cell_id=m.to_grid(position.x, position.y);
 		if (cell_id!=_cell_id){//if npc move to other cell
@@ -271,16 +270,16 @@ namespace clasteredServerSlave{
 	}
 #undef packAttr
 	
-	int npc::gridOwner(){
-		return world::grid->getOwner(position.x, position.y);
-	}
+//	int npc::gridOwner(){
+//		return world->grid->getOwner(position.x, position.y);
+//	}
 	
-	std::vector<int>& npc::gridShares(){
-		return world::grid->getShares(position.x, position.y);		
-	}
+//	std::vector<int>& npc::gridShares(){
+//		return world->grid->getShares(position.x, position.y);		
+//	}
 	
-	npc* npc::addBot(float x, float y, short type){
-		npc* n=new npc(world::getId(), 0, type);
+	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
+		npc* n=new npc(world, id, 0, type);
 		n->position.x=x;
 		n->position.y=y;
 		n->direction.y=0.1;
@@ -288,19 +287,19 @@ namespace clasteredServerSlave{
 		n->bot.goal.y=y;
 		
 		n->bot.used=1;
-		world::new_npcs_m.lock();
-			world::new_npcs.push_back(n);
-		world::new_npcs_m.unlock();
+		world->new_npcs_m.lock();
+			world->new_npcs.push_back(n);
+		world->new_npcs_m.unlock();
 		printf("added bot %d on %g, %g\n", n->id, n->position.x, n->position.y);
 		return n;
 	}
 	
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
-		std::vector<int> &&ids=world::map.near_cells(x, y, r); //!check this!
-		//printf("segments %d \n", world::map.segments.size());
+		std::vector<int> &&ids=world->map.near_cells(x, y, r); //!check this!
+		//printf("segments %d \n", world->map.segments.size());
 		for(int c=0,cend=ids.size();c<cend;c++){//TODO: change to check by map grid
-			clasteredServerSlave::cell *cell=world::map.cells(ids[c]);
+			share::cell *cell=world->map.cells(ids[c]);
 			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
 				segment *s=cell->segments[i];
 				if(s->distanse(p)<=r){

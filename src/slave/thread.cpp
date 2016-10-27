@@ -8,7 +8,7 @@ extern "C"{
 #include "world.h"
 
 using namespace share;
-using namespace clasteredServerSlave;
+using namespace slave;
 
 static void* threadFunc(void *arg){
 	packet p;

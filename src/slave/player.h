@@ -13,7 +13,7 @@ extern "C"{
 
 }
 
-namespace clasteredServerSlave {
+namespace slave {
 
 	class player {
 		public:

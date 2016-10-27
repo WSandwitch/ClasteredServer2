@@ -8,7 +8,7 @@
 
 using namespace share;
 
-namespace clasteredServerSlave{
+namespace slave{
 
 	player::player(int id): id(id), connected(0), npc(0){
 		//add position get, check and redirest to write server

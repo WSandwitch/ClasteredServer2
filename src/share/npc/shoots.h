@@ -3,7 +3,7 @@
 
 #include "../npc.h"
 
-namespace clasteredServerSlave{
+namespace share{
 	class npc;
 	
 	class npc_shoots: npc{

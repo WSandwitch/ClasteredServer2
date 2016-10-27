@@ -5,18 +5,17 @@
 #include <queue>
 #include <vector>
 
-#include "lib/grid.h"
 #include "npc.h"
-#include "player.h"
-#include "segment.h"
+#include "math/segment.h"
 
 
 extern "C"{
 
 }
 
-namespace clasteredServerSlave {
-
+namespace share {
+	class npc;
+	
 	struct cell{
 		int id;
 		std::map<int, npc*> npcs;
@@ -30,14 +29,15 @@ namespace clasteredServerSlave {
 			point source;
 			pointi size;
 			point cell;
-			clasteredServerSlave::cell *grid;
+			share::cell *grid;
 			std::vector<segment*> segments;
-			
-			map(int x, int y);
+			int map_size[2];
+		
+			map(int x=10, int y=10);
 			~map();
-			clasteredServerSlave::cell* cells(int id);
-			clasteredServerSlave::cell* cells(point &p);
-			clasteredServerSlave::cell* cells(typeof(point::x) x, typeof(point::y) y);
+			share::cell* cells(int id);
+			share::cell* cells(point &p);
+			share::cell* cells(typeof(point::x) x, typeof(point::y) y);
 			std::vector<int> cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b);
 			int to_grid(typeof(point::x) x, typeof(point::y) y);
 			int to_grid_x(typeof(point::x) x);

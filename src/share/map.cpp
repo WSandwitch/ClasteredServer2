@@ -3,10 +3,9 @@
 #include <math.h>
 
 #include "map.h"
-#include "world.h"
 #include "NLTmxMap/NLTmxMap.h"
 
-namespace clasteredServerSlave{
+namespace share{
 
 	static void* loadFile( const char * filename, bool appendNull ) {
     
@@ -55,8 +54,8 @@ namespace clasteredServerSlave{
 		if (xml){
 			NLTmxMap* map = NLLoadTmxMap( xml );
 			//fill data
-			world::map_size[0]=map->tileWidth*map->width;
-			world::map_size[1]=map->tileHeight*map->height;
+			map_size[0]=map->tileWidth*map->width;
+			map_size[1]=map->tileHeight*map->height;
 			delete map;
 			free(xml);
 		}
@@ -65,18 +64,18 @@ namespace clasteredServerSlave{
 		clean_segments();
 		{//set main map borders
 			point lt(0, 0);
-			point rt(0, world::map_size[1]-1);
-			point rb(world::map_size[0]-1, world::map_size[1]-1);
-			point lb(world::map_size[0]-1, 0);
+			point rt(0, map_size[1]-1);
+			point rb(map_size[0]-1, map_size[1]-1);
+			point lb(map_size[0]-1, 0);
 			segments.push_back(new segment(lt,rt));
 			segments.push_back(new segment(rt,rb));
 			segments.push_back(new segment(rb,lb));
 			segments.push_back(new segment(lb,lt));
 		}
-		size.x=ceil((1.0*world::map_size[0])/cell.x);//TODO: change to local server area
-		size.y=ceil((1.0*world::map_size[1])/cell.y);
+		size.x=ceil((1.0*map_size[0])/cell.x);//TODO: change to local server area
+		size.y=ceil((1.0*map_size[1])/cell.y);
 		int grid_size=size.x*size.y;
-		grid=new clasteredServerSlave::cell[grid_size+1];
+		grid=new share::cell[grid_size+1];
 		for(int i=0;i<grid_size;i++){
 			vector<segment> &&borders=cell_borders(i);
 //			printf("%d: ",i);

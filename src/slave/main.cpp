@@ -19,7 +19,7 @@ extern "C"{
 #include "world.h"
 #include "npc.h"
 
-using namespace clasteredServerSlave;
+using namespace slave;
 
 pthread_t startThread();//in thread.cpp
 

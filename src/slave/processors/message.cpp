@@ -10,7 +10,7 @@ extern "C"{
 
 using namespace share;
 
-namespace clasteredServerSlave {
+namespace slave {
 	
 	std::map<char, processor> processors::messages;
 	

@@ -1,7 +1,8 @@
 #ifndef CLASTERED_SERVER_SLAVE_POINT_HEADER
 #define CLASTERED_SERVER_SLAVE_POINT_HEADER
 
-namespace clasteredServerSlave {
+namespace share {
+	
 	template <class T>
 		class point_{
 			public:

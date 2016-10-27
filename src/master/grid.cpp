@@ -16,7 +16,7 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
-namespace share {
+namespace master {
 	bool operator==(const data_cell &b, const data_cell &o) {
 		return (b.owner == o.owner && b.shares == o.shares);
 	}

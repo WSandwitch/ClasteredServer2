@@ -4,7 +4,7 @@
 #include "m.h" //for sqr
 #include "point.h"
 
-namespace clasteredServerSlave {
+namespace share {
 
 	template<class T>
 		point_<T>::point_(): x(0), y(0){

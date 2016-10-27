@@ -12,7 +12,7 @@ struct server_area{
 
 }
 
-namespace share {
+namespace master {
 	struct data_cell{
 		int owner;
 		std::vector<int> shares;

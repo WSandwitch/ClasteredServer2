@@ -4,7 +4,9 @@
 #include <vector>
 #include <map>
 
-namespace clasteredServerSlave {
+//for npc attributes
+namespace share {
+	
 	class attrs_map{
 		public:
 			attrs_map(): _size(0) {

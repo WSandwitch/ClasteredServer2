@@ -3,7 +3,7 @@
 
 #include "point.h"
 
-namespace clasteredServerSlave {
+namespace share {
 	class segment{
 		public:
 			point a,b;

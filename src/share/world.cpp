@@ -23,45 +23,33 @@ namespace std{
 	}
 }
 
-using namespace share;
 
-namespace clasteredServerSlave {
-	
+namespace share {
+/*	
 	int world::id=0;
 	float world::map_size[2]={320, 320};
 	float world::map_offset=32;
 	bool world::main_loop=0;
 	share::mutex world::m;
 	share::mutex world::new_npcs_m;
-	share::grid* world::grid=0;
 	share::socket* world::sock=0;
 	clasteredServerSlave::map world::map(10,10);
 	std::queue<int> world::ids;
-	std::list<npc*>world:: new_npcs;
-	std::unordered_map<int, npc*>world:: npcs;
+	std::list<npc*> world::new_npcs;
+	std::unordered_map<int, npc*> world::npcs;
 	std::map<int, player*> world::players;
-
-	void world::init(){
-		//read data from disk and init
-		grid=new share::grid(map_size, map_offset);
-	}
-
-	int world::getId(){
-		packet p;
-		int o=ids.front();
-		if (ids.size()-1<10){
-			p.setType(6);
-			world::sock->send(&p);
-		}
-		ids.pop();
-		return o;
-	}
+*/	
+	world::world():
+		id=0,
+		map_size[2]({320, 320}),
+		map_offset(32),
+		main_loop(0),
+		sock(0)
+	{	}
 	
-	void world::clear(){
+	world::~world(){
 		if (sock)
-			delete sock;
-		if (grid)
-			delete grid;
+			delete sock
 	}
 	
 }

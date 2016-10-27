@@ -9,7 +9,7 @@ extern "C"{
 
 }
 
-namespace clasteredServerSlave {
+namespace slave {
 	typedef void*(*processor)(share::packet*);
 	struct processors{
 		static std::map<char, processor> messages;

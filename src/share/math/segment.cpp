@@ -5,7 +5,7 @@
 #include "point.h"
 #include "segment.h"
 
-namespace clasteredServerSlave {
+namespace share {
 	
 	segment::segment(){
 		
