@@ -203,7 +203,7 @@ namespace master {
 			for (auto i=messages.begin(), end=messages.end();i!=end;){
 				client_message *m=*i;
 				if (withLock(m->mutex, m->ready)){
-					packet p(1);
+					packet p;
 					p.init(m->data, m->$data);
 					sock->send(&p);
 					messages.erase(i++);

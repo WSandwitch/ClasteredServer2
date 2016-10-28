@@ -3,11 +3,13 @@
 #include "messages/server.h"
 #include "server.h"
 #include "client.h"
+#include "world.h"
 #include "messageprocessor.h"
 #include "workers/serverworkers.h"
 #include "../share/network/packet.h"
 #include "../share/system/log.h"
 #include "../share/crypt/crc32.h"
+#include "../share/messages.h"
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
@@ -50,13 +52,6 @@ namespace master {
 	}
 
 	server::~server(){
-		
-		mutex.lock();
-			for (auto c:clients){
-				c.second->server_clear();
-			}
-//			bintreeErase(&s->clients, (void(*)(void*))clientServerClear);
-		mutex.unlock();
 		delete sock;
 	}
 
@@ -142,26 +137,10 @@ namespace master {
 		}
 	}
 
-	int server::getIdAuto(){
-		int i1=0;
-		int i2=0;
-		m.lock();
-			for (auto i:all){
-				server *s=i.second;
-				if (s->ready &&(i1==0 || i2>=(int)s->clients.size())){
-					i1=s->id;
-					i2=s->clients.size();
-			//		return &s->id;
-				}
-			}
-		m.unlock();
-		return i1;
-	}
-
 	void server::proceed(packet *p){
 		server_processor processor;
 	//	printf("got server message %d\n", *((char*)buf));
-		if ((processor=(server_processor)messageprocessorServer(*((char*)buf)))!=0){
+		if ((processor=(server_processor)messageprocessorServer(p->type()))!=0){
 			processor(this, p);
 		}
 	}
@@ -179,49 +158,6 @@ namespace master {
 				i.second->sock->send(p);
 			}
 		m.unlock();
-	}
-
-	int server::clients_add(client *c){
-		packet p;
-		withLock(c->mutex, c->server_id=id);
-		mutex.lock();
-			clients[c->id]=c;
-		mutex.unlock();
-	//	printf("added client %d to server %d\n",c->id, s->id);
-		p.setType((char)MSG_S_CLIENT_CONNECTED);
-		p.add(c->id);
-		p.add((short)client::all.size());
-		p.add((char)0);
-		p.dest.id=(int)0;
-		sock->send(&p);
-		return 0;
-	}
-
-	client* server::clients_get(int id){
-		client* c=0;
-		mutex.lock();
-			auto i=clients.find(id);
-			if (i!=clients.end())
-				c=i->second;
-		mutex.unlock();
-		return c;
-	}
-
-	int server::clients_remove(client *c){
-		int id=c->id;
-		share::packet p;
-		mutex.lock();
-			clients.erase(c->id);
-			c->server_clear();
-		mutex.unlock();
-	//	printf("removed client %d to server %d\n", id, s->id);
-		p.setType((char)MSG_S_CLIENT_DISCONNECTED);
-		p.add(id);
-		p.add((short)client::all.size());
-		p.dest.type=(char)0;//must be here
-		p.dest.id=(int)0;//must be here
-		sock->send(&p);
-		return 0;
 	}
 
 	void server::set_ready(){

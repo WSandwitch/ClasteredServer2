@@ -38,6 +38,9 @@ namespace share {
 		attr.push_back(type); //5s
 		attr.push_back(owner_id); //6s
 		attr.push_back(health); //7
+		attr.push_back(bot.goal.x); //8
+		attr.push_back(bot.goal.y); //9
+		attr.push_back(bot.used); //10
 		
 		for(unsigned i=0;i<attr.size();i++){
 			attrs.push_back(1);
@@ -185,34 +188,6 @@ namespace share {
 				}else{
 					printf("got strange index %d\n", (int)index);
 				}
-			}else{
-				//special params
-				switch(index){
-					case -1:
-						keys[0]=p->chanks[i].value.c;
-						break;
-					case -2:
-						keys[1]=p->chanks[i].value.c;
-						break;
-					case -3:
-						keys[2]=p->chanks[i].value.c;
-						break;
-					case -4:
-						keys[3]=p->chanks[i].value.c;
-						break;					
-					case -5:
-						bot.used=p->chanks[i].value.c;
-//						printf("%d got bot used x %d\n", id, bot.used);
-						break;					
-					case -6:
-						bot.goal.x=p->chanks[i].value.f;
-//						printf("%d got goal x %g\n",id, bot.goal.x);
-						break;					
-					case -7://TODO:find why it prints 2 times
-						bot.goal.y=p->chanks[i].value.f;
-//						printf("%d got goal y %g\n",id, bot.goal.y);
-						break;
-				}
 			}
 		}
 		set_dir();
@@ -242,7 +217,7 @@ namespace share {
 				_updated.pack.server!=server || 
 				_updated.pack.all!=all){
 			p.init();
-			p.setType(server?MSG_SERVER_NPC_UPDATE:MSG_CLIENT_NPC_UPDATE);//npc update
+			p.setType(MESSAGE_NPC_UPDATE);//npc update
 			p.add(id);
 			packAttr(p, position.x, all);
 			packAttr(p, position.y, all);
@@ -250,28 +225,13 @@ namespace share {
 			packAttr(p, direction.y, all);
 			packAttr(p, state, all);
 			
-			p.dest.type=server?SERVER_MESSAGE:CLIENT_MESSAGE;
-			if (all){//static
-				packAttr(p, type, 1);
-				packAttr(p, owner_id, 1);
-				_updated.pack.all=1;
-			} 
+			packAttr(p, type, all);
+			packAttr(p, owner_id, all);
+			_updated.pack.all=1;
 			if (server){
-				if (all){
-					p.add((char)-5);
-					p.add((char)bot.used);
-				}
-				if (!bot.used){
-					for(int i=0;i<4;i++){
-						p.add((char)(-1-i));//-1 to -4
-						p.add((char)keys[i]);
-					}
-				}else{
-					p.add((char)-6);
-					p.add(bot.goal.x);
-					p.add((char)-7);
-					p.add(bot.goal.y);
-				}
+				packAttr(p, bot.used, all);
+				packAttr(p, bot.goal.x, all);
+				packAttr(p, bot.goal.y, all);
 				_updated.pack.server=1;
 			} 
 			_updated.pack.done=1;

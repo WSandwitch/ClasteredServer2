@@ -5,5 +5,5 @@
 
 namespace master {
 	extern share::world world;
-	extern master::grid grid;
+	extern master::special::grid *grid;
 }

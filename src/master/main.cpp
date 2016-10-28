@@ -33,7 +33,7 @@
 
 namespace master{
 	share::world world;
-	master::grid *grid;
+	master::special::grid *grid;
 }
 
 using namespace share;
@@ -153,7 +153,7 @@ int main(int argc,char* argv[]){
 	readConfig();
 	storageInit(&config.storage);
 	log_config::config=config.log;
-	master::grid=new grid(master::world->map.map_size, master::world->map.offset);
+	grid=new master::special::grid(master::world.map.map_size, master::world.map.offset);
 	
 	clientMessageProcessorInit();
 	serverMessageProcessorInit();

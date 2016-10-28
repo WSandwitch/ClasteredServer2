@@ -2,11 +2,12 @@
 #define CLASTERED_SERVER_SLAVE_ATTRS_MAP_HEADER
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 
+#define map_cont std::unordered_map
 //for npc attributes
 namespace share {
-	
+
 	class attrs_map{
 		public:
 			attrs_map(): _size(0) {
@@ -33,12 +34,14 @@ namespace share {
 			unsigned short size(void* attr){
 				return attr_size[operator()(attr)];
 			};
+			
 		private:
 			char _size;//max 250 elements
-			std::map<char, unsigned short> attr_size;
-			std::map<char, void*> attr_shift;
-			std::map<void*, char> shift_attr;	
+			map_cont<char, unsigned short> attr_size;
+			map_cont<char, void*> attr_shift;
+			map_cont<void*, char> shift_attr;	
 	};
 }
+#undef map_cont
 
 #endif

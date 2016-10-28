@@ -46,11 +46,13 @@ namespace share {
 	
 	world::world():
 		id(0),
-		map_size({320, 320}),
 		map_offset(32),
 		main_loop(0),
 		sock(0)
-	{	}
+	{	
+		map_size[0]=320;
+		map_size[1]=320;
+	}
 	
 	world::~world(){
 		if (sock)
