@@ -64,8 +64,6 @@ namespace share {
 	
 	int socket::send(packet* p){
 		short size=p->size();
-		if (!p->client)
-			size+=sizeof(p->dest.type)+sizeof(p->dest.id);
 		size=byteSwap(size);
 		int flag=1;
 		int result=1;
@@ -79,12 +77,6 @@ namespace share {
 			shift+=sizeof(size);
 			memcpy(data+shift, p->data(), p->size());
 			shift+=p->size();
-			if (!p->client){
-				memcpy(data+shift, (void*)&p->dest.type, sizeof(p->dest.type));
-				shift+=sizeof(p->dest.type);
-				memcpy(data+shift, (void*)&p->dest.id, sizeof(p->dest.id));
-				shift+=sizeof(p->dest.id);
-			}
 			lockWrite();
 				setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));//maybe try TCP_CORK
 //					send((void*)&size, sizeof(size));
@@ -163,9 +155,6 @@ namespace share {
 		if (recv(&size)<=0)
 			return 0;
 //		printf("packet size %d\n", size);
-		if (!p->client){
-			size-=sizeof(char)+sizeof(int);
-		}
 		char* buf=(char*)malloc(size);
 		if (!buf){
 			return 0;
@@ -182,12 +171,6 @@ namespace share {
 //			printf("\n");
 /////
 			p->init(buf,size);
-			if (!p->client){//TODO:remove
-				if (recv(&p->dest.type, sizeof(p->dest.type))<=0)
-					return 0;
-				if (recv(&p->dest.id, sizeof(p->dest.id))<=0)
-					return 0;
-			}
 			free(buf);
 		}
 		return size;

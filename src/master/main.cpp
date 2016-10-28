@@ -9,6 +9,7 @@
 #include <execinfo.h>
 #endif
 
+#include "grid.h"
 #include "main.h"
 #include "chat.h"
 #include "client.h"
@@ -26,24 +27,25 @@
 #include "../share/network/packet.h"
 #include "../share/system/sync.h"
 #include "../share/system/log.h"
+#include "../share/world.h"
 
 #define CONFIG_FILE "config.cfg"
+
+namespace master{
+	share::world world;
+	master::grid *grid;
+}
 
 using namespace share;
 using namespace master; 
 
 static int main_loop;
-share::world master::world
-
-log_config* mainLogConfig(){
-	return &config.log;
-}
 
 static int readConfig(){
 	FILE* f;
 	if ((f=fopen(CONFIG_FILE,"rt"))==0){
 		printf("cant open %s, using defaults\n",CONFIG_FILE);
-		sprintf(config.storage.file, "%s", "storage.txt");
+		sprintf(config.storage.file, "%s", "storage.txt");//set default
 		config.log.debug=1;
 		return 1;
 	}
@@ -151,6 +153,7 @@ int main(int argc,char* argv[]){
 	readConfig();
 	storageInit(&config.storage);
 	log_config::config=config.log;
+	master::grid=new grid(master::world->map.map_size, master::world->map.offset);
 	
 	clientMessageProcessorInit();
 	serverMessageProcessorInit();
@@ -212,6 +215,7 @@ int main(int argc,char* argv[]){
 	printf("Clients cleared\n");
 	storageClear();
 	printf("Storage cleared\n");
+	delete master::grid;
 	printf("Exiting\n");
 	sleep(1);
 	return 0;

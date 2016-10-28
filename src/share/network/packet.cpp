@@ -82,7 +82,7 @@ namespace share {
 	};
 */
 	
-	packet::packet(bool c):client(c){
+	packet::packet(){
 		init();
 	}
 	

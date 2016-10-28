@@ -8,6 +8,7 @@
 #include "../messageprocessor.h"
 #include "../../share/network/packet.h"
 #include "../../share/system/log.h"
+#include "../../share/messages.h"
 
 
 /*
@@ -30,7 +31,7 @@ using namespace share;
 
 ///get client attributes 
 namespace master {
-		
+/*		
 	static void *message1(server *sv, packet *p_){
 
 		return 0;//check for error return
@@ -93,65 +94,26 @@ namespace master {
 		return 0;
 	}
 
-	static int id=1;
-	///i need new id {6,0,0}
-	static void *message6(server *sv, packet *p_){
-		packet p;
-		p.setType((char)MSG_S_NEW_ID);
-		p.add(id++);
-		p.dest.type=(char)0;
-		p.dest.id=(int)0;
-		sv->sock->send(&p);
+*/
+
+	static void *message_NPC_HURT(server *sv, packet *p_){
+		//find npc and hurt it
 		return 0;
 	}
 
+	static void *message_SERVER_READY(server *sv, packet *p_){
+		master::world.m.lock();
+			master::grid->add(sv->id);
+		master::world.m.unlock();
+		return 0;
+	}
 
-	voidMessageProcessor(7)
-	voidMessageProcessor(8)
-	voidMessageProcessor(9)
-	voidMessageProcessor(10)
-	voidMessageProcessor(11)
-	voidMessageProcessor(12)
-	voidMessageProcessor(13)
-	voidMessageProcessor(14)
-	voidMessageProcessor(15)
-	voidMessageProcessor(16)
-	voidMessageProcessor(17)
-	voidMessageProcessor(18)
-	voidMessageProcessor(19)
-	voidMessageProcessor(20)
-	voidMessageProcessor(21)
-	voidMessageProcessor(22)
-	voidMessageProcessor(23)
-	voidMessageProcessor(24)
-	voidMessageProcessor(25)
+//	voidMessageProcessor(1)
 
 
 	void serverMessageProcessorInit(){
-		serverMessageProcessor(1);
-		serverMessageProcessor(2);
-		serverMessageProcessor(3);
-		serverMessageProcessor(4);
-		serverMessageProcessor(5);
-		serverMessageProcessor(6);
-		serverMessageProcessor(7);
-		serverMessageProcessor(8);
-		serverMessageProcessor(9);
-		serverMessageProcessor(10);
-		serverMessageProcessor(11);
-		serverMessageProcessor(12);
-		serverMessageProcessor(13);
-		serverMessageProcessor(14);
-		serverMessageProcessor(15);
-		serverMessageProcessor(16);
-		serverMessageProcessor(17);
-		serverMessageProcessor(18);
-		serverMessageProcessor(19);
-		serverMessageProcessor(20);
-		serverMessageProcessor(21);
-		serverMessageProcessor(22);
-		serverMessageProcessor(23);
-		serverMessageProcessor(24);
-		serverMessageProcessor(25);
+//		serverMessageProcessor(1);
+		messageprocessorServerAdd(MESSAGE_NPC_HURT, (void*)&message_NPC_HURT);
+		messageprocessorServerAdd(MESSAGE_SERVER_READY, (void*)&message_SERVER_READY);
 	}
 }

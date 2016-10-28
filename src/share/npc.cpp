@@ -9,6 +9,7 @@ extern "C"{
 #include "npc.h"
 #include "npc/moves.h"
 #include "world.h"
+#include "messages.h"
 
 using namespace share;
 
@@ -155,6 +156,14 @@ namespace share {
 		health-=d;//TODO: add armor, resist and other
 		attrs[attr(&health)]=1;
 		return health<=0;
+	}
+	
+	void npc::hurt(npc* n){
+		packet p;
+		p.setType(MESSAGE_NPC_HURT);
+		p.add(id);
+		p.add(n->id);
+		world->sock->send(&p);
 	}
 	
 	void npc::update(packet * p){

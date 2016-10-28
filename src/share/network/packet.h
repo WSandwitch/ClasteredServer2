@@ -30,14 +30,13 @@ namespace share {
 	
 	class packet {
 		public:
-			bool client;
 			std::vector<packet_chank> chanks;
 			struct{
 				char type;
 				int id;
 			} dest;
 			
-			packet(bool c=0);
+			packet();
 //			~packet();
 			void setType(char);
 			char type();

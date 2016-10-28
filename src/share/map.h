@@ -32,6 +32,7 @@ namespace share {
 			share::cell *grid;
 			std::vector<segment*> segments;
 			int map_size[2];
+			int offset;
 		
 			map(int x=10, int y=10);
 			~map();

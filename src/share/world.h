@@ -19,19 +19,6 @@ extern "C"{
 	};
 }
 
-#define MASTER_MESSAGE 0
-#define CLIENT_MESSAGE 1
-#define SERVER_MESSAGE 2
-
-#define MSG_MASTER_MOVE_CLIENT 4 //{cl_id,sv_id}
-
-#define MSG_CLIENT_NPC_UPDATE 40
-#define MSG_CLIENT_UPDATE 41
-#define MSG_CLIENT_PLAYER_INFO 42
-
-#define MSG_SERVER_NPC_INFO 40 
-#define MSG_SERVER_NPC_UPDATE 41 
-#define MSG_SERVER_PLAYER_INFO 42
 
 namespace std{
 	ostream& operator<<(ostream &stream, const vector<int> &v);
@@ -54,6 +41,8 @@ namespace share {
 		
 		world();
 		~world();
+		
+		static int getId();
 	};
 }
 

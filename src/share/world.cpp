@@ -39,6 +39,11 @@ namespace share {
 	std::unordered_map<int, npc*> world::npcs;
 	std::map<int, player*> world::players;
 */	
+	int world::getId(){
+		static int id=1;
+		return id++;
+	}
+	
 	world::world():
 		id(0),
 		map_size({320, 320}),

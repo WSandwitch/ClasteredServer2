@@ -5,10 +5,10 @@
 
 extern "C" {
 
-typedef 
-struct server_area{
-	float l,t,r,b;
-} server_area, server_area_t;
+	typedef 
+	struct server_area{
+		float l,t,r,b;
+	} server_area, server_area_t;
 
 }
 

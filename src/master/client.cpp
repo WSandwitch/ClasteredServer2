@@ -127,27 +127,7 @@ namespace master {
 		client_processor processor;
 		//void*(*processor)(packet*);
 	//	printf("got message %d\n", *buf);
-		if ((processor=(client_processor)messageprocessorClient(*buf))==0){
-	//	if (*buf<0){//proxy
-	//		printf("redirect message\n");
-			//add client data to the end
-			p->dest.type=MSG_CLIENT;
-			p->dest.id=id;
-			p->client=0;
-			server* s=server::get(withLock(mutex, server_id));
-			if (s==0){
-				int id=server::getIdAuto();
-				if ((s=server::get(id))!=0){
-					s->clients_add(this);
-				}else{
-					delete sock;
-					sock=0;
-					printf("client %d server %d error\n", id, withLock(mutex, server_id));
-					return 1;
-				}
-			}
-			s->sock->send(p);
-		}else{//proceed by self
+		if ((processor=(client_processor)messageprocessorClient(*buf))!=0){
 			return processor(this, p)!=0;
 		}
 		return 0;

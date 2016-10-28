@@ -1,0 +1,7 @@
+#pragma once
+
+
+#define MESSAGE_SERVER_INFO 1
+#define MESSAGE_SERVER_READY 2
+#define MESSAGE_NPC_UPDATE 3
+#define MESSAGE_NPC_HURT 4

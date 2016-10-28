@@ -3,6 +3,7 @@ extern "C"{
 }
 #include "../world.h"
 #include "../../share/system/mutex.h"
+#include "../../share/messages.h"
 #include "message.h"
 
 #define addProcessor(id)\
@@ -15,7 +16,7 @@ namespace slave {
 	std::map<char, processor> processors::messages;
 	
 	
-	static void* message2(packet* p){
+	static void* message_NPC_UPDATE(packet* p){
 		return 0;
 	}
 	
@@ -167,7 +168,8 @@ namespace slave {
 	}
 */	
 	processors::processors(){
-		addProcessor(2);
+		messages[MESSAGE_NPC_UPDATE]=&message_NPC_UPDATE;
+//		addProcessor(2);
 //		addProcessor(3);
 //		addProcessor(4);
 //		addProcessor(5);

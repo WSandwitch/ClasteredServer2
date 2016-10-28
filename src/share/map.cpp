@@ -29,10 +29,12 @@ namespace share{
 		return buffer;
 	}
 	
-	map::map(int x, int y){
+	map::map(int x, int y): offset(10){
 		cell.x=x;
 		cell.y=y;
 		grid=0;
+		map_size[0]=200;
+		map_size[1]=200;
 		reconfigure();
 	}
 	

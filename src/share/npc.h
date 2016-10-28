@@ -73,6 +73,7 @@ namespace share {
 			void set_dir();
 			void set_dir(float x, float y);
 			bool hurt(short d);
+			void hurt(npc* n);
 			void update(share::packet * p);
 			bool updated(); 			
 			void pack(bool all=0, bool server=0); //pack action attributes, do not pack special atributes

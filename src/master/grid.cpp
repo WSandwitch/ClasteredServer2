@@ -128,7 +128,7 @@ namespace master {
 		for(std::vector<int>::iterator it=server_ids.begin(),end=server_ids.end();it<end;++it){
 			int _id=*it;
 			int i=it-server_ids.begin();
-			server s;
+			grid_server s;
 			s.id=_id;
 			s.index=i;
 			s.area.l=size[0]/cell[0]/counts[0]*(i% counts[0]);
@@ -145,7 +145,7 @@ namespace master {
 		int _offset[2]={(int)ceil(offset/cell[0]),(int)ceil(offset/cell[1])};
 		for(int y=0;y<grid_size[1];y++){
 			for(int x=0;x<grid_size[0];x++){
-				server s=servers[server_ids[x/(grid_size[0]/counts[0])+y/(grid_size[1]/counts[1])*counts[0]]];
+				grid_server s=servers[server_ids[x/(grid_size[0]/counts[0])+y/(grid_size[1]/counts[1])*counts[0]]];
 				data_cell o;
 				o.owner=s.id;
 				if (id==0 || s.id==id){

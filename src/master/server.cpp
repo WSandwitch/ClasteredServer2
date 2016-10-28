@@ -65,15 +65,10 @@ namespace master {
 			m.lock();
 				all[s->id]=s;
 				packet p;
-				p.setType((char)MSG_S_SERVER_CONNECTED);
+				p.setType((char)MESSAGE_SERVER_INFO);
 				p.add(s->id);
-				p.add((short)all.size());
-				p.dest.type=0;
-				p.dest.id=0;
 				///send packet
-				for (auto i:all){
-					i.second->sock->send(&p);
-				}
+				s->sock->send(&p);
 //				bintreeForEach(&servers, serversSendPacket, p);
 			m.unlock();
 			serverworkers::addWorkAuto(s);			
@@ -100,12 +95,8 @@ namespace master {
 			delete s;
 		m.unlock();
 		printf("removed server %d\n", id);
-		p.setType((char)MSG_S_SERVER_DISCONNECTED);
-		p.add(id);
-		p.add((short)all.size());
-		p.dest.type=(char)0;
-		p.dest.id=(int)0;
-		sendAll(&p);
+		//add grid update
+		master::grid->remove(s->id);
 	}
 
 	static int checkSlaves(slave_info *si, void *arg){
@@ -168,34 +159,9 @@ namespace master {
 	}
 
 	void server::proceed(packet *p){
-		void* buf=p->data();
 		server_processor processor;
 	//	printf("got server message %d\n", *((char*)buf));
-		if ((processor=(server_processor)messageprocessorServer(*((char*)buf)))==0){
-			//remove client data from the end
-			short size=p->size();
-	//		printf("got message size %d\n", size);
-			int _id=p->dest.id;
-			char dir=p->dest.type;
-			if (dir==MSG_CLIENT){ //redirect packet to client
-	//			printf("redirect to client %d\n", _id);
-				client* c=0;
-				if (_id==0 || (c=client::get(_id))!=0){
-					c->messages_add(new client_message(buf, size));
-				}
-			}else if (dir==MSG_SERVER){ //redirect packet to server
-	//			printf("redirect to server %d\n", _id);
-				server* sv=server::get(_id);
-	//			printf("set message size %d\n", size);
-				p->dest.type=MSG_SERVER;//message from server
-				p->dest.id=id;
-				if (sv){
-					sv->sock->send(p);
-				}else if (_id==0){
-					server::sendAll(p);
-				}
-			}
-		}else{//proceed by self
+		if ((processor=(server_processor)messageprocessorServer(*((char*)buf)))!=0){
 			processor(this, p);
 		}
 	}
