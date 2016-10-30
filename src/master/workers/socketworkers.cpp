@@ -55,9 +55,8 @@ namespace master {
 	}
 */
 	void* socketworkers::proceed(client *c){
-		server *s;
 		int i;
-		packet p(1);
+		packet p;
 //		clientMessagesProceed(c, clientMessageEach, &wd->packet);
 		c->messages_proceed();
 		for(i=0;i<checks;i++){
@@ -73,8 +72,6 @@ namespace master {
 					withLock(c->mutex, c->broken=1);
 					delete c->sock;//check if need it
 					withLock(c->mutex, c->sock=0);//check if need it
-					if ((s=server::get(withLock(c->mutex, c->server_id)))!=0)
-						s->clients_remove(c);
 					if (c->id==0)
 						delete c;
 					printf("error with client\n");

@@ -5,6 +5,7 @@
 #include "client.h"
 #include "../server.h"
 #include "../client.h"
+#include "../world.h"
 #include "../messageprocessor.h"
 #include "../../share/network/packet.h"
 #include "../../share/system/log.h"

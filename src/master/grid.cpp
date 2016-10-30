@@ -113,7 +113,7 @@ namespace master {
 	//		printf("counts %d %d\n", counts[0], counts[1]);
 	//		printf("area %g %g\n", size[0]/counts[0], size[1]/counts[1]);
 			for(int i=0;i<2;i++){
-				float l=size[i]/counts[i];
+				float l=size[i]/(float)counts[i];
 				float d=offset;
 				for(int n=0;n<1000000;n++){
 					float a=l/n;

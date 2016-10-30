@@ -6,6 +6,7 @@
 #include "server.h"
 #include "../client.h"
 #include "../server.h"
+#include "../world.h"
 #include "../storage.h"
 #include "../messageprocessor.h"
 #include "../../share/network/packet.h"
@@ -91,7 +92,7 @@ namespace master {
 							client::add(cl);
 							share::MD5::create((char*)&tokenbase, sizeof(tokenbase), cl->token); //add normal token
 							s=share::base64::encode((unsigned char*)cl->token, (unsigned char*)token,16, 0);
-							packet p(1);
+							packet p;
 							p.setType(MSG_C_AUTH_TOKEN);
 		//					packetAddNumber(p,s);
 							p.add((char*)token, s);
@@ -119,7 +120,7 @@ namespace master {
 						if (strcmp(buf,token)==0){//add normal token check
 							//auth ok
 							fclose(f);
-							packet p(1);
+							packet p;
 							p.setType(MSG_C_USER_INFO);
 							p.add(cl->id);
 							//packetAddString(p, cl->name);

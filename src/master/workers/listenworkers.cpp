@@ -62,7 +62,7 @@ namespace master {
 		if (sockfd){
 			printf("%s: client connected\n", name.data());
 			share::socket *s=new share::socket(sockfd);
-			share::packet p(1); 
+			share::packet p; 
 			do {
 				short size;
 				char c,buf[100];
