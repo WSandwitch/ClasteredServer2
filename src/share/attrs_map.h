@@ -9,6 +9,12 @@
 namespace share {
 
 	class attrs_map{
+		private:
+			char _size;//max 250 elements
+			map_cont<char, unsigned short> attr_size;
+			map_cont<char, void*> attr_shift;
+			map_cont<void*, char> shift_attr;	
+		
 		public:
 			attrs_map(): _size(0) {
 			};
@@ -34,12 +40,12 @@ namespace share {
 			unsigned short size(void* attr){
 				return attr_size[operator()(attr)];
 			};
-			
-		private:
-			char _size;//max 250 elements
-			map_cont<char, unsigned short> attr_size;
-			map_cont<char, void*> attr_shift;
-			map_cont<void*, char> shift_attr;	
+			typeof(attr_shift.begin()) begin(){
+				return attr_shift.begin();
+			};
+			typeof(attr_shift.end()) end(){
+				return attr_shift.end();
+			};			
 	};
 }
 #undef map_cont

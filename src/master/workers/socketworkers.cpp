@@ -62,7 +62,7 @@ namespace master {
 		for(i=0;i<checks;i++){
 			if (c->sock->recv_check()){//WHY it doesn't enter here?
 //				printf("can read\n");
-				c->timestamp=time(0);
+				c->timestamp=share::time(0);
 				do{
 					if (c->sock->recv(&p)){
 						printf("got message %d\n", ((char*)p.data())[0]);

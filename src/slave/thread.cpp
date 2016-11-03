@@ -2,7 +2,7 @@
 extern "C"{
 #include <pthread.h>
 }
-#include "processors/message.h"
+#include "processors.h"
 #include "../share/system/mutex.h"
 #include "../share/network/packet.h"
 #include "world.h"
@@ -46,7 +46,7 @@ static void* threadFunc(void *arg){
 		else
 			printf("unknown message\n");
 	}
-	world.main_loop=0;
+	withLock(world.m, world.main_loop=0);
 	return 0;
 }
 

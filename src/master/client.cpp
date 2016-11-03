@@ -4,6 +4,7 @@
 
 #include "client.h"
 #include "chat.h"
+#include "world.h"
 #include "server.h"
 #include "storage.h"
 #include "messageprocessor.h"
@@ -57,6 +58,7 @@ namespace master {
 		name[0]=0;
 		login[0]=0;
 		passwd[0]=0;
+		npc=new share::npc(&master::world, master::world.getId());
 	}
 	
 	client::~client(){
@@ -65,6 +67,11 @@ namespace master {
 				delete sock;
 			for (auto mes:messages){
 				delete mes;
+			}
+			if (npc){
+				npc->world->m.lock();
+					npc->world->npcs.erase(npc->id);
+				npc->world->m.unlock();
 			}
 		mutex.unlock();
 	}
@@ -98,7 +105,7 @@ namespace master {
 		m.lock();
 			for (auto c:all){
 				if (withLock(c.second->mutex, c.second->broken) || c.second->id==0){
-					if (abs(time(0)-c.second->timestamp)>=0){//add 10 seconds for reconnect
+					if (abs(share::time(0)-c.second->timestamp)>=0){//add 10 seconds for reconnect
 						l.push_back(c.second);
 					}
 				}

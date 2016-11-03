@@ -103,12 +103,13 @@ int main(int argc, char* argv[]){
 	if (argc>1)
 		sscanf(argv[1], "%d", &port);
 	
-	srand(time(0));
+	srand(share::time(0));
 	//init map
 	{
 		//initialize listener
 		share::listener l(port);
 		world.sock=l.accept();
+		world.sock->blocking(1);
 		//pid=
 		startThread();
 	}
@@ -122,14 +123,18 @@ int main(int argc, char* argv[]){
 		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-//				printf("n %d\n",n);
 				if (n){
 					n->m.lock();
-//						printf("%d|%d on (%g,%g) from %d\n", n->id, world.id, n->position.x, n->position.y, n->gridOwner());
-						if (world.id==n->slave_id){
-							n->move();
-						}
-					n->m.unlock();
+				}
+			}
+			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
+				npc* n=it->second;
+				if (n){
+//					n->m.lock();
+					if (world.id==n->slave_id){
+						n->move();
+					}
+//					n->m.unlock();
 				}
 			}
 //		world.m.unlock();
@@ -137,77 +142,32 @@ int main(int argc, char* argv[]){
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-//				printf("n %d\n",n);
 				if (n){
-					n->m.lock();
-//						printf("%d|%d on (%g,%g) from %d\n", n->id, world.id, n->position.x, n->position.y, n->gridOwner());
-						if (world.id==n->slave_id){
-							n->attack();
-						}
-					n->m.unlock();
+//					n->m.lock();
+					if (world.id==n->slave_id){
+						n->attack();
+					}
+//					n->m.unlock();
 				}
 			}
 //		world.m.unlock();
-		//send data to players
-//		world.m.lock();
-/*	
-			for(auto it = world.players.begin(), end = world.players.end();it != end; ++it){
-				player *p=it->second;
-				if (p && withLock(p->m, p->connected)){
-					p->sendUpdates();
-				}
-			}		
-//		world.m.unlock();
-		//check areas
+		//send data
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
-				npc *n=it->second;
+				npc* n=it->second;
 				if (n){
-					int oid=n->gridOwner();
-//					printf("%d on (%g %g) %d :",n->id, n->position.x, n->position.y,oid);
-//					std::vector<int> shares=world.grid->getShares(n->position.x, n->position.y);
-//					for(unsigned i=0;i<shares.size();i++){
-//						printf("%d ", shares[i]);
-//					}
-//					printf(":\n");
-	//				printf("%d on %d==%d\n", n->id, world.id, oid);
-					if (world.id==oid){
-						//i am owner
-						n->m.lock();
-							if (n->updated()){
-								std::vector<int>& shares=n->gridShares();
-								n->pack(0,1);
-								for(unsigned i=0, end=shares.size();i<end;i++){
-									n->p.dest.id=shares[i];
-									world.sock->send(&n->p);
-								}
-							}
-						n->m.unlock();
-					}else{
-						//i am not owner		
-						player *p;
-	//					printf("i'm not owner\n");
-						if (n->owner_id==0 || (p=world.players[n->owner_id])!=0){
-							n->m.lock();
-								n->pack(1,1);
-								n->p.dest.id=oid;
-								world.sock->send(&n->p);
-							n->m.unlock();
-						}
-						if (p && withLock(p->m, p->connected)){
-							p->move();
-						}
-					}
+					n->pack(1,0);
+					world.sock->send(&n->p);
 				}
-			}	
-*/
+			}
 //		world.m.unlock();
 		//clear flags
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
 				if (n){
-					withLock(n->m, n->clear());
+					n->clear();
+					n->m.unlock();
 				}
 			}
 			world.new_npcs_m.lock();

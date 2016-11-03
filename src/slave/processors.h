@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "../../share/network/packet.h"
+#include "../share/network/packet.h"
 
 extern "C"{
 

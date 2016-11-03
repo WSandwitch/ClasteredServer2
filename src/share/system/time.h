@@ -4,7 +4,7 @@
 typedef long long timestamp_t;
 
 namespace share {
-
+	timestamp_t time(void* a);
 }
 
 #endif

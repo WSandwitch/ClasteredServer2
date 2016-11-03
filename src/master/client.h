@@ -8,6 +8,7 @@
 
 #include "storage.h"
 #include "chat.h"
+#include "../share/npc.h"
 #include "../share/system/time.h"
 #include "../share/system/mutex.h"
 #include "../share/network/socket.h"
@@ -42,6 +43,7 @@ namespace master {
 			short broken;
 			int server_id;
 			share::socket* sock;
+			share::npc* npc;
 			share::mutex mutex;
 			std::list<client_message*> messages;
 			std::map<int, void*> chats;

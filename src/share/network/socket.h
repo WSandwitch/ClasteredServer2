@@ -12,6 +12,7 @@ namespace share {
 	class socket {
 		private: 
 			int sockfd;
+			int nonblock;
 			struct{
 				mutex write;
 				mutex read;
@@ -35,6 +36,7 @@ namespace share {
 			void lockWrite();
 			void unlockWrite();
 			void close();
+			void blocking(bool v);
 		
 			static socket* connect(char*, int);
 	};

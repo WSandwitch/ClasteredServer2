@@ -31,6 +31,7 @@ extern "C"{
 namespace share {
 	
 	socket::socket(int sock):sockfd(sock){
+		blocking(0);
 	}
 
 	socket::~socket(){
@@ -101,7 +102,7 @@ namespace share {
 	int socket::recv(void* buf, int size){
 		int need=size;
 		int got;
-		got=::recv(sockfd,buf,need,0);
+		got=::recv(sockfd,buf,need,nonblock);
 		if (got==0)
 			return 0;
 		if (got<0)
@@ -114,7 +115,7 @@ namespace share {
 			if (got>0)
 				need-=got;
 	//		printf("try to get\n");
-			if((got=::recv(sockfd,(char*)buf+(size-need),need,0))<=0)
+			if((got=::recv(sockfd,(char*)buf+(size-need),need,nonblock))<=0)
 				if (errno!=EAGAIN)
 					return -1;
 //			printf("got %d\n", got);
@@ -251,6 +252,9 @@ namespace share {
 */
 	}
 	
+	void socket::blocking(bool v){
+		nonblock=!v?MSG_DONTWAIT:0;
+	}
 }
 
 /*

@@ -7,6 +7,7 @@ extern "C"{
 #include <string.h>
 }
 #include "npc.h"
+#include "system/time.h"
 #include "npc/moves.h"
 #include "world.h"
 #include "messages.h"
@@ -22,11 +23,11 @@ namespace share {
 		type(type), 
 		bot({0}), 
 		world(w),
+		slave_id(slave),
 		cell_id(0)
 	{
-		slave_id=slave?:world->id;
+//		slave_id=slave?:world->id;
 //		memset(&bot,0,sizeof(bot));
-		memset(keys,0,sizeof(keys));
 //		memset(&direction,0,sizeof(direction));
 		memset(&_updated,0,sizeof(_updated));
 		
@@ -35,15 +36,16 @@ namespace share {
 		attr.push_back(direction.x); //2
 		attr.push_back(direction.y); //3
 		attr.push_back(state); //4
-		attr.push_back(type); //5s
-		attr.push_back(owner_id); //6s
-		attr.push_back(health); //7
-		attr.push_back(bot.goal.x); //8
-		attr.push_back(bot.goal.y); //9
-		attr.push_back(bot.used); //10
+		attr.push_back(type); //5
+		attr.push_back(slave_id); //6s
+		attr.push_back(health); //7c
+		attr.push_back(angle); //8
+		attr.push_back(bot.goal.x); //9s
+		attr.push_back(bot.goal.y); //10s
+		attr.push_back(bot.used); //11s
 		
-		for(unsigned i=0;i<attr.size();i++){
-			attrs.push_back(1);
+		for(auto i:attr){
+			attrs[i.first]=1;
 		}
 		
 		movef=npc::moves[type];
@@ -139,25 +141,22 @@ namespace share {
 	}
 #undef m
 	
-	void npc::set_dir(){
+	void npc::set_dir(){//TODO:remove
 		if (bot.used)
 			set_dir(bot.goal.x-position.x, bot.goal.y-position.y);
 		else
-			set_dir(keys[0], keys[1]);
+			set_dir(direction.x, direction.y);
 	}
 
 	void npc::set_dir(float x, float y){
-		direction.x=x;
-		attrs[attr(&direction.x)]=1;
-		direction.y=y;
-		attrs[attr(&direction.y)]=1;
-		timestamp=time(0);
+		set_attr(direction.x, x);
+		set_attr(direction.y, y);
+		timestamp=share::time(0);
 		direction.normalize();
 	}
 	
 	bool npc::hurt(short d){
-		health-=d;//TODO: add armor, resist and other
-		attrs[attr(&health)]=1;
+		set_attr(health, health-d);
 		return health<=0;
 	}
 	
@@ -190,7 +189,7 @@ namespace share {
 				}
 			}
 		}
-		set_dir();
+//		set_dir();
 	}
 	
 	bool npc::updated(){
@@ -212,7 +211,7 @@ namespace share {
 	}while(0)
 	
 	//need to choose: <0 - static attrs or slave attrs
-	void npc::pack(bool all, bool server){
+	void npc::pack(bool server, bool all){
 		if (!_updated.pack.done || 
 				_updated.pack.server!=server || 
 				_updated.pack.all!=all){

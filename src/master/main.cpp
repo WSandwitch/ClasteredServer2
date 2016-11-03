@@ -143,7 +143,7 @@ int main(int argc,char* argv[]){
 	
 	signal(SIGSEGV, segfault_sigaction);
 	
-	srand(time(0));
+	srand(share::time(0));
 	
 	memset(&config,0,sizeof(config));
 	config.serverworkers.tps=1;
@@ -175,9 +175,9 @@ int main(int argc,char* argv[]){
 	main_loop=1;
 //	printf("Start main loop\n");
 	timestamp_t timestamp;
-	timestamps.start=time(0);
+	timestamps.start=share::time(0);
 	do{
-		timestamp=time(0);
+		timestamp=share::time(0);
 		tv.timePassed(); //start timer
 		//////test
 		

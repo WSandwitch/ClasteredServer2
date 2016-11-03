@@ -38,9 +38,11 @@ namespace share {
 			point position;
 			pointf direction;
 			short health;
+			short damage;
 			short type;
 			int owner_id;
-			char keys[4]; //x,y(l- r+ t- b+), angle	
+			char angle;
+//			char keys[4]; //x,y(l- r+ t- b+), angle	
 			share::bot bot;
 			share::world *world;
 		
@@ -59,7 +61,7 @@ namespace share {
 				} pack;
 			} _updated;
 			attrs_map attr;
-			std::vector<bool> attrs; //attributes updated flags
+			std::map<char, bool> attrs; //attributes updated flags
 			move_func movef;
 			shoot_func shootf;
 
@@ -76,8 +78,13 @@ namespace share {
 			void hurt(npc* n);
 			void update(share::packet * p);
 			bool updated(); 			
-			void pack(bool all=0, bool server=0); //pack action attributes, do not pack special atributes
-//			int gridOwner();
+			void pack(bool server=0, bool all=0); //pack action attributes, do not pack special atributes
+			
+			template<class T1, class T2>
+			int set_attr(T1 &a, T2 v){
+				a=v;
+				return attrs[attr(&a)]=1;
+			};
 //			std::vector<int>& gridShares();
 
 			static std::map<short, move_func> moves;

@@ -73,8 +73,8 @@ namespace master {
 							client* _cl=0;
 							struct {
 								int $1;
-								long $2;
-							} tokenbase={rand(), time(0)};//uniq token
+								timestamp_t $2;
+							} tokenbase={rand(), share::time(0)};//uniq token
 							char token[100];
 							cl->set_info(&u);
 							cl->conn_type=CLIENT_CONN_SOCKET;
@@ -98,7 +98,8 @@ namespace master {
 							p.add((char*)token, s);
 //							std::string ts(token);
 //							p.add(ts); 
-							cl->messages_add(new client_message((char*)p.data(), p.size()));
+							cl->sock->send(&p);
+//							cl->messages_add(new client_message((char*)p.data(), p.size()));
 							break;
 						}
 					}
@@ -125,7 +126,10 @@ namespace master {
 							p.add(cl->id);
 							//packetAddString(p, cl->name);
 							//add other params
-							cl->messages_add(new client_message(p.data(), p.size()));
+							cl->sock->send(&p);
+//							cl->messages_add(new client_message(p.data(), p.size()));
+							///set npc data and add npc to world
+							withLock(master::world.m, master::world.npcs[cl->npc->id]=cl->npc);
 							printf("token OK\n");
 							break;
 						}
