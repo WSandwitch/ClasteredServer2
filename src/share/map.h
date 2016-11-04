@@ -2,6 +2,7 @@
 #define CLASTERED_SERVER_SLAVE_MAP_HEADER
 
 #include <map>
+#include <list>
 #include <queue>
 #include <vector>
 
@@ -39,7 +40,7 @@ namespace share {
 			share::cell* cells(int id);
 			share::cell* cells(point &p);
 			share::cell* cells(typeof(point::x) x, typeof(point::y) y);
-			std::vector<int> cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b);
+			std::list<int> cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b);
 			int to_grid(typeof(point::x) x, typeof(point::y) y);
 			int to_grid_x(typeof(point::x) x);
 			int to_grid_y(typeof(point::y) y);
@@ -47,8 +48,8 @@ namespace share {
 			int id_to_y(int id);
 			void reconfigure();
 			std::vector<segment> cell_borders(int id);
-			std::vector<int> near_cells(int id, typeof(npc::r) r);
-			std::vector<int> near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r);
+			std::list<int> near_cells(int id, typeof(npc::r) r);
+			std::list<int> near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r);
 			
 			friend std::ostream& operator<<(std::ostream &stream, const map &m);
 		private:

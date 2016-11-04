@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <list>
+#include <unordered_map>
 extern "C"{
 #include <math.h>
 #include <string.h>
@@ -68,8 +69,8 @@ namespace share {
 //			return 1;
 //		}
 		
-		for(unsigned i=0;i<attrs.size();i++){
-			attrs[i]=0;
+		for(auto i: attrs){
+			attrs[i.first]=0;
 		}
 //		_updated.pack.done=0;
 //		_updated.pack.all=0;
@@ -96,15 +97,15 @@ namespace share {
 	bool npc::update_cells(){//TODO:improve performance
 		int _cell_id=m.to_grid(position.x, position.y);
 		if (cell_id!=_cell_id){//if npc move to other cell
-			std::map<int, bool> e;
-			std::vector<int> &&v=m.near_cells(_cell_id, r);
+			std::unordered_map<int, bool> e;
+			std::list<int> &&v=m.near_cells(_cell_id, r);
 			//set old cells to true
-			for(int i=0,end=cells.size();i<end;i++){
-				e[cells[i]]=1;
+			for(auto i: cells){
+				e[i]=1;
 			}
 			//set new cells to false
-			for(int i=0,end=v.size();i<end;i++){
-				std::map<int, bool>::iterator it = e.find(v[i]);
+			for(auto i: v){
+				auto it = e.find(i);
 				if (it!=e.end())
 					if (it->second)
 						e[it->first]=0;
@@ -112,14 +113,14 @@ namespace share {
 			//remove npc from old
 			//invert false
 			std::list<int> for_del;
-			for(std::map<int, bool>::iterator i=e.begin(), end=e.end();i!=end;++i){
+			for(auto i: e){
 //				printf("%d\n", i->first);
-				if (i->second){
-					m.cells(i->first)->npcs.erase(id);///WTF!!!
-					for_del.push_back(i->first);
+				if (i.second){
+					m.cells(i.first)->npcs.erase(id);///WTF!!!
+					for_del.push_back(i.first);
 //					e.erase(i->first);
 				}else{
-					e[i->first]=1;
+					i.second=1;
 				}
 			} 
 			//remove true
@@ -127,10 +128,10 @@ namespace share {
 				e.erase(i);
 			}
 			//add npc to new cells
-			for(int i=0,end=v.size();i<end;i++){
+			for(auto i: v){
 //				printf("\t %d\n", v[i]);
-				if (!e[v[i]])
-					m.cells(v[i])->npcs[id]=this;
+				if (!e[i])
+					m.cells(i)->npcs[id]=this;
 			}
 			//c->npcs.erase(id);
 			cell_id=_cell_id;
@@ -179,10 +180,14 @@ namespace share {
 					if (p->chanks[i].type<6){
 //						printf("sizeof chank %d\n",p->chanks[i].size());
 						void* data=p->chanks[i].data();
-						if (data && p->chanks[i].size()==attr.size(index))
-							memcpy(attr(index), p->chanks[i].data(), p->chanks[i].size());
-						else//smth wrong with server>server proxy
+						if (data && p->chanks[i].size()==attr.size(index)){
+							if (memcmp(attr(index), data, p->chanks[i].size())!=0){
+								attrs[index]=1;
+								memcpy(attr(index), data, p->chanks[i].size());
+							}
+						}else{//smth wrong with server>server proxy
 							printf("npc update corrupt chank on index %d %d\n", (int)index, i);
+						}
 					}
 				}else{
 					printf("got strange index %d\n", (int)index);
@@ -264,10 +269,10 @@ namespace share {
 	
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
-		std::vector<int> &&ids=world->map.near_cells(x, y, r); //!check this!
+		std::list<int> &&ids=world->map.near_cells(x, y, r); //!check this!
 		//printf("segments %d \n", world->map.segments.size());
-		for(int c=0,cend=ids.size();c<cend;c++){//TODO: change to check by map grid
-			share::cell *cell=world->map.cells(ids[c]);
+		for(auto c: ids){//TODO: change to check by map grid
+			share::cell *cell=world->map.cells(c);
 			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
 				segment *s=cell->segments[i];
 				if(s->distanse(p)<=r){

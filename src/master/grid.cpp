@@ -49,12 +49,12 @@ namespace master {
 			cells.clear();
 		}
 		
-		int grid::getOwner(const float x, const float y){
+		int grid::get_owner(const float x, const float y){
 			//printf("on %g %g(%g %g) index %d owner %d\n",x, y, x/cell[0], y/cell[1], to_grid(x/cell[0], y/cell[1]), data[to_grid(x/cell[0], y/cell[1])]);
 			return data[to_grid(x/cell[0], y/cell[1])]->owner;
 		}
 		
-		std::vector<int>& grid::getShares(const float x, const float y){//return array of int of different size
+		std::vector<int>& grid::get_shares(const float x, const float y){//return array of int of different size
 			return data[to_grid(x/cell[0], y/cell[1])]->shares;
 		}
 

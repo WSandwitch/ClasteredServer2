@@ -11,7 +11,7 @@ extern "C"{
 #include <execinfo.h>
 #endif
 }
-#include "processors/message.h"
+#include "processors.h"
 #include "../share/network/socket.h"
 #include "../share/network/listener.h"
 #include "../share/system/sync.h"

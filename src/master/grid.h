@@ -35,8 +35,8 @@ namespace master {
 				void setId(int id);
 				bool add(int id, bool rec=1);
 				bool remove(int id, bool rec=1);
-				int getOwner(const float x, const float y);
-				std::vector<int>& getShares(const float x, const float y);//return array of int of different size
+				int get_owner(const float x, const float y);
+				std::vector<int>& get_shares(const float x, const float y);//return array of int of different size
 			private:
 				int id;
 				int offset;

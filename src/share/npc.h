@@ -2,6 +2,8 @@
 #define CLASTERED_SERVER_SLAVE_NPC_HEADER
 
 #include <map>
+#include <set>
+#include <list>
 #include <vector>
 #include "../share/system/time.h"
 #include "../share/system/mutex.h"
@@ -52,7 +54,8 @@ namespace share {
 			int slave_id;
 			int cell_id;
 			int r; //radius of collision
-			std::vector<int> cells;
+			std::list<int> cells;
+			std::set<int> slaves;
 			struct{
 				struct{
 					bool done;

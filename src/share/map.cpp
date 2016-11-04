@@ -110,8 +110,8 @@ namespace share{
 		return cells(to_grid(x, y));
 	}
 	
-	std::vector<int> map::cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b){
-		std::vector<int> v;
+	std::list<int> map::cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b){
+		std::list<int> v;
 		//TODO: check returned ids
 		for(int x=to_grid_x(l), xend=to_grid_x(r);x<=xend;x++){
 			for(int y=to_grid_y(t), yend=to_grid_y(b);y<=yend;y++){
@@ -164,11 +164,11 @@ namespace share{
 		return v;
 	}
 	
-	std::vector<int> map::near_cells(int id, typeof(npc::r) r){
+	std::list<int> map::near_cells(int id, typeof(npc::r) r){
 		return near_cells(id_to_x(id)*cell.x+cell.x/2, id_to_y(id)*cell.y+cell.y/2, r+(cell.x+cell.y)/4);
 	}
 	
-	std::vector<int> map::near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r){
+	std::list<int> map::near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r){
 		//TODO: check returned data
 		return cells(x-r, y-r, x+r, y+r);
 	}

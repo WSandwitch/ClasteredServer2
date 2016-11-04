@@ -30,6 +30,13 @@
 #include "../share/world.h"
 
 #define CONFIG_FILE "config.cfg"
+#ifndef VIEW_AREA_X
+	#define VIEW_AREA_X 200
+#endif
+#ifndef VIEW_AREA_Y
+	#define VIEW_AREA_Y 200
+#endif
+
 
 namespace master{
 	share::world world;
@@ -179,8 +186,67 @@ int main(int argc,char* argv[]){
 	do{
 		timestamp=share::time(0);
 		tv.timePassed(); //start timer
-		//////test
-		
+		//////
+		master::world.m.lock();
+			for(auto ni: master::world.npcs){
+				npc *n=ni.second;
+				if(n){
+					n->m.lock();
+				}
+			}
+			for(auto ni: master::world.npcs){
+				npc *n=ni.second;
+				if(n){
+					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
+					//move in map
+					//update n->slaves
+					//send slaves to remove npc
+					n->slave_id=slave_id;
+				}
+			}
+			for(auto ni: master::world.npcs){
+				npc *n=ni.second;
+				if(n){
+					n->pack(1);
+					for(auto i: n->slaves){
+						server *s=server::get(i);
+						if (s){
+							s->sock->send(&n->p);
+						}
+					}
+				}
+			}
+			for(auto ci: client::all){
+				client *c=ci.second;
+				if (c){
+					auto cells=master::world.map.cells(
+						c->npc->position.x-VIEW_AREA_X/2, //l
+						c->npc->position.x+VIEW_AREA_Y/2, //t
+						c->npc->position.x+VIEW_AREA_X/2, //r
+						c->npc->position.x-VIEW_AREA_Y/2 //b
+					);
+					for (auto i:cells){
+						auto cell=master::world.map.cells(i);
+						if (cell){
+							for(auto ni: cell->npcs){
+								npc* n=ni.second;
+								if (n){
+									n->pack(0);
+									c->sock->send(&n->p);
+								}
+							}
+						}
+					}
+				}
+			}		
+			for(auto ni: master::world.npcs){
+				npc *n=ni.second;
+				if(n){
+					n->clear();
+					n->m.unlock();
+				}
+			}
+		master::world.m.unlock();
 		//////
 		if (timestamp-timestamps.servers_check>5){
 			server::check();
@@ -188,10 +254,10 @@ int main(int argc,char* argv[]){
 		}
 		client::check();
 		chatsCheck();
-		tv.syncTPS(TPS);
 //		if (timestamp-timestamps.start>25){//debug feature
 //			main_loop=0;
 //		}
+		tv.syncTPS(TPS);
 	}while(main_loop);
 	//clearing
 	sleep(2);
