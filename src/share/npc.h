@@ -82,6 +82,7 @@ namespace share {
 			void update(share::packet * p);
 			bool updated(); 			
 			void pack(bool server=0, bool all=0); //pack action attributes, do not pack special atributes
+			bool update_cells();//return 1 if updated
 			
 			template<class T1, class T2>
 			int set_attr(T1 &a, T2 v){
@@ -101,7 +102,6 @@ namespace share {
 			timestamp_t timestamp;
 			
 			bool check_point(typeof(point::x) x, typeof(point::y) y);
-			bool update_cells();
 		
 			static npc_moves _moves;
 			static npc_shoots _shoots;

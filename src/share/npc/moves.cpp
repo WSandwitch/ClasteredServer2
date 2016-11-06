@@ -41,7 +41,7 @@ namespace share{
 				set_dir();
 			}
 		}
-		update_cells();
+//		update_cells();
 	}
 	
 	//bullet move, go straight for dist, enemy or wall, than suicide

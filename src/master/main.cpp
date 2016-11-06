@@ -1,3 +1,8 @@
+#include <map> 
+#include <set> 
+#include <unordered_map> 
+#include <unordered_set> 
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h>
@@ -28,6 +33,7 @@
 #include "../share/system/sync.h"
 #include "../share/system/log.h"
 #include "../share/world.h"
+#include "../share/messages.h"
 
 #define CONFIG_FILE "config.cfg"
 #ifndef VIEW_AREA_X
@@ -197,22 +203,32 @@ int main(int argc,char* argv[]){
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
-					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
+					n->slave_id=master::grid->get_owner(n->position.x, n->position.y);
+					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 					//move in map
+					n->update_cells();
 					//update n->slaves
-					//send slaves to remove npc
-					n->slave_id=slave_id;
-				}
-			}
-			for(auto ni: master::world.npcs){
-				npc *n=ni.second;
-				if(n){
 					n->pack(1);
-					for(auto i: n->slaves){
-						server *s=server::get(i);
+					std::unordered_map<int, bool> slaves;
+					for(auto slave: n->slaves)
+						slaves[slave]=0;
+					n->slaves.clear();
+					for(auto slave: share_ids)
+						slaves[slave]=1;
+					slaves[n->slave_id]=1;
+					for(auto slave: slaves){
+						server *s=server::get(slave.first);
 						if (s){
-							s->sock->send(&n->p);
-						}
+							if (slave.second){
+									s->sock->send(&n->p);
+									n->slaves.insert(slave.first);//TODO: check may be move out of if
+							}else{
+								packet p;
+								p.setType(MESSAGE_NPC_REMOVE);
+								p.add(n->id);
+								s->sock->send(&p);
+							}
+						}	
 					}
 				}
 			}
@@ -228,12 +244,16 @@ int main(int argc,char* argv[]){
 					for (auto i:cells){
 						auto cell=master::world.map.cells(i);
 						if (cell){
+							std::unordered_set<npc*> npcs;
 							for(auto ni: cell->npcs){
 								npc* n=ni.second;
 								if (n){
-									n->pack(0);
-									c->sock->send(&n->p);
+									npcs.insert(n);
 								}
+							}
+							for(auto n: npcs){
+								n->pack(0);
+								c->sock->send(&n->p);
 							}
 						}
 					}

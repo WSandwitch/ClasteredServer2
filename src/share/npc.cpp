@@ -60,7 +60,10 @@ namespace share {
 	}
 	
 	npc::~npc(){
-
+		for(auto i: cells){
+			auto cell=world->map.cells(i);
+			cell->npcs.erase(id);
+		}
 		//add returning of id
 	}
 		

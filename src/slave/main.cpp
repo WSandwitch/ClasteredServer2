@@ -134,6 +134,7 @@ int main(int argc, char* argv[]){
 					if (world.id==n->slave_id){
 						n->move();
 					}
+					n->update_cells();
 //					n->m.unlock();
 				}
 			}
