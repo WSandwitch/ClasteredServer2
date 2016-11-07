@@ -49,7 +49,7 @@ namespace share {
 			attrs[i.first]=1;
 		}
 		
-		movef=npc::moves[type];
+		move_id=type;
 		timestamp=time(0);
 		//TODO: add normal spawn position
 		///
@@ -86,14 +86,16 @@ namespace share {
 		//TODO: fill
 	}
 	
-	void npc::move(){
-		if (movef)
-			(this->*movef)(direction.x*vel, direction.y*vel);
+	void npc::move(){ //TODO: check if it works
+		auto $=moves[move_id];
+		if ($)
+			(this->*$)(direction.x*vel, direction.y*vel);
 	}
 	
 	void npc::shoot(){
-		if (shootf)
-			(this->*shootf)(0, 0);//add useful coordinates
+		auto $=shoots[shoot_id];
+		if ($)
+			(this->*$)(0, 0);//add useful coordinates
 	}
 	
 #define m world->map

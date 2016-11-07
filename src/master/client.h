@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <set>
 #include <string>
 #include <sys/time.h>
 
@@ -47,6 +48,7 @@ namespace master {
 			share::mutex mutex;
 			std::list<client_message*> messages;
 			std::map<int, void*> chats;
+			std::set<share::npc*> npcs;
 			timestamp_t timestamp;
 			char token[30];
 			

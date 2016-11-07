@@ -203,30 +203,49 @@ int main(int argc,char* argv[]){
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
+					int slave_id=n->slave_id;
 					n->slave_id=master::grid->get_owner(n->position.x, n->position.y);
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 					//move in map
 					n->update_cells();
 					//update n->slaves
-					n->pack(1);
-					std::unordered_map<int, bool> slaves;
-					for(auto slave: n->slaves)
-						slaves[slave]=0;
+					std::unordered_map<int, short> slaves;
+					for(auto slave: n->slaves)//set had to 2
+						slaves[slave]=2;
 					n->slaves.clear();
 					for(auto slave: share_ids)
-						slaves[slave]=1;
-					slaves[n->slave_id]=1;
+						slaves[slave]++; //inc real
+					slaves[n->slave_id]++;
 					for(auto slave: slaves){
 						server *s=server::get(slave.first);
 						if (s){
-							if (slave.second){
+							switch(slave.second){
+								case 2: //need to remove
+									{
+										packet p;
+										p.setType(MESSAGE_NPC_REMOVE);
+										p.add(n->id);
+										s->sock->send(&p);
+									}
+									break;
+								case 1: //new npc
+									n->pack(1,1);
 									s->sock->send(&n->p);
-									n->slaves.insert(slave.first);//TODO: check may be move out of if
-							}else{
-								packet p;
-								p.setType(MESSAGE_NPC_REMOVE);
-								p.add(n->id);
-								s->sock->send(&p);
+									n->slaves.insert(slave.first);
+									break;
+								case 3: //already had npc
+									if (slave_id!=n->slave_id && n->updated()){ //if attrs updated
+										n->pack(1);
+										s->sock->send(&n->p);
+									}else{ //send only needed attrs
+										packet p;
+										p.setType(MESSAGE_NPC_UPDATE);
+										p.add(n->id);
+										p.add(n->slave_id);//TODO: add other attrs
+										s->sock->send(&p);
+									}
+									n->slaves.insert(slave.first);
+									break;
 							}
 						}	
 					}
@@ -244,16 +263,44 @@ int main(int argc,char* argv[]){
 					for (auto i:cells){
 						auto cell=master::world.map.cells(i);
 						if (cell){
-							std::unordered_set<npc*> npcs;
+							std::unordered_map<npc*, short> npcs;
+							for(auto n: c->npcs){
+								if (n){
+									npcs[n]=2;
+								}
+							}
+							c->npcs.clear();
 							for(auto ni: cell->npcs){
 								npc* n=ni.second;
 								if (n){
-									npcs.insert(n);
+									npcs[n]++;
 								}
 							}
 							for(auto n: npcs){
-								n->pack(0);
-								c->sock->send(&n->p);
+								if (n.first){
+									switch(n.second){
+										case 2: //need to remove
+											{
+												packet p;
+												p.setType(MESSAGE_NPC_REMOVE);
+												p.add(n.first->id);
+												c->sock->send(&p);
+											}
+											break;
+										case 1: //new npc
+											n.first->pack(0,1); //all attrs
+											c->sock->send(&n.first->p);
+											c->npcs.insert(n.first);
+											break;
+										case 3: //already had npc
+											if (n.first->updated()){
+												n.first->pack(0); 
+												c->sock->send(&n.first->p);
+											}
+											c->npcs.insert(n.first);
+											break;
+									}
+								}	
 							}
 						}
 					}

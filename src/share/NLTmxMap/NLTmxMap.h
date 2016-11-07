@@ -40,7 +40,7 @@ struct NLTmxMapObjectProperty {
 };
 
 struct NLTmxMapPoint {
-	NLTmxMapPoint(int _x,int _y){x=_x;y=_y;}
+	NLTmxMapPoint(int x,int y):x(x),y(y){}
 	int x,y;
 };
 

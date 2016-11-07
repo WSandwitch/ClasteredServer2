@@ -42,6 +42,8 @@ namespace share {
 			short health;
 			short damage;
 			short type;
+			short move_id;
+			short shoot_id;
 			int owner_id;
 			char angle;
 //			char keys[4]; //x,y(l- r+ t- b+), angle	
@@ -65,8 +67,8 @@ namespace share {
 			} _updated;
 			attrs_map attr;
 			std::map<char, bool> attrs; //attributes updated flags
-			move_func movef;
-			shoot_func shootf;
+//			move_func movef;
+//			shoot_func shootf;
 
 			npc(){};
 			npc(share::world *w, int id, int slave=0, short type=0);

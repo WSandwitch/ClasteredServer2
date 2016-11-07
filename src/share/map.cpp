@@ -58,6 +58,12 @@ namespace share{
 			//fill data
 			map_size[0]=map->tileWidth*map->width;
 			map_size[1]=map->tileHeight*map->height;
+			for(auto group: map->groups){
+				if (group->name==std::string("collision"))
+					for(auto obj: group->objects)
+						for(int i=1, end=obj->points.size();i<end;i++)
+							segments.push_back(new segment(obj->points[i-1].x, obj->points[i-1].y, obj->points[i].x, obj->points[i].y));
+			}
 			delete map;
 			free(xml);
 		}
