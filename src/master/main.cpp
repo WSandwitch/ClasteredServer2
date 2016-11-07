@@ -134,6 +134,9 @@ static void segfault_sigaction(int sig){
 
 
 //	FILE *f = fmemopen(&w, sizeof(w), "r+");
+#define packAttr(p,n,a)\
+	if (n->attrs[n->attr(&n->a)])\
+		p.add(n->a);
 
 #define startWorkers(type)\
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
@@ -241,7 +244,9 @@ int main(int argc,char* argv[]){
 										packet p;
 										p.setType(MESSAGE_NPC_UPDATE);
 										p.add(n->id);
-										p.add(n->slave_id);//TODO: add other attrs
+										packAttr(p, n, slave_id);
+										packAttr(p, n, weapon_id);
+										//TODO: add other attrs
 										s->sock->send(&p);
 									}
 									n->slaves.insert(slave.first);
@@ -256,11 +261,11 @@ int main(int argc,char* argv[]){
 				if (c){
 					auto cells=master::world.map.cells(
 						c->npc->position.x-VIEW_AREA_X/2, //l
-						c->npc->position.x+VIEW_AREA_Y/2, //t
+						c->npc->position.x-VIEW_AREA_Y/2, //t
 						c->npc->position.x+VIEW_AREA_X/2, //r
-						c->npc->position.x-VIEW_AREA_Y/2 //b
+						c->npc->position.x+VIEW_AREA_Y/2 //b
 					);
-					for (auto i:cells){
+					for(auto i:cells){
 						auto cell=master::world.map.cells(i);
 						if (cell){
 							std::unordered_map<npc*, short> npcs;

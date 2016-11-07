@@ -6,7 +6,7 @@
 
 namespace share{
 	
-	std::map<short, move_func> npc::moves;
+	typeof(npc::moves) npc::moves;
 	npc_moves npc::_moves;
 	
 #define addMoveFunc(id)\

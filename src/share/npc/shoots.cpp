@@ -6,7 +6,7 @@
 
 namespace share{
 	
-	std::map<short, shoot_func> npc::shoots;
+	typeof(npc::shoots) npc::shoots;
 	npc_shoots npc::_shoots;
 
 #define addShootFunc(id)\

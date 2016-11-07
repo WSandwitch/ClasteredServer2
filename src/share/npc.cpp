@@ -44,6 +44,8 @@ namespace share {
 		attr.push_back(bot.goal.x); //9s
 		attr.push_back(bot.goal.y); //10s
 		attr.push_back(bot.used); //11s
+		attr.push_back(move_id); //12s
+		attr.push_back(shoot_id); //13s
 		
 		for(auto i:attr){
 			attrs[i.first]=1;
@@ -83,13 +85,40 @@ namespace share {
 	}
 	
 	void npc::attack(){
-		//TODO: fill
+		//TODO: check	
+		short warmup=1000; //set
+		short cooldown=1000; //set
+		short latency=10; //tiks
+		//add attack prepare
+		if (state==STATE_WARMUP){//preparing
+			if(weapon.temp<NPC_FULL_TEMP){
+				weapon.temp+=warmup;
+			}else{
+				state=STATE_ATTACK;
+			}
+		}
+		if (state==STATE_ATTACK){//attacking
+			if (weapon.next_shot==0){
+				shoot();
+				weapon.next_shot=latency;
+			}else{
+				weapon.next_shot--;
+			}
+		}
+		if (state==STATE_COOLDOWN){//after attack			
+			if(weapon.temp>0){
+				weapon.temp-=cooldown;
+			}else{
+				weapon.temp=0;
+				state=STATE_IDLE;
+			}
+		}
 	}
 	
 	void npc::move(){ //TODO: check if it works
 		auto $=moves[move_id];
 		if ($)
-			(this->*$)(direction.x*vel, direction.y*vel);
+			(this->*$)(direction.x*vel, direction.y*vel);//TODO:add angle correction
 	}
 	
 	void npc::shoot(){
@@ -101,42 +130,28 @@ namespace share {
 #define m world->map
 	bool npc::update_cells(){//TODO:improve performance
 		int _cell_id=m.to_grid(position.x, position.y);
-		if (cell_id!=_cell_id){//if npc move to other cell
-			std::unordered_map<int, bool> e;
+		if (cell_id!=_cell_id){//if npc move to another cell
+			std::unordered_map<int, short> e;
 			std::list<int> &&v=m.near_cells(_cell_id, r);
-			//set old cells to true
+			//set old cells to 2
 			for(auto i: cells){
-				e[i]=1;
+				e[i]=2;
 			}
-			//set new cells to false
+			//inc new cells
 			for(auto i: v){
-				auto it = e.find(i);
-				if (it!=e.end())
-					if (it->second)
-						e[it->first]=0;
+				e[i]++;
 			}
-			//remove npc from old
-			//invert false
-			std::list<int> for_del;
 			for(auto i: e){
-//				printf("%d\n", i->first);
-				if (i.second){
-					m.cells(i.first)->npcs.erase(id);///WTF!!!
-					for_del.push_back(i.first);
-//					e.erase(i->first);
-				}else{
-					i.second=1;
+				switch(i.second){
+					case 1: //new
+						m.cells(i.first)->npcs[id]=this;
+						break;
+					case 2: //remove
+						m.cells(i.first)->npcs.erase(id);
+						break;
+					case 3: //already has
+						break;
 				}
-			} 
-			//remove true
-			for(auto i:for_del){//!need to use!
-				e.erase(i);
-			}
-			//add npc to new cells
-			for(auto i: v){
-//				printf("\t %d\n", v[i]);
-				if (!e[i])
-					m.cells(i)->npcs[id]=this;
 			}
 			//c->npcs.erase(id);
 			cell_id=_cell_id;
@@ -177,18 +192,19 @@ namespace share {
 	void npc::update(packet * p){
 		for(unsigned i=1;i<p->chanks.size();i++){
 			int index=(int)p->chanks[i++].value.c;
+			void *pattr=attr(index);
 			if (p->chanks[i-1].type!=1)
 				printf("chank index type error, got %d\n", p->chanks[i-1].type);
 //			printf("index %d\n", index);
 			if (index>=0){
-				if (attr(index)){
+				if (pattr){
 					if (p->chanks[i].type<6){
 //						printf("sizeof chank %d\n",p->chanks[i].size());
 						void* data=p->chanks[i].data();
 						if (data && p->chanks[i].size()==attr.size(index)){
-							if (memcmp(attr(index), data, p->chanks[i].size())!=0){
-								attrs[index]=1;
-								memcpy(attr(index), data, p->chanks[i].size());
+							if (memcmp(pattr, data, p->chanks[i].size())!=0){
+								attrs[index]=1;//updated
+								memcpy(pattr, data, p->chanks[i].size());
 							}
 						}else{//smth wrong with server>server proxy
 							printf("npc update corrupt chank on index %d %d\n", (int)index, i);

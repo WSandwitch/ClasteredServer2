@@ -34,6 +34,18 @@ namespace slave {
 	}
 	
 	static void* message_NPC_REMOVE(packet* p){
+		int id=p->chanks[0].value.i;
+		npc* n=0;
+		slave::world.m.lock();
+			n=slave::world.npcs[id];
+			if (n)
+				n->m.lock();
+			slave::world.npcs.erase(id);
+		slave::world.m.unlock();
+		if (n){
+			n->m.unlock();
+			delete n;
+		}
 		return 0;
 	}
 	

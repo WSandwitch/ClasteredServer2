@@ -2,6 +2,7 @@
 #define CLASTERED_SERVER_SLAVE_NPC_HEADER
 
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <list>
 #include <vector>
@@ -10,6 +11,12 @@
 #include "../share/network/packet.h"
 #include "math/point.h"
 #include "attrs_map.h"
+
+#define NPC_FULL_TEMP 10000
+#define STATE_IDLE 0
+#define STATE_WARMUP 1
+#define STATE_ATTACK 2
+#define STATE_COOLDOWN 3
 
 extern "C"{
 #include <time.h>
@@ -35,22 +42,25 @@ namespace share {
 	class npc {
 		public:
 			int id;
-			//action attributes
-			char state; //TODO: use it
+			char state; //attack state
 			point position;
 			pointf direction;
-			short health;
-			short damage;
-			short type;
+			short health; //curent health
+			short damage; //calculated damage
+			short type; //
 			short move_id;
-			short shoot_id;
-			int owner_id;
-			char angle;
+			short shoot_id; 
+			short weapon_id; 
+			int owner_id; //id of player
+			char angle; //angle of view
 //			char keys[4]; //x,y(l- r+ t- b+), angle	
 			share::bot bot;
 			share::world *world;
-		
-			//common attributes
+			struct{
+				short temp;
+				short next_shot;
+			} weapon;
+				
 			share::packet p;
 			share::mutex m;
 			int slave_id;
@@ -66,7 +76,7 @@ namespace share {
 				} pack;
 			} _updated;
 			attrs_map attr;
-			std::map<char, bool> attrs; //attributes updated flags
+			std::unordered_map<char, bool> attrs; //attributes updated flags
 //			move_func movef;
 //			shoot_func shootf;
 
@@ -93,8 +103,8 @@ namespace share {
 			};
 //			std::vector<int>& gridShares();
 
-			static std::map<short, move_func> moves;
-			static std::map<short, shoot_func> shoots;
+			static std::unordered_map<short, move_func> moves;
+			static std::unordered_map<short, shoot_func> shoots;
 			
 			static npc* addBot(share::world *world, int id, float x, float y, short type=0);
 			
