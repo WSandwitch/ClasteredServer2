@@ -1,5 +1,4 @@
 package;
-import haxe.CallStack;
 
 import clasteredServerClient.Connection;
 import clasteredServerClient.Receiver;
@@ -27,17 +26,6 @@ class Main extends Sprite
 //		FlxG.camera.setSize(800, 600);
 	#end
 		//FlxG.fullscreen = true;
-		var game:CSGame = cast FlxG.game;
-		try{
-			var conn = new Connection("172.16.1.40", 8000);
-			game.id = conn.auth("qwer", "qwer");
-			trace(game.id);
-			game.connection = conn;
-			game.recv_loop = true;
-			game.receiver = new Receiver();
-		}catch(e:Dynamic){
-			trace(e);
-			trace(CallStack.toString(CallStack.exceptionStack()));
-		}
+		
 	}
 }

@@ -5,8 +5,12 @@ import clasteredServerClient.Packet.Chank;
 import haxe.io.Bytes;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
+#if flash
+import flash.net.Socket;
+#else
 import sys.net.Socket;
 import sys.net.Host;
+#end
 import haxe.crypto.Md5;
 import haxe.crypto.Base64;
 
@@ -19,10 +23,15 @@ class Connection{
 		var p:Packet = new Packet();
 //		sock.setBlocking(true);
 //		sock.setTimeout(100000);
+	#if flash
+		sock.connect(host, port);
+		sock.endian = LITTLE_ENDIAN;
+	#else
 		sock.connect(new Host(host), port);
 		sock.input.bigEndian=false;
 		sock.output.bigEndian = false;
 		sock.setFastSend(true);
+	#end
 		p.type = 0;
 		p.addString("Haxe hello");
 		sendPacket(p);
@@ -30,70 +39,136 @@ class Connection{
 	
 	public function recvChar():Int{
 //		sock.waitForRead();
+	#if flash
+		return sock.readByte();
+	#else
 		return sock.input.readInt8();
+	#end
 	}
 
 	public function recvShort():Int{
 //		sock.waitForRead();
+	#if flash
+		return sock.readShort();
+	#else
 		return sock.input.readInt16();
+	#end
 	}
 
 	public function recvInt():Int{
 //		sock.waitForRead();
+	#if flash
+		return sock.readInt();
+	#else
 		return sock.input.readInt32();
+	#end
 	}
 
 	public function recvFloat():Float{
 //		sock.waitForRead();
+	#if flash
+		return sock.readFloat();
+	#else
 		return sock.input.readFloat();
+	#end
 	}
 
 	public function recvDouble():Float{
 //		sock.waitForRead();
+	#if flash
+		return sock.readDouble();
+	#else
 		return sock.input.readDouble();
+	#end
 	}
 
 	public function recvBytes(?size:Null<Int>):Bytes{
 //		sock.waitForRead();
+	#if flash
+		return Bytes.ofString(recvString(size));
+	#else
 		if (size==null)
 			size=recvShort();
 		return sock.input.read(size);
+	#end
 	}
 
 	public function recvString(?size:Null<Int>):String{
 //		sock.waitForRead();
+	#if flash
+		if (size == null)
+			return sock.readUTF();//unsigned!!
+		else
+			return sock.readUTFBytes(size);
+	#else
 		if (size==null)
 			size=recvShort();
 		return sock.input.readString(size);
+	#end
 	}
 
 	public function sendChar(a:Int):Void{
+	#if flash
+		sock.writeByte(a);
+		sock.flush();
+	#else
 		sock.output.writeInt8(a);
+	#end
 	}
 
 	public function sendShort(a:Int):Void{
+	#if flash
+		sock.writeShort(a);
+		sock.flush();
+	#else
 		sock.output.writeInt16(a);
+	#end
 	}
 
 	public function sendInt(a:Int):Void{
+	#if flash
+		sock.writeInt(a);
+		sock.flush();
+	#else
 		sock.output.writeInt32(a);
+	#end
 	}
 
 	public function sendFloat(a:Float):Void{
+	#if flash
+		sock.writeFloat(a);
+		sock.flush();
+	#else
 		sock.output.writeFloat(a);
+	#end
 	}
 
 	public function sendDouble(a:Float):Void{
+	#if flash
+		sock.writeDouble(a);
+		sock.flush();
+	#else
 		sock.output.writeDouble(a);
+	#end
 	}
 
 	public function sendBytes(s:Bytes):Void{
+	#if flash
+		sock.writeBytes(s.getData(), 0, s.length);
+		sock.flush();
+	#else
 		sock.output.write(s);
+	#end
 	}
 
 	public function sendString(s:String):Void{
+	#if flash
+		sock.writeUTF(s);//unsigned!!
+		sock.flush();
+	#else
 		sock.output.writeInt16(s.length);
 		sock.output.writeString(s);
+	#end
 	}
 
 	public function recvPacket():Packet{

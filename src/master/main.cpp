@@ -209,6 +209,8 @@ int main(int argc,char* argv[]){
 					int slave_id=n->slave_id;
 					n->slave_id=master::grid->get_owner(n->position.x, n->position.y);
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
+if (slave_id!=n->slave_id)
+n->attrs[n->attr(n->slave_id)]=1;
 					//move in map
 					n->update_cells();
 					//update n->slaves

@@ -14,6 +14,9 @@ import flixel.math.FlxRect;
 import flixel.util.FlxColor;
 import nape.geom.Vec2;
 import openfl.Assets;
+import clasteredServerClient.*;
+import haxe.CallStack;
+
 using flixel.util.FlxSpriteUtil;
 
 /**
@@ -36,9 +39,39 @@ class PlayState extends FlxState
 	private var deadzoneOverlay:FlxSprite;
 	private var keys:Array<Int> = [0,0,0,0];
 
+	///network attrs
+	public var id:Int;
+	public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
+	public var npc:Null<Npc> = null;
+	public var npc_id:Int = 0;
+	
+	public var l:Lock = new Lock();
+	public var connection:Null<Connection> = null;
+	public var recv_loop:Bool = true;
+	public var receiver:Null<Receiver> = null;
+	public var packets:Array<Packet> = new Array<Packet>();
+	
+	public function connection_lost(){
+		
+	}
+	///
+	
 	override public function create():Void 
 	{	
 		FlxNapeSpace.init();
+		
+		try{
+			var conn = new Connection("172.16.1.40", 8000);
+			id = conn.auth("qwer", "qwer");
+			trace(id);
+			connection = conn;
+			recv_loop = true;
+			receiver = new Receiver(this);
+		}catch(e:Dynamic){
+			trace(e);
+			trace(CallStack.toString(CallStack.exceptionStack()));
+			//Add move to AuthState
+		}
 		
 		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
 		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
@@ -288,7 +321,7 @@ class PlayState extends FlxState
 		
 		if (p.chanks.length>0){
 			p.type = 41;
-			game.connection.sendPacket(p);
+			connection.sendPacket(p);
 //			trace("sended");
 		}
 		
@@ -315,17 +348,17 @@ class PlayState extends FlxState
 	private function checkPackets(elapsed:Float) {
 		var p:Null<Packet> = null;
 		do{
-			game.l.lock();
-				p = game.packets.pop();
-			game.l.unlock();
+			l.lock();
+				p = packets.pop();
+			l.unlock();
 			if (p!=null){
 				switch p.type {
 					case 40:
-						var n:Null<Npc> = game.npcs[p.chanks[0].i];
+						var n:Null<Npc> = npcs[p.chanks[0].i];
 						if (n == null){
 							n = new Npc(0, 0, 0);
 							n.id = p.chanks[0].i;
-							game.npcs[p.chanks[0].i] = n;
+							npcs[p.chanks[0].i] = n;
 							add(n);
 						}
 						n.update_attributes(p);
@@ -334,14 +367,14 @@ class PlayState extends FlxState
 						while(i<p.chanks.length-1){
 							switch p.chanks[i].i {
 								case 1:
-									game.npc_id=p.chanks[++i].i;
-									if (game.npcs[game.npc_id] == null){
-										game.npcs[game.npc_id] = new Npc(0, 0, 0);
-										game.npcs[game.npc_id].id = game.npc_id;
-										add(game.npcs[game.npc_id]);
+									npc_id=p.chanks[++i].i;
+									if (npcs[npc_id] == null){
+										npcs[npc_id] = new Npc(0, 0, 0);
+										npcs[npc_id].id = npc_id;
+										add(npcs[npc_id]);
 									}
-									game.npc = game.npcs[game.npc_id];
-									FlxG.camera.follow(game.npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
+									npc = npcs[npc_id];
+									FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
 									i++;
 							}
 						}

@@ -11,6 +11,7 @@ import cpp.vm.Thread;
 import neko.vm.Thread;
 #elseif java
 import java.vm.Thread;
+#elseif flash
 #end
 
 
@@ -20,27 +21,37 @@ import java.vm.Thread;
  */
 class Receiver{
 #if flash
-	
+	private var state:Null<PlayState>=null;
 #else
 	private var t:Thread;
+#end
 
-	public function new(){
+	public function new(?s:Null<PlayState>){
+	#if flash
+		state = s;
+		
+	#else	
 		this.t = Thread.create(thread);
 		this.t.sendMessage(Thread.current());
+		this.t.sendMessage(s);
+	#end
 	}
+
+#if flash
 	
+#else
 	private function thread(){
 		var main:Thread = Thread.readMessage(true);
-		var game:CSGame = cast FlxG.game;
+		var state:Null<PlayState> = Thread.readMessage(true);
 		trace("receiver started");
-		if (game.connection != null){
+		if (state != null && state.connection != null){
 			try{
-				while (game.recv_loop){
-					var p:Packet = game.connection.recvPacket();
+				while (state.recv_loop){
+					var p:Packet = state.connection.recvPacket();
 //					trace(p);
-					game.l.lock();
-						game.packets.push(p);
-					game.l.unlock();
+					state.l.lock();
+						state.packets.push(p);
+					state.l.unlock();
 //					trace("loop");
 				}
 			}catch(e:Dynamic){
@@ -48,7 +59,7 @@ class Receiver{
 				trace(CallStack.toString(CallStack.exceptionStack()));
 			}
 		}
-		game.connection_lost();
+		state.connection_lost();
 		trace("receiver exited");
 	}
 	
