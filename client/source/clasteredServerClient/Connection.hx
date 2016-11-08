@@ -37,11 +37,14 @@ class Connection{
 		sendPacket(p);
 	}
 	
-#if flash 
-	public function bytesAvailable():Int{
-		return sock.bytesAvailable;
+	public function bytesAvailable(size:UInt):Bool{
+	#if flash 
+		trace(sock.bytesAvailable);
+		return sock.bytesAvailable>=size;
+	#else
+		return true;
+	#end
 	}
-#end
 
 	public function recvChar():Int{
 //		sock.waitForRead();
@@ -250,7 +253,7 @@ class Connection{
 		write.unlock();		
 	}
 	
-	public function auth(login:String, pass:String):Int{
+	public function auth(login:String, pass:String, f:Int->Void):Int{
 		var p:Packet;
 		p = recvPacket();
 //		trace(p);
@@ -277,6 +280,11 @@ class Connection{
 		
 		p = recvPacket();//chank 0- id(Int)
 //		trace(p);
+		f(p.chanks[0].i);
 		return p.chanks[0].i;
+	}
+	
+	private function authStep(callback){
+		
 	}
 }

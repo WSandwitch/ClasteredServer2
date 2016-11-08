@@ -60,19 +60,6 @@ class PlayState extends FlxState
 	{	
 		FlxNapeSpace.init();
 		
-		try{
-			var conn = new Connection("172.16.1.40", 8000);
-			id = conn.auth("qwer", "qwer");
-			trace(id);
-			connection = conn;
-			recv_loop = true;
-			receiver = new Receiver(this);
-		}catch(e:Dynamic){
-			trace(e);
-			trace(CallStack.toString(CallStack.exceptionStack()));
-			//Add move to AuthState
-		}
-		
 		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
 		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
 		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
@@ -80,6 +67,11 @@ class PlayState extends FlxState
 		
 		super.create();
 		game = cast FlxG.game;
+		
+		id = game.id;
+		connection = game.connection;
+		recv_loop = true;
+		receiver = new Receiver(this);
 		
 		FlxG.mouse.visible = false;
 		
@@ -321,6 +313,7 @@ class PlayState extends FlxState
 		
 		if (p.chanks.length>0){
 			p.type = 41;
+//			trace(connection);
 			connection.sendPacket(p);
 //			trace("sended");
 		}

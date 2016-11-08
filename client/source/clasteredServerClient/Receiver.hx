@@ -53,21 +53,21 @@ class Receiver{
 			while(true){
 				switch(status){
 					case 0:
-						if (state.connection.bytesAvailable()>=2){
+						if (state.connection.bytesAvailable(2)){
 							size_left = state.connection.recvShort();
 							packet = new Packet();
 							status = 1;
 						}else
 							break;
 					case 1:
-						if (state.connection.bytesAvailable()>=1){
+						if (state.connection.bytesAvailable(1)){
 							packet.type = state.connection.recvChar();
 							status += 1;
 							size_left -= 1;
 						}else
 							break;
 					case 2:
-						if (state.connection.bytesAvailable()>=1){
+						if (state.connection.bytesAvailable(1)){
 							var tmp:Int = state.connection.recvChar();
 							status += 1;
 							size_left -= 1;
@@ -80,7 +80,7 @@ class Receiver{
 							state.l.unlock();
 							status = 0;
 						}else							
-							if (state.connection.bytesAvailable()>=1){
+							if (state.connection.bytesAvailable(1)){
 								next_type = state.connection.recvChar();
 								switch(next_type){
 									case 1:
@@ -101,7 +101,7 @@ class Receiver{
 							}else
 								break;
 					case 4:
-						if (state.connection.bytesAvailable()>=next_size){
+						if (state.connection.bytesAvailable(next_size)){
 							switch(next_type){
 								case 1:
 									packet.addChar(state.connection.recvChar());
@@ -123,7 +123,7 @@ class Receiver{
 						}else
 							break;
 					case 5:
-						if (state.connection.bytesAvailable()>=next_size){
+						if (state.connection.bytesAvailable(next_size)){
 							packet.addString(state.connection.recvString(next_size));
 							size_left -= next_size;
 							status = 3;

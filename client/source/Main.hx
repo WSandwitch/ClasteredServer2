@@ -8,14 +8,14 @@ import openfl.display.Sprite;
 
 import flixel.FlxG;
 import flixel.system.scaleModes.*;
-
+import clasteredServerClient.*;
 
 class Main extends Sprite
 {
 	public function new()
 	{
 		super();
-		addChild(new CSGame(640, 480, PlayState));
+		addChild(new CSGame(640, 480, LoginState));
 		
 		//FlxG.fixedTimestep = false;
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1024,768);
@@ -26,6 +26,6 @@ class Main extends Sprite
 //		FlxG.camera.setSize(800, 600);
 	#end
 		//FlxG.fullscreen = true;
-		
+		//FlxG.switchState(new PlayState());
 	}
 }
