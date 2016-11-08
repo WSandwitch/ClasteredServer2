@@ -37,6 +37,12 @@ class Connection{
 		sendPacket(p);
 	}
 	
+#if flash 
+	public function bytesAvailable():Int{
+		return sock.bytesAvailable;
+	}
+#end
+
 	public function recvChar():Int{
 //		sock.waitForRead();
 	#if flash
