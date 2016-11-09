@@ -262,6 +262,7 @@ class Connection{
 		write.unlock();		
 	}
 	
+	//created special for flash
 	public function auth(login:String, pass:String, f:Int->Void):Void{
 		var p:Packet=new Packet();
 		repeater(function(){
@@ -294,7 +295,10 @@ class Connection{
 											return false;
 										recvPacketData(p);
 									
-										var password:String = Base64.encode(Md5.make(Bytes.ofString(Base64.decode(p.chanks[0].s).toString() + Md5.make(Bytes.ofString(pass)).toString())));//WTF salted pass
+										var buf:Bytes = Bytes.ofString("aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbb"); //create Bytes 32 long 
+										buf.blit(0, Base64.decode(p.chanks[0].s), 0, 16); //set first 16 
+										buf.blit(16, Md5.make(Bytes.ofString(pass)), 0, 16); //set second 16
+										var password:String = Base64.encode(Md5.make(buf));//md5(salte+pass)
 										p.init();
 										p.type = 1;
 										p.addChar(2);

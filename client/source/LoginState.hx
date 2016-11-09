@@ -22,6 +22,7 @@ using flixel.util.FlxSpriteUtil;
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
+ 
 class LoginState extends FlxState
 {
 
@@ -31,11 +32,6 @@ class LoginState extends FlxState
 		super.create();
 		
 		trace("login state");
-		
-		var pass = "hello";
-		var salt=haxe.crypto.Base64.encode(haxe.crypto.Md5.make(haxe.io.Bytes.ofString("hello")));
-		trace(haxe.crypto.Base64.encode(haxe.crypto.Md5.make(haxe.io.Bytes.ofString(haxe.crypto.Base64.decode(salt).toString() + haxe.crypto.Md5.make(haxe.io.Bytes.ofString(pass)).toString()))));
-		
 		
 		//add show cursor
 		if (game.login == null && game.pass == null)

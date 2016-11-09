@@ -48,7 +48,7 @@ class LoadState extends FlxState
 			
 			conn.auth(game.login, game.pass, function (i:Int){
 				game.id = i;
-				trace(game.id);
+				trace("Got id: ", game.id);
 				
 				FlxG.switchState(new PlayState());
 			});

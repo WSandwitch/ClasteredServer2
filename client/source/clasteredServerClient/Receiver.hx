@@ -45,7 +45,7 @@ class Receiver{
 #if flash
 	private static function worker(){
 //		bytesAvailable();
-		if (state == null || state.connection == null){
+		if (state.connection == null){
 			state.connection_lost();
 			return;
 		}
@@ -96,7 +96,7 @@ class Receiver{
 									case 6:
 										next_size = 2;
 								}
-								size_left -= next_size;
+								size_left -= 1;
 								status += 1;
 							}else
 								break;
@@ -125,7 +125,7 @@ class Receiver{
 					case 5:
 						if (state.connection.bytesAvailable(next_size)){
 							packet.addString(state.connection.recvString(next_size));
-							size_left -= next_size;
+//							size_left -= next_size;
 							status = 3;
 						}else
 							break;

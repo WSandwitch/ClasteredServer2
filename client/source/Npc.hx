@@ -58,22 +58,21 @@ class Npc extends FlxSprite
 	
 	public function update_attributes(p:Packet){
 		var i:Int = 1;
-		while (i < p.chanks.length - 1){
+		while (i < p.chanks.length){
 			var index:Int = p.chanks[i++].i;
 			if (updater[index]!=null){
 				var value:Dynamic = null;
 				switch p.chanks[i].type {
 					case 1, 2, 3:
-						value = p.chanks[i++].i;
+						value = p.chanks[i].i;
 					case 4, 5:
-						value = p.chanks[i++].f;
+						value = p.chanks[i].f;
 					case 6:
-						value = p.chanks[i++].s;
-					default:
-						i++;
+						value = p.chanks[i].s;
 				}
 				updater[index](value);
 			}
+			i++;
 		}
 	}
 	
