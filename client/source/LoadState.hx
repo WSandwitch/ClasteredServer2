@@ -16,6 +16,7 @@ import nape.geom.Vec2;
 import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
+import haxe.Timer.delay;
 
 using flixel.util.FlxSpriteUtil;
 
@@ -30,12 +31,22 @@ class LoadState extends FlxState
 		var game:CSGame = cast FlxG.game;
 		super.create();
 		
+		trace("load state");
+		
 		//add loading screen
+		
+		game.login = "qwer";
+		game.pass = "qwer";
 		
 		try{
 			var conn = new Connection("172.16.1.40", 8000);
 			game.connection = conn;
-			conn.auth("qwer", "qwer", function (i:Int){
+			delay(function(){
+				if (game.id == null)
+					game.connection_lost();
+			}, 10000);//10 seconds for connect and sign in
+			
+			conn.auth(game.login, game.pass, function (i:Int){
 				game.id = i;
 				trace(game.id);
 				

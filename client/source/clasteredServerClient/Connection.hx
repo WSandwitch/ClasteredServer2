@@ -13,9 +13,10 @@ import sys.net.Host;
 #end
 import haxe.crypto.Md5;
 import haxe.crypto.Base64;
+import haxe.Timer.delay;
 
 class Connection{
-	private var sock:Socket = new Socket();
+	private var sock:Null<Socket>;
 	public var write:Lock = new Lock();
 	public var read:Lock = new Lock();
 	
@@ -24,9 +25,11 @@ class Connection{
 //		sock.setBlocking(true);
 //		sock.setTimeout(100000);
 	#if flash
-		sock.connect(host, port);
+		sock = new Socket(host, port);
+		//sock.connect(host, port);
 		sock.endian = LITTLE_ENDIAN;
 	#else
+		sock = new Socket();
 		sock.connect(new Host(host), port);
 		sock.input.bigEndian=false;
 		sock.output.bigEndian = false;
@@ -39,7 +42,7 @@ class Connection{
 	
 	public function bytesAvailable(size:UInt):Bool{
 	#if flash 
-		trace(sock.bytesAvailable);
+//		trace(sock.bytesAvailable);
 		return sock.bytesAvailable>=size;
 	#else
 		return true;
@@ -187,37 +190,43 @@ class Connection{
 			size = recvShort();
 //			trace("size",size);
 			p.size = size;
-			p.type = recvChar();
-			size--;
-			recvChar();//
-			size--;
-			while(size>1){
-				var type:Int = recvChar();
-				size--;
-				var c:Chank = new Chank(type);
-				switch type {
-					case 1: 
-						c.i = recvChar();
-						size-= 1;
-					case 2: 
-						c.i=recvShort();
-						size-= 2;
-					case 3: 
-						c.i=recvInt();
-						size-= 4;
-					case 4: 
-						c.f=recvFloat();
-						size-= 4;
-					case 5: 
-						c.f=recvDouble();
-						size-= 8;
-					case 6: 
-						c.s=recvString();
-						size-= c.s.length+2;
-				}
-				p.chanks.push(c);
-			}
+			recvPacketData(p);
 		read.unlock();
+		return p;
+	}
+
+	private function recvPacketData(p:Packet):Packet{ //data size in p.size
+		var size = p.size;
+		p.type = recvChar();
+		size--;
+		recvChar();//
+		size--;
+		while(size>1){
+			var type:Int = recvChar();
+			size--;
+			var c:Chank = new Chank(type);
+			switch type {
+				case 1: 
+					c.i = recvChar();
+					size-= 1;
+				case 2: 
+					c.i=recvShort();
+					size-= 2;
+				case 3: 
+					c.i=recvInt();
+					size-= 4;
+				case 4: 
+					c.f=recvFloat();
+					size-= 4;
+				case 5: 
+					c.f=recvDouble();
+					size-= 8;
+				case 6: 
+					c.s=recvString();
+					size-= c.s.length+2;
+			}
+			p.chanks.push(c);
+		}
 		return p;
 	}
 
@@ -253,38 +262,87 @@ class Connection{
 		write.unlock();		
 	}
 	
-	public function auth(login:String, pass:String, f:Int->Void):Int{
-		var p:Packet;
-		p = recvPacket();
-//		trace(p);
-		p.init();
-		p.type = 1;
-		p.addChar(1);//first stage
-		p.addString(login);
-		sendPacket(p);
-		
-		p = recvPacket();
-//		trace(p);
-		var password:String = Base64.encode(Md5.make(Bytes.ofString(Base64.decode(p.chanks[0].s).toString() + Md5.make(Bytes.ofString(pass)).toString())));//WTF salted pass
-		p.init();
-		p.type = 1;
-		p.addChar(2);
-		p.addString(password);
-		sendPacket(p);
-		
-		p.init();
-		p.type = 50;
-		p.addChar(2);
-		p.addString(password);
-		sendPacket(p);
-		
-		p = recvPacket();//chank 0- id(Int)
-//		trace(p);
-		f(p.chanks[0].i);
-		return p.chanks[0].i;
+	public function auth(login:String, pass:String, f:Int->Void):Void{
+		var p:Packet=new Packet();
+		repeater(function(){
+			try{
+				if (!bytesAvailable(2))
+					return false;
+				p.size = recvShort();
+				repeater(function(){
+					try{
+						if (!bytesAvailable(p.size))
+							return false;
+						recvPacketData(p);
+
+						p.init();
+						p.type = 1;
+						p.addChar(1);//first stage
+						p.addString(login);
+						sendPacket(p);
+						
+						p.init();
+						repeater(function(){
+							try{
+								if (!bytesAvailable(2))
+									return false;
+								p.size = recvShort();
+							
+								repeater(function(){
+									try{
+										if (!bytesAvailable(p.size))
+											return false;
+										recvPacketData(p);
+									
+										var password:String = Base64.encode(Md5.make(Bytes.ofString(Base64.decode(p.chanks[0].s).toString() + Md5.make(Bytes.ofString(pass)).toString())));//WTF salted pass
+										p.init();
+										p.type = 1;
+										p.addChar(2);
+										p.addString(password);
+										sendPacket(p);
+										
+										p.init();
+										p.type = 50;
+										p.addChar(2);
+										p.addString(password);
+										sendPacket(p);
+										
+										p.init();
+										repeater(function(){
+											try{
+												if (!bytesAvailable(2))
+													return false;
+												p.size = recvShort();
+											
+												repeater(function(){
+													try{
+														if (!bytesAvailable(p.size))
+															return false;
+														recvPacketData(p);
+													
+														f(p.chanks[0].i);
+													}catch(e:Dynamic){}
+													return true;
+												});
+											}catch(e:Dynamic){}
+											return true;
+										});
+									}catch(e:Dynamic){}
+									return true;
+								});
+							}catch(e:Dynamic){}
+							return true;
+						});
+					}catch(e:Dynamic){}
+					return true;
+				});
+			}catch(e:Dynamic){}
+			return true;
+		});
 	}
 	
-	private function authStep(callback){
-		
+	private function repeater(callback:Void->Bool){
+		if (!callback())
+			delay(repeater.bind(callback), 10);
 	}
 }

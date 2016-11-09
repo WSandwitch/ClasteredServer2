@@ -27,11 +27,21 @@ class LoginState extends FlxState
 
 	override public function create():Void 
 	{	
+		var game:CSGame = cast FlxG.game;
 		super.create();
 		
+		trace("login state");
+		
+		var pass = "hello";
+		var salt=haxe.crypto.Base64.encode(haxe.crypto.Md5.make(haxe.io.Bytes.ofString("hello")));
+		trace(haxe.crypto.Base64.encode(haxe.crypto.Md5.make(haxe.io.Bytes.ofString(haxe.crypto.Base64.decode(salt).toString() + haxe.crypto.Md5.make(haxe.io.Bytes.ofString(pass)).toString()))));
+		
+		
 		//add show cursor
-	
-		FlxG.switchState(new LoadState());
+		if (game.login == null && game.pass == null)
+			FlxG.switchState(new LoadState());
+		else
+			trace("Login error");
 	}
 	
 }

@@ -52,7 +52,7 @@ class PlayState extends FlxState
 	public var packets:Array<Packet> = new Array<Packet>();
 	
 	public function connection_lost(){
-		
+		game.connection_lost();
 	}
 	///
 	
