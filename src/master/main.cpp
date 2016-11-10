@@ -81,6 +81,9 @@ static int readConfig(){
 //				printf("Listener %d added\n",l->sockfd);
 			}
 		}else
+		if (strcmp(buf, "tps")==0){
+			fscanf(f, "%hd", &config.tps);
+		}else
 		if (strcmp(buf, "sw_total")==0){
 			fscanf(f, "%hd", &config.serverworkers.total);
 		}else
@@ -142,7 +145,6 @@ static void segfault_sigaction(int sig){
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
 int main(int argc,char* argv[]){
-	int TPS=10;  //ticks per sec
 	share::sync tv;
 	struct sigaction sa;
 	struct {
@@ -164,6 +166,8 @@ int main(int argc,char* argv[]){
 	memset(&config,0,sizeof(config));
 	config.serverworkers.tps=1;
 	config.socketworkers.tps=1;
+	config.listenworkers.tps=3;
+	config.tps=52;
 	config.log.debug=1;
 		
 	readConfig();
@@ -206,11 +210,11 @@ int main(int argc,char* argv[]){
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
-					int slave_id=n->slave_id;
-					n->slave_id=master::grid->get_owner(n->position.x, n->position.y);
+					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
-if (slave_id!=n->slave_id)
-n->attrs[n->attr(n->slave_id)]=1;
+//					printf("%d %d\n", slave_id, n->slave_id);
+					if (slave_id!=n->slave_id)
+						slave_id=n->set_attr(n->slave_id, slave_id);
 					//move in map
 					n->update_cells();
 					//update n->slaves
@@ -237,19 +241,17 @@ n->attrs[n->attr(n->slave_id)]=1;
 									n->pack(1,1);
 									s->sock->send(&n->p);
 									n->slaves.insert(slave.first);
+									printf("send new npc\n");
 									break;
 								case 3: //already had npc
-									if (slave_id!=n->slave_id && n->updated()){ //if attrs updated
-										n->pack(1);
-										s->sock->send(&n->p);
-									}else{ //send only needed attrs
-										packet p;
-										p.setType(MESSAGE_NPC_UPDATE);
-										p.add(n->id);
-										packAttr(p, n, slave_id);
-										packAttr(p, n, weapon_id);
-										//TODO: add other attrs
-										s->sock->send(&p);
+									if (n->updated()){
+										if (slave_id!=n->slave_id){ //if attrs updated
+											n->pack(1);
+											s->sock->send(&n->p);
+										}else{ //send only needed attrs
+											n->pack(1,0,1);
+											s->sock->send(&n->p);
+										}
 									}
 									n->slaves.insert(slave.first);
 									break;
@@ -267,49 +269,53 @@ n->attrs[n->attr(n->slave_id)]=1;
 						c->npc->position.x+VIEW_AREA_X/2, //r
 						c->npc->position.x+VIEW_AREA_Y/2 //b
 					);
+					std::unordered_map<npc*, short> npcs;
+					for(auto n: c->npcs){
+						if (n){
+							npcs[n]=2;
+						}
+					}
+					c->npcs.clear();
+					std::unordered_set<npc*> _npcs;
 					for(auto i:cells){
 						auto cell=master::world.map.cells(i);
 						if (cell){
-							std::unordered_map<npc*, short> npcs;
-							for(auto n: c->npcs){
-								if (n){
-									npcs[n]=2;
-								}
-							}
-							c->npcs.clear();
 							for(auto ni: cell->npcs){
 								npc* n=ni.second;
 								if (n){
-									npcs[n]++;
+									_npcs.insert(n);
 								}
 							}
-							for(auto n: npcs){
-								if (n.first){
-									switch(n.second){
-										case 2: //need to remove
-											{
-												packet p;
-												p.setType(MESSAGE_NPC_REMOVE);
-												p.add(n.first->id);
-												c->sock->send(&p);
-											}
-											break;
-										case 1: //new npc
-											n.first->pack(0,1); //all attrs
-											c->sock->send(&n.first->p);
-											c->npcs.insert(n.first);
-											break;
-										case 3: //already had npc
-											if (n.first->updated()){
-												n.first->pack(0); 
-												c->sock->send(&n.first->p);
-											}
-											c->npcs.insert(n.first);
-											break;
-									}
-								}	
-							}
 						}
+					}
+					for(auto n: _npcs){
+						npcs[n]++;
+					}
+					for(auto n: npcs){
+						if (n.first){
+							switch(n.second){
+								case 2: //need to remove
+									{
+										packet p;
+										p.setType(MESSAGE_NPC_REMOVE);
+										p.add(n.first->id);
+										c->sock->send(&p);
+									}
+									break;
+								case 1: //new npc
+									n.first->pack(0,1); //all attrs
+									c->sock->send(&n.first->p);
+									c->npcs.insert(n.first);
+									break;
+								case 3: //already had npc
+									if (n.first->updated()){
+										n.first->pack(0); 
+										c->sock->send(&n.first->p);
+									}
+									c->npcs.insert(n.first);
+									break;
+							}
+						}	
 					}
 				}
 			}		
@@ -321,7 +327,15 @@ n->attrs[n->attr(n->slave_id)]=1;
 				}
 			}
 		master::world.m.unlock();
-		//////
+		/////
+		packet p;
+		p.setType(MESSAGE_NPC_REMOVE);
+		for(int id: master::world.old_npcs)
+			p.add(id);
+		for(auto s: server::all)
+			s.second->sock->send(&p);
+		master::world.old_npcs.clear();
+		/////
 		if (timestamp-timestamps.servers_check>5){
 			server::check();
 			timestamps.servers_check=timestamp;
@@ -331,7 +345,7 @@ n->attrs[n->attr(n->slave_id)]=1;
 //		if (timestamp-timestamps.start>25){//debug feature
 //			main_loop=0;
 //		}
-		tv.syncTPS(TPS);
+		tv.syncTPS(config.tps);
 	}while(main_loop);
 	//clearing
 	sleep(2);
@@ -339,12 +353,13 @@ n->attrs[n->attr(n->slave_id)]=1;
 	socketworkers::stopAll();
 //	printf("Ask to stop client workers\n");
 	serverworkers::stopAll();
-//	printf("Ask to stop server workers\n");
-	listenworkers::stopAll();
 //	printf("Ask to stop listen workers\n");
 	sleep(1);
 	listeners::clear();
 	printf("Listeners cleared\n");
+//	printf("Ask to stop server workers\n");
+	listenworkers::stopAll();
+
 	chatsClear();
 	printf("Chats cleared\n");
 	for (auto i:server::all)

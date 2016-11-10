@@ -65,13 +65,14 @@ namespace master {
 				c->timestamp=share::time(0);
 				do{
 					if (c->sock->recv(&p)){
-						printf("got message %d\n", ((char*)p.data())[0]);
+						printf("(client) got message %d\n", ((char*)p.data())[0]);
 						if (c->proceed(&p)==0)
 							break;
 					}
-					withLock(c->mutex, c->broken=1);
-					delete c->sock;//check if need it
-					withLock(c->mutex, c->sock=0);//check if need it
+					c->mutex.lock();
+						c->broken=1;
+						c->sock->close();//check if need it
+					c->mutex.unlock();
 					if (c->id==0)
 						delete c;
 					printf("error with client\n");

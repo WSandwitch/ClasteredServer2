@@ -39,6 +39,7 @@ namespace master {
 		for(i=0;i<checks;i++){
 			if (s->sock->recv_check()!=0){
 				if (s->sock->recv(&p)>0){
+					printf("(slave) got message %d\n", ((char*)p.data())[0]);
 					s->proceed(&p);//proceed packet
 				}else{
 					printf("Server %d connection lost\n", s->id);

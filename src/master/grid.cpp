@@ -36,7 +36,7 @@ namespace master {
 				grid_size[i]=0;
 			}
 			id=0;
-			data=NULL;
+			data=0;//Add check for 0 servers
 		}
 		
 		grid::~grid(){
@@ -86,8 +86,8 @@ namespace master {
 			std::sort(server_ids.begin(), server_ids.end());
 			//cleanup
 			if (data){
-				for(std::map<data_cell, data_cell*>::const_iterator it = cells.begin(), end = cells.end(); it != end; ++it)
-					delete it->second;
+				for(auto it: cells)
+					delete it.second;
 				delete[] data;
 			}
 			cells.clear();

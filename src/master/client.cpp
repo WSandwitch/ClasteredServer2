@@ -58,6 +58,7 @@ namespace master {
 		name[0]=0;
 		login[0]=0;
 		passwd[0]=0;
+		stick_force=0;
 		npc=new share::npc(&master::world, master::world.getId());
 	}
 	
@@ -72,6 +73,7 @@ namespace master {
 				npc->world->m.lock();
 					npc->world->npcs.erase(npc->id);
 				npc->world->m.unlock();
+				delete npc;
 			}
 		mutex.unlock();
 	}

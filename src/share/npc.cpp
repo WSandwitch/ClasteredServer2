@@ -17,35 +17,36 @@ using namespace share;
 
 namespace share {
 	
-	npc::npc(share::world *w, int id, int slave, short type): 
+	npc::npc(share::world *w, int id, int slave, short t): 
 		id(id), 
 		state(0), 
 		health(1),
-		type(type), 
-		bot({0}), 
+		type(t), 
+//		bot({0}), 
 		world(w),
 		slave_id(slave),
 		cell_id(0)
 	{
 //		slave_id=slave?:world->id;
-//		memset(&bot,0,sizeof(bot));
+		memset(&bot,0,sizeof(bot));
 //		memset(&direction,0,sizeof(direction));
 		memset(&_updated,0,sizeof(_updated));
 		
-		attr.push_back(position.x); //0
-		attr.push_back(position.y); //1
-		attr.push_back(direction.x); //2
-		attr.push_back(direction.y); //3
-		attr.push_back(state); //4
-		attr.push_back(type); //5
-		attr.push_back(slave_id); //6s
-		attr.push_back(health); //7c
-		attr.push_back(angle); //8
-		attr.push_back(bot.goal.x); //9s
-		attr.push_back(bot.goal.y); //10s
-		attr.push_back(bot.used); //11s
-		attr.push_back(move_id); //12s
-		attr.push_back(shoot_id); //13s
+		//why it doesn't work from 0?
+		attr.push_back(position.x); //1
+		attr.push_back(position.y); //2
+		attr.push_back(direction.x); //3
+		attr.push_back(direction.y); //4
+		attr.push_back(state); //5
+		attr.push_back(type); //6
+		attr.push_back(slave_id); //7s
+		attr.push_back(health); //8c
+		attr.push_back(angle); //9
+		attr.push_back(bot.goal.x); //10s
+		attr.push_back(bot.goal.y); //11s
+		attr.push_back(bot.used); //12s
+		attr.push_back(move_id); //13s
+		attr.push_back(shoot_id); //14s
 		
 		for(auto i:attr){
 			attrs[i.first]=1;
@@ -55,8 +56,8 @@ namespace share {
 		timestamp=time(0);
 		//TODO: add normal spawn position
 		///
-		position.x=10;
-		position.y=10;
+		position.x=20;
+		position.y=20;
 		vel=10;
 		r=5;
 	}
@@ -66,6 +67,7 @@ namespace share {
 			auto cell=world->map.cells(i);
 			cell->npcs.erase(id);
 		}
+		world->old_npcs.insert(id);
 		//add returning of id
 	}
 		
@@ -207,7 +209,7 @@ namespace share {
 								memcpy(pattr, data, p->chanks[i].size());
 							}
 						}else{//smth wrong with server>server proxy
-							printf("npc update corrupt chank on index %d %d\n", (int)index, i);
+							printf("npc update corrupt chank %d index %d (size %d == %d)\n", i, (int)index, p->chanks[i].size(), attr.size(index));
 						}
 					}
 				}else{
@@ -237,15 +239,18 @@ namespace share {
 	}while(0)
 	
 	//need to choose: <0 - static attrs or slave attrs
-	void npc::pack(bool server, bool all){
+	void npc::pack(bool server, bool all, bool ts){
 		if (!_updated.pack.done || 
+				_updated.pack.to_slave!=ts || 
 				_updated.pack.server!=server || 
 				_updated.pack.all!=all){
 			p.init();
 			p.setType(MESSAGE_NPC_UPDATE);//npc update
 			p.add(id);
-			packAttr(p, position.x, all);
-			packAttr(p, position.y, all);
+			if (!server || !ts || all){ //not need to send to slave
+				packAttr(p, position.x, all);
+				packAttr(p, position.y, all);
+			}
 			packAttr(p, direction.x, all);
 			packAttr(p, direction.y, all);
 			packAttr(p, state, all);
@@ -254,6 +259,9 @@ namespace share {
 			packAttr(p, owner_id, all);
 			_updated.pack.all=1;
 			if (server){
+				packAttr(p, slave_id, all);
+				packAttr(p, move_id, all);
+				packAttr(p, shoot_id, all);
 				packAttr(p, bot.used, all);
 				packAttr(p, bot.goal.x, all);
 				packAttr(p, bot.goal.y, all);

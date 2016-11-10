@@ -13,6 +13,7 @@
 #include "../../share/system/log.h"
 #include "../../share/crypt/base64.h"
 #include "../../share/crypt/md5.h"
+#include "../../share/messages.h"
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
@@ -43,7 +44,7 @@ using namespace share;
 
 namespace master {
 	//AUTH
-	static void *message1(client*cl, packet* _p){
+	static void *message_MESSAGE_AUTH(client*cl, packet* _p){
 		FILE* f=_p->stream();
 		char c;
 		int size;
@@ -131,6 +132,11 @@ namespace master {
 							///set npc data and add npc to world
 							withLock(master::world.m, master::world.npcs[cl->npc->id]=cl->npc);
 							printf("token OK\n");
+							p.init();
+							p.setType(MSG_CLIENT_UPDATE);
+							p.add((char)1);//index
+							p.add(cl->npc->id);
+							cl->sock->send(&p);
 							break;
 						}
 					}
@@ -148,61 +154,40 @@ namespace master {
 		return 0;
 	}
 
-	static void *message2(client*c, packet* p){
-		clientCheckAuth(c);//client must have id already
-		//some work
+	static void *message_MESSAGE_SET_DIRECTION(client*cl, packet* p){
+		clientCheckAuth(cl);//client must have id already
+		if (cl->npc){
+			typeof(point::x) x=0;
+			typeof(point::y) y=0;
+			bool dir=0;
+			for(int i=0, end=p->chanks.size();i<end;i++){
+				int index=p->chanks[i++].value.c;
+				switch (index){
+					case 0://x
+						x=p->chanks[i].value.c/100.0;
+						dir++;
+						break;
+					case 1://y
+						y=p->chanks[i].value.c/100.0;
+						dir++;
+						break;
+				}
+			}
+			if (dir==2){
+				cl->npc->m.lock();
+					cl->npc->set_dir(x, y);
+				cl->npc->m.unlock();
+			}
+		}
 		return 0;
 	}
 
-	voidMessageProcessor(3)
-	voidMessageProcessor(4)
-	voidMessageProcessor(5)
-	voidMessageProcessor(6)
-	voidMessageProcessor(7)
-	voidMessageProcessor(8)
-	voidMessageProcessor(9)
-	voidMessageProcessor(10)
-	voidMessageProcessor(11)
-	voidMessageProcessor(12)
-	voidMessageProcessor(13)
-	voidMessageProcessor(14)
-	voidMessageProcessor(15)
-	voidMessageProcessor(16)
-	voidMessageProcessor(17)
-	voidMessageProcessor(18)
-	voidMessageProcessor(19)
-	voidMessageProcessor(20)
-	voidMessageProcessor(21)
-	voidMessageProcessor(22)
-	voidMessageProcessor(23)
-	voidMessageProcessor(24)
 	voidMessageProcessor(25)
 
 	void clientMessageProcessorInit(){
-		clientMessageProcessor(1);
-		clientMessageProcessor(2);
-		clientMessageProcessor(3);
-		clientMessageProcessor(4);
-		clientMessageProcessor(5);
-		clientMessageProcessor(6);
-		clientMessageProcessor(7);
-		clientMessageProcessor(8);
-		clientMessageProcessor(9);
-		clientMessageProcessor(10);
-		clientMessageProcessor(11);
-		clientMessageProcessor(12);
-		clientMessageProcessor(13);
-		clientMessageProcessor(14);
-		clientMessageProcessor(15);
-		clientMessageProcessor(16);
-		clientMessageProcessor(17);
-		clientMessageProcessor(18);
-		clientMessageProcessor(19);
-		clientMessageProcessor(20);
-		clientMessageProcessor(21);
-		clientMessageProcessor(22);
-		clientMessageProcessor(23);
-		clientMessageProcessor(24);
+		messageprocessorClientAdd(MESSAGE_AUTH, (void*)&message_MESSAGE_AUTH);
+		messageprocessorClientAdd(MESSAGE_SET_DIRECTION, (void*)&message_MESSAGE_SET_DIRECTION);
+
 		clientMessageProcessor(25);
 	}
 }

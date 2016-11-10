@@ -54,7 +54,13 @@ class PlayState extends FlxState
 	public function connection_lost(){
 		game.connection_lost();
 	}
+	///out messages
+	private static inline var MSG_SET_DIRECTION:Int = 2;
+	//in messages
+	private static inline var MSG_NPC_UPDATE:Int=3;
+	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
+
 	
 	override public function create():Void 
 	{	
@@ -267,52 +273,50 @@ class PlayState extends FlxState
 	private function checkInput(elapsed:Float) {
 		var speed = 200;
 		var p:Packet = new Packet();
-		var keys_changed:Array<Bool> = [false, false];
+		var keys_changed:Bool = false;
 
 		if (FlxG.keys.anyJustPressed([A, LEFT])){
 			keys[0] -= 100;
-			keys_changed[0] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustReleased([A, LEFT])){
 			keys[0] += 100;
-			keys_changed[0] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustPressed([D, RIGHT])){
 			keys[0] += 100;
-			keys_changed[0] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustReleased([D, RIGHT])){
 			keys[0] -= 100;
-			keys_changed[0] = true;
+			keys_changed = true;
 		}
-		if (keys_changed[0]){
-			p.addChar(0);
-			p.addChar(keys[0]);
-		}
-		
+
 		if (FlxG.keys.anyJustPressed([S, DOWN])){
 			keys[1] += 100;
-			keys_changed[1] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustReleased([S, DOWN])){
 			keys[1] -= 100;
-			keys_changed[1] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustPressed([W, UP])){
 			keys[1] -= 100;
-			keys_changed[1] = true;
+			keys_changed = true;
 		}
 		if (FlxG.keys.anyJustReleased([W, UP])){
 			keys[1] += 100;
-			keys_changed[1] = true;
+			keys_changed = true;
 		}
-		if (keys_changed[1]){
+		if (keys_changed){
+			p.addChar(0);
+			p.addChar(keys[0]);
 			p.addChar(1);
 			p.addChar(keys[1]);
 		}
 		
 		if (p.chanks.length>0){
-			p.type = 41;
+			p.type = MSG_SET_DIRECTION;
 //			trace(connection);
 			connection.sendPacket(p);
 //			trace("sended");
@@ -346,7 +350,7 @@ class PlayState extends FlxState
 			l.unlock();
 			if (p!=null){
 				switch p.type {
-					case 40:
+					case MSG_NPC_UPDATE:
 						var n:Null<Npc> = npcs[p.chanks[0].i];
 						if (n == null){
 							n = new Npc(0, 0, 0);
@@ -355,7 +359,7 @@ class PlayState extends FlxState
 							add(n);
 						}
 						n.update_attributes(p);
-					case 41:
+					case MSG_CLIENT_UPDATE:
 						var i:Int=0;
 						while(i<p.chanks.length-1){
 							switch p.chanks[i].i {

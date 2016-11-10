@@ -3,6 +3,7 @@ extern "C"{
 #include <pthread.h>
 }
 #include "processors.h"
+#include "../share/messages.h"
 #include "../share/system/mutex.h"
 #include "../share/network/packet.h"
 #include "world.h"
@@ -21,16 +22,9 @@ static void* threadFunc(void *arg){
 	//get information about world
 	
 	p.init();
-	p.setType(6);//get new id
-	for(int i =0;i<10;i++)
-		world.sock->send(&p);//send ready
-	p.setType(3);//get info about servers
-	world.sock->send(&p);
 	
-	p.init();
-	p.setType(5);
+	p.setType(MESSAGE_SERVER_READY);
 	p.add(world.id);
-	//dest already 0,0
 	world.sock->send(&p);//send ready
 	
 	withLock(world.m, world.main_loop=1);

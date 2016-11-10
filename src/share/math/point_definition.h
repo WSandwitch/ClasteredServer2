@@ -34,7 +34,13 @@ namespace share {
 			x=l*cosf(rad);
 			y=l*sinf(rad);
 		}
-
+		
+	template<class T>
+		template<class T1, class T2>		
+			float point_<T>::length(T1 x, T2 y){
+				return sqrtf(sqr(x)+sqr(y));
+			}
+		
 	template<class T>
 	template<class T1>		
 		float point_<T>::distanse(point_<T1> &b){

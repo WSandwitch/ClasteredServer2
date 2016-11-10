@@ -25,7 +25,8 @@ namespace share {
 					static T scalar(point_<T1> &&a, point_<T2> &&b);
 				template<class T1, class T2>
 					static point_<T> toVector(point_<T1> &a, point_<T2> &b);
-
+				template<class T1, class T2>		
+					static float length(T1 x, T2 y);
 		};
 	
 	template <class T>

@@ -32,8 +32,16 @@ namespace share {
 	typedef void (npc:: *shoot_func)(typeof(point::x) x, typeof(point::y) y);
 	typedef void (npc:: *move_func)(typeof(point::x) x, typeof(point::y) y);
 	
+	template<class T>
+		struct multi_map{
+			std::unordered_map<int, T> p;
+			T* operator()(bool b1=0, bool b2=0, bool b3=0){
+				return &p[b1?1:0+b2?10:0+b3?100:0];
+			}
+		};
+	
 	struct bot {
-		bool used;
+		char used;
 		point goal;
 		int dist; //moved distance
 		npc* target;
@@ -73,13 +81,12 @@ namespace share {
 					bool done;
 					bool all; //static parameters
 					bool server;
+					bool to_slave;
 				} pack;
 			} _updated;
 			attrs_map attr;
 			std::unordered_map<char, bool> attrs; //attributes updated flags
-//			move_func movef;
-//			shoot_func shootf;
-
+			
 			npc(){};
 			npc(share::world *w, int id, int slave=0, short type=0);
 			~npc();
@@ -93,13 +100,15 @@ namespace share {
 			void hurt(npc* n);
 			void update(share::packet * p);
 			bool updated(); 			
-			void pack(bool server=0, bool all=0); //pack action attributes, do not pack special atributes
+			void pack(bool server=0, bool all=0, bool to_slave=0); //pack action attributes, do not pack special atributes
 			bool update_cells();//return 1 if updated
 			
 			template<class T1, class T2>
-			int set_attr(T1 &a, T2 v){
+			T1 set_attr(T1 &a, T2 v){
+				T1 $=a;
 				a=v;
-				return attrs[attr(&a)]=1;
+				attrs[attr(&a)]=1;
+				return $;
 			};
 //			std::vector<int>& gridShares();
 

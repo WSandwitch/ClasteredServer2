@@ -41,10 +41,11 @@ namespace master {
 
 	void listenworkers::loop(){
 		int sockfd=0;
-		struct timeval t={0, 80000};
+		struct timeval t={0, 80};
 		//packetInit(&wd->packet);
 		//printf("1\t%d\n", w->mutex->val);
 		//add some actions for every iteration
+//		printf("test\n");
 		mutex.lock();
 			if(select(maxfd+1, &set, 0, 0, &t)>0){
 				for (auto l:works){
@@ -94,6 +95,7 @@ namespace master {
 				}else if (strstr(buf,"<po")!=0 ){
 					//Flash policy 
 					s->send(PRIVATE_POLICY,sizeof(PRIVATE_POLICY));
+					printf("sent flash policy\n");
 					delete s;
 					break;//already clear socket
 				}else if (strstr(buf,"GET")!=0){//TODO: add web socket

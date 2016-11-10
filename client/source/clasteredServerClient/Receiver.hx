@@ -80,6 +80,7 @@ class Receiver{
 			try{
 				while (state.recv_loop){
 					var p:Packet = state.connection.recvPacket();
+//					trace("Got packet", p.type);
 //					trace(p);
 					state.l.lock();
 						state.packets.push(p);

@@ -14,6 +14,7 @@ using namespace share;
 namespace slave {
 	
 	std::map<char, processor> processors::messages;
+	processors processors::init;
 	
 	static void* message_NPC_UPDATE(packet* p){
 		int id=p->chanks[0].value.i;
@@ -30,6 +31,7 @@ namespace slave {
 		slave::world.m.unlock();
 			n->update(p);
 		n->m.unlock();
+//		printf("%g %g\n", n->position.x, n->position.y);
 		return 0;
 	}
 	

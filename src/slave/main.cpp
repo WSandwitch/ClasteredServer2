@@ -156,7 +156,7 @@ int main(int argc, char* argv[]){
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n){
+				if (n && n->updated()){
 					n->pack(1,0);
 					world.sock->send(&n->p);
 				}
@@ -178,6 +178,7 @@ int main(int argc, char* argv[]){
 				world.new_npcs.clear();
 			world.new_npcs_m.unlock();			
 		world.m.unlock();
+		world.old_npcs.clear();
 		syncer.syncTPS(TPS);
 	}
 	sleep(1);

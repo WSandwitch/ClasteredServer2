@@ -16,7 +16,7 @@ namespace share {
 			map_cont<void*, char> shift_attr;	
 		
 		public:
-			attrs_map(): _size(0) {
+			attrs_map(): _size(1) {
 			};
 			template<class T> 
 				void push_back(T& attr){

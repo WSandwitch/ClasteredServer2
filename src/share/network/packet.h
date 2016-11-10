@@ -31,10 +31,6 @@ namespace share {
 	class packet {
 		public:
 			std::vector<packet_chank> chanks;
-			struct{
-				char type;
-				int id;
-			} dest;
 			
 			packet();
 //			~packet();

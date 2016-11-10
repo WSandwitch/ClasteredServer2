@@ -2,6 +2,7 @@
 #define CLASTERED_SERVER_SLAVE_WORLD_HEADER
 
 #include <map>
+#include <unordered_set>
 #include <unordered_map>
 #include <list>
 #include <queue>
@@ -37,6 +38,7 @@ namespace share {
 		share::map map;
 		std::queue<int> ids;
 		std::list<npc*> new_npcs;
+		std::unordered_set<int> old_npcs;
 		std::unordered_map<int, npc*> npcs;
 		
 		world();

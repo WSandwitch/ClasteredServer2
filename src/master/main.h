@@ -9,6 +9,7 @@ namespace master {
 		log_config log;
 		storage_config storage;
 		short run;
+		short tps;
 		struct{
 			short total;
 			short tps;

@@ -35,7 +35,8 @@ namespace share {
 	}
 
 	socket::~socket(){
-		::close(sockfd);
+		if (sockfd)
+			::close(sockfd);
 	}
 
 	int socket::send(void* buf, int size){
@@ -58,17 +59,21 @@ namespace share {
 
 	void socket::flush(){
 		int flag=1;
-		setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
-		flag=0; 
-		setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+		if (sockfd){
+			setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+			flag=0; 
+			setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+		}
 	}
 	
 	int socket::send(packet* p){
+		if (!sockfd)
+			return -1;
 		short size=p->size();
-		size=byteSwap(size);
 		int flag=1;
 		int result=1;
-		char* data=(char*)malloc(p->size()+sizeof(p->dest.type)+sizeof(p->dest.id)+sizeof(size));
+		char* data=(char*)malloc(size+sizeof(size));
+		size=byteSwap(size);
 		if (data==0){
 			perror("malloc");
 			//check result set to 0
@@ -80,10 +85,6 @@ namespace share {
 			shift+=p->size();
 			lockWrite();
 				setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));//maybe try TCP_CORK
-//					send((void*)&size, sizeof(size));
-//					send(p->data(), p->size());
-//					send((void*)&p->dest.type, sizeof(p->dest.type));
-//					send((void*)&p->dest.id, sizeof(p->dest.id));
 					result=send(data, shift);
 /*					printf("send ");
 					for(int i=0;i<shift;i++){
@@ -195,6 +196,7 @@ namespace share {
 
 	void socket::close(){
 		::close(sockfd);
+		sockfd=0;
 	}
 
 	socket* socket::connect(char* host, int port){

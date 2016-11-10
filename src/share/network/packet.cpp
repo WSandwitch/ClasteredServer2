@@ -106,8 +106,6 @@ namespace share {
 		buf.clear();
 		buf.push_back(0);
 		buf.push_back(0);
-		dest.type=0;
-		dest.id=0;
 		return 0;
 	}
 	

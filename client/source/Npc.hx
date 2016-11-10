@@ -30,8 +30,8 @@ class Npc extends FlxSprite
 		//moves = false;
 		//this.field("aaa")();
         //untyped this["aaa"]();
-		updater[0] = function(a:Dynamic){that.dest_x = a;};
-		updater[1] = function(a:Dynamic){that.dest_y = a;};
+		updater[1] = function(a:Dynamic){that.dest_x = a;};
+		updater[2] = function(a:Dynamic){that.dest_y = a;};
 	}
 	
 	override public function update(elapsed:Float):Void 
