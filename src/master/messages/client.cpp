@@ -130,7 +130,9 @@ namespace master {
 							cl->sock->send(&p);
 //							cl->messages_add(new client_message(p.data(), p.size()));
 							///set npc data and add npc to world
-							withLock(master::world.m, master::world.npcs[cl->npc->id]=cl->npc);
+							master::world.npcs_m.lock();
+								master::world.new_npcs.push_back(cl->npc);
+							master::world.npcs_m.unlock();
 							printf("token OK\n");
 							p.init();
 							p.setType(MSG_CLIENT_UPDATE);
@@ -159,7 +161,7 @@ namespace master {
 		if (cl->npc){
 			typeof(point::x) x=0;
 			typeof(point::y) y=0;
-			bool dir=0;
+			short dir=0;
 			for(int i=0, end=p->chanks.size();i<end;i++){
 				int index=p->chanks[i++].value.c;
 				switch (index){
@@ -177,6 +179,7 @@ namespace master {
 				cl->npc->m.lock();
 					cl->npc->set_dir(x, y);
 				cl->npc->m.unlock();
+//				printf("set dir (%d %d)\n", x,y);
 			}
 		}
 		return 0;

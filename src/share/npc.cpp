@@ -15,6 +15,21 @@ extern "C"{
 
 using namespace share;
 
+#define packAttr(a,call,c,sall,s,ts)\
+	do{\
+		attr.push_back(a);\
+		if(call)\
+			pack_attrs(0,1).push_back(&a);\
+		if(c)\
+			pack_attrs(0,0).push_back(&a);\
+		if(sall)\
+			pack_attrs(1,1).push_back(&a);\
+		if(s)\
+			pack_attrs(1,0).push_back(&a);\
+		if(ts)\
+			pack_attrs(1,0,1).push_back(&a);\
+	}while(0)
+
 namespace share {
 	
 	npc::npc(share::world *w, int id, int slave, short t): 
@@ -30,24 +45,31 @@ namespace share {
 //		slave_id=slave?:world->id;
 		memset(&bot,0,sizeof(bot));
 //		memset(&direction,0,sizeof(direction));
-		memset(&_updated,0,sizeof(_updated));
 		
 		//why it doesn't work from 0?
-		attr.push_back(position.x); //1
-		attr.push_back(position.y); //2
-		attr.push_back(direction.x); //3
-		attr.push_back(direction.y); //4
-		attr.push_back(state); //5
-		attr.push_back(type); //6
-		attr.push_back(slave_id); //7s
-		attr.push_back(health); //8c
-		attr.push_back(angle); //9
-		attr.push_back(bot.goal.x); //10s
-		attr.push_back(bot.goal.y); //11s
-		attr.push_back(bot.used); //12s
-		attr.push_back(move_id); //13s
-		attr.push_back(shoot_id); //14s
-		
+		/*
+			attribute
+			all attributes to client
+			changes to client
+			all attributes to slave
+			changes to master, slave can change it
+			changes to slave
+		*/
+		///(attr, client_all, client, master_slave, from_slave, to_slave)
+		packAttr(position.x,1,1,1,1,0); //1cm
+		packAttr(position.y,1,1,1,1,0); //2cm
+		packAttr(direction.x,1,1,1,1,1); //3cms
+		packAttr(direction.y,1,1,1,1,1); //4cms
+		packAttr(state,1,1,1,1,1); //5cms
+		packAttr(type,1,1,1,0,1); //6cms
+		packAttr(slave_id,0,0,1,0,1); //7ms
+		packAttr(health,1,1,0,0,0); //8c
+		packAttr(angle,1,1,1,1,1); //9cms
+		packAttr(bot.goal.x,0,0,1,1,1); //10ms
+		packAttr(bot.goal.y,0,0,1,1,1); //11ms
+		packAttr(bot.used,0,0,1,0,1); //12s
+		packAttr(move_id,0,0,1,0,1); //13s
+		packAttr(shoot_id,0,0,1,0,1); //14s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -63,11 +85,15 @@ namespace share {
 	}
 	
 	npc::~npc(){
-		for(auto i: cells){
-			auto cell=world->map.cells(i);
-			cell->npcs.erase(id);
+		if (world){
+			for(auto i: cells){
+				auto cell=world->map.cells(i);
+				cell->npcs.erase(id);
+			}
+			world->npcs_m.lock();
+				world->old_npcs.insert(id);
+			world->npcs_m.unlock();
 		}
-		world->old_npcs.insert(id);
 		//add returning of id
 	}
 		
@@ -79,10 +105,9 @@ namespace share {
 		for(auto i: attrs){
 			attrs[i.first]=0;
 		}
-//		_updated.pack.done=0;
-//		_updated.pack.all=0;
-//		_updated.pack.server=0;
-		memset(&_updated,0,sizeof(_updated));
+		for(auto i: _packs){
+			_packs.p[i.first]=0;
+		}
 		return 0;
 	}
 	
@@ -198,23 +223,22 @@ namespace share {
 			if (p->chanks[i-1].type!=1)
 				printf("chank index type error, got %d\n", p->chanks[i-1].type);
 //			printf("index %d\n", index);
-			if (index>=0){
-				if (pattr){
-					if (p->chanks[i].type<6){
-//						printf("sizeof chank %d\n",p->chanks[i].size());
-						void* data=p->chanks[i].data();
-						if (data && p->chanks[i].size()==attr.size(index)){
-							if (memcmp(pattr, data, p->chanks[i].size())!=0){
-								attrs[index]=1;//updated
-								memcpy(pattr, data, p->chanks[i].size());
-							}
-						}else{//smth wrong with server>server proxy
-							printf("npc update corrupt chank %d index %d (size %d == %d)\n", i, (int)index, p->chanks[i].size(), attr.size(index));
+			if (pattr){
+				if (p->chanks[i].type<6){
+//					printf("sizeof chank %d\n",p->chanks[i].size());
+					void* data=p->chanks[i].data();
+					if (data && p->chanks[i].size()==attr.size(index)){
+						if (memcmp(pattr, data, p->chanks[i].size())!=0){
+//							printf("%d updated\n", index);
+							attrs[index]=1;//updated
+							memcpy(pattr, data, p->chanks[i].size());
 						}
+					}else{//smth wrong with server>server proxy
+						printf("npc update corrupt chank %d index %d (size %d == %d)\n", i, (int)index, p->chanks[i].size(), attr.size(index));
 					}
-				}else{
-					printf("got strange index %d\n", (int)index);
 				}
+			}else{
+				printf("got strange index %d\n", (int)index);
 			}
 		}
 //		set_dir();
@@ -229,7 +253,7 @@ namespace share {
 		return 0;
 	}
 	
-#define packAttr(p, a, b)\
+#define packAttr0(p, a, b)\
 	do{\
 		int $=attr(&(a));\
 		if (b || attrs[$]){\
@@ -239,35 +263,47 @@ namespace share {
 	}while(0)
 	
 	//need to choose: <0 - static attrs or slave attrs
-	void npc::pack(bool server, bool all, bool ts){
-		if (!_updated.pack.done || 
-				_updated.pack.to_slave!=ts || 
-				_updated.pack.server!=server || 
-				_updated.pack.all!=all){
+	void npc::pack(bool s, bool all, bool ts){
+		if (!_packs(s,all,ts)){
+			auto as=pack_attrs(s,all,ts);
+//			printf("pack %d %d %d, %d \n", s,all,ts, as.size());
+			packet &p=packs(s,all,ts);
 			p.init();
 			p.setType(MESSAGE_NPC_UPDATE);//npc update
 			p.add(id);
-			if (!server || !ts || all){ //not need to send to slave
-				packAttr(p, position.x, all);
-				packAttr(p, position.y, all);
+			for(auto a: as){
+				int $=attr(a);
+				if (all || attrs[$]){
+					p.add((char)$);
+//					printf("added type %d index %d\n", attr.type(a), $);
+					switch(attr.type(a)){
+						case 1:
+							p.add(*(char*)a);
+//							printf("added type value %d\n", *(char*)a);
+							break;
+						case 2:
+							p.add(*(short*)a);
+//							printf("added type value %d\n", *(short*)a);
+							break;
+						case 3:
+							p.add(*(int*)a);
+//							printf("added type value %d\n", *(int*)a);
+							break;
+						case 4:
+							p.add(*(float*)a);
+//							printf("added type value %g\n", *(float*)a);
+							break;
+						case 5:
+							p.add(*(double*)a);
+//							printf("added type value %lg\n", *(double*)a);
+							break;
+						default:
+							p.add((char)0);
+							break;
+					}
+				}
 			}
-			packAttr(p, direction.x, all);
-			packAttr(p, direction.y, all);
-			packAttr(p, state, all);
-			
-			packAttr(p, type, all);
-			packAttr(p, owner_id, all);
-			_updated.pack.all=1;
-			if (server){
-				packAttr(p, slave_id, all);
-				packAttr(p, move_id, all);
-				packAttr(p, shoot_id, all);
-				packAttr(p, bot.used, all);
-				packAttr(p, bot.goal.x, all);
-				packAttr(p, bot.goal.y, all);
-				_updated.pack.server=1;
-			} 
-			_updated.pack.done=1;
+			_packs(s,all,ts)=1;
 		}
 	}
 #undef packAttr
@@ -289,9 +325,9 @@ namespace share {
 		n->bot.goal.y=y;
 		
 		n->bot.used=1;
-		world->new_npcs_m.lock();
+		world->npcs_m.lock();
 			world->new_npcs.push_back(n);
-		world->new_npcs_m.unlock();
+		world->npcs_m.unlock();
 		printf("added bot %d on %g, %g\n", n->id, n->position.x, n->position.y);
 		return n;
 	}

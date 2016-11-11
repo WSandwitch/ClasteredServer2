@@ -131,6 +131,7 @@ int main(int argc, char* argv[]){
 				npc* n=it->second;
 				if (n){
 //					n->m.lock();
+//					printf("%d %d, %d\n", world.id, n->slave_id, world.id==n->slave_id);
 					if (world.id==n->slave_id){
 						n->move();
 					}
@@ -158,7 +159,7 @@ int main(int argc, char* argv[]){
 				npc* n=it->second;
 				if (n && n->updated()){
 					n->pack(1,0);
-					world.sock->send(&n->p);
+					world.sock->send(&n->packs(1,0));
 				}
 			}
 //		world.m.unlock();
@@ -171,14 +172,14 @@ int main(int argc, char* argv[]){
 					n->m.unlock();
 				}
 			}
-			world.new_npcs_m.lock();
+			world.npcs_m.lock();
 				for(auto n: world.new_npcs){
 					world.npcs[n->id]=n;
 				}
 				world.new_npcs.clear();
-			world.new_npcs_m.unlock();			
+				world.old_npcs.clear();
+			world.npcs_m.unlock();			
 		world.m.unlock();
-		world.old_npcs.clear();
 		syncer.syncTPS(TPS);
 	}
 	sleep(1);

@@ -37,6 +37,7 @@ namespace master {
 			}
 			id=0;
 			data=0;//Add check for 0 servers
+			reconfigure();
 		}
 		
 		grid::~grid(){
@@ -80,7 +81,7 @@ namespace master {
 
 		//private	
 		bool grid::reconfigure(){
-			int counts[2]={0};
+			int counts[2]={1,1};
 			
 			servers.clear();
 			std::sort(server_ids.begin(), server_ids.end());
@@ -144,9 +145,10 @@ namespace master {
 	//		printf("grid_size %d %d total %d\n",grid_size[0],grid_size[1],grid_size[0]*grid_size[1]);
 			data=new data_cell*[grid_size[0]*grid_size[1]+1];
 			int _offset[2]={(int)ceil(offset/cell[0]),(int)ceil(offset/cell[1])};
+			grid_server fake_gs;//for none servers
 			for(int y=0;y<grid_size[1];y++){
 				for(int x=0;x<grid_size[0];x++){
-					grid_server s=servers[server_ids[x/(grid_size[0]/counts[0])+y/(grid_size[1]/counts[1])*counts[0]]];
+					grid_server &s=server_ids.size()>0?servers[server_ids[x/(grid_size[0]/counts[0])+y/(grid_size[1]/counts[1])*counts[0]]]:fake_gs;
 					data_cell o;
 					o.owner=s.id;
 					if (id==0 || s.id==id){

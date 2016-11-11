@@ -58,7 +58,6 @@ namespace master {
 		name[0]=0;
 		login[0]=0;
 		passwd[0]=0;
-		stick_force=0;
 		npc=new share::npc(&master::world, master::world.getId());
 	}
 	

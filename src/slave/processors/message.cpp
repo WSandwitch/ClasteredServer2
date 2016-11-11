@@ -23,9 +23,9 @@ namespace slave {
 			n=slave::world.npcs[id];
 			if(!n){
 				n=new npc(&slave::world, id);
-				slave::world.new_npcs_m.lock();
+				slave::world.npcs_m.lock();
 					slave::world.new_npcs.push_back(n);
-				slave::world.new_npcs_m.unlock();
+				slave::world.npcs_m.unlock();
 			}
 			n->m.lock();
 		slave::world.m.unlock();
@@ -43,6 +43,7 @@ namespace slave {
 			if (n)
 				n->m.lock();
 			slave::world.npcs.erase(id);
+			printf("npc %d removed\n", id);
 		slave::world.m.unlock();
 		if (n){
 			n->m.unlock();

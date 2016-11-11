@@ -40,8 +40,9 @@ namespace share {
 	std::map<int, player*> world::players;
 */	
 	int world::getId(){
+		static mutex m;
 		static int id=1;
-		return id++;
+		return withLock(m, id++);
 	}
 	
 	world::world():

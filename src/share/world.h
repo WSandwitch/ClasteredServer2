@@ -33,7 +33,7 @@ namespace share {
 		float map_offset;
 		bool main_loop;
 		share::mutex m;
-		share::mutex new_npcs_m;
+		share::mutex npcs_m;
 		share::socket* sock;
 		share::map map;
 		std::queue<int> ids;

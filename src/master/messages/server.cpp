@@ -66,9 +66,9 @@ namespace master {
 			n=master::world.npcs[id];
 			if(!n){
 				n=new npc(&master::world, id);
-				master::world.new_npcs_m.lock();
+				master::world.npcs_m.lock();
 					master::world.new_npcs.push_back(n);
-				master::world.new_npcs_m.unlock();
+				master::world.npcs_m.unlock();
 			}
 			n->m.lock();
 		master::world.m.unlock();

@@ -201,6 +201,12 @@ int main(int argc,char* argv[]){
 		tv.timePassed(); //start timer
 		//////
 		master::world.m.lock();
+			master::world.npcs_m.lock();
+				for(auto n: master::world.new_npcs){
+					master::world.npcs[n->id]=n;
+				}
+				master::world.new_npcs.clear();
+			master::world.npcs_m.unlock();			
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
@@ -239,18 +245,18 @@ int main(int argc,char* argv[]){
 									break;
 								case 1: //new npc
 									n->pack(1,1);
-									s->sock->send(&n->p);
+									s->sock->send(&n->packs(1,1));
 									n->slaves.insert(slave.first);
-									printf("send new npc\n");
+									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
 									if (n->updated()){
 										if (slave_id!=n->slave_id){ //if attrs updated
 											n->pack(1);
-											s->sock->send(&n->p);
+											s->sock->send(&n->packs(1));
 										}else{ //send only needed attrs
 											n->pack(1,0,1);
-											s->sock->send(&n->p);
+											s->sock->send(&n->packs(1,0,1));
 										}
 									}
 									n->slaves.insert(slave.first);
@@ -269,11 +275,9 @@ int main(int argc,char* argv[]){
 						c->npc->position.x+VIEW_AREA_X/2, //r
 						c->npc->position.x+VIEW_AREA_Y/2 //b
 					);
-					std::unordered_map<npc*, short> npcs;
+					std::unordered_map<int, short> npcs;
 					for(auto n: c->npcs){
-						if (n){
 							npcs[n]=2;
-						}
 					}
 					c->npcs.clear();
 					std::unordered_set<npc*> _npcs;
@@ -289,33 +293,37 @@ int main(int argc,char* argv[]){
 						}
 					}
 					for(auto n: _npcs){
-						npcs[n]++;
+						npcs[n->id]++;
 					}
-					for(auto n: npcs){
-						if (n.first){
-							switch(n.second){
-								case 2: //need to remove
-									{
-										packet p;
-										p.setType(MESSAGE_NPC_REMOVE);
-										p.add(n.first->id);
-										c->sock->send(&p);
+					npc *n;
+					for(auto i: npcs){
+						switch(i.second){
+							case 2: //need to remove
+								{
+									packet p;
+									p.setType(MESSAGE_NPC_REMOVE);
+									p.add(i.first);
+									c->sock->send(&p);
+								}
+								break;
+							case 1: //new npc
+								if ((n=master::world.npcs[i.first])!=0){
+									n->pack(0,1); //all attrs
+									c->sock->send(&n->packs(0,1));
+									c->npcs.insert(i.first);
+									printf("(client)send new npc\n");
+								}
+								break;
+							case 3: //already had npc
+								if ((n=master::world.npcs[i.first])!=0){
+									if (n->updated()){
+										n->pack(0); 
+										c->sock->send(&n->packs(0));
 									}
-									break;
-								case 1: //new npc
-									n.first->pack(0,1); //all attrs
-									c->sock->send(&n.first->p);
-									c->npcs.insert(n.first);
-									break;
-								case 3: //already had npc
-									if (n.first->updated()){
-										n.first->pack(0); 
-										c->sock->send(&n.first->p);
-									}
-									c->npcs.insert(n.first);
-									break;
-							}
-						}	
+									c->npcs.insert(i.first);
+								}
+								break;
+						}
 					}
 				}
 			}		
@@ -326,15 +334,19 @@ int main(int argc,char* argv[]){
 					n->m.unlock();
 				}
 			}
+			master::world.npcs_m.lock();
+				if (master::world.old_npcs.size()>0){
+					packet p;
+					p.setType(MESSAGE_NPC_REMOVE);
+					for(int id: master::world.old_npcs)
+						p.add(id);
+					for(auto s: server::all)
+						s.second->sock->send(&p);
+					master::world.old_npcs.clear();
+				}
+			master::world.npcs_m.unlock();			
 		master::world.m.unlock();
 		/////
-		packet p;
-		p.setType(MESSAGE_NPC_REMOVE);
-		for(int id: master::world.old_npcs)
-			p.add(id);
-		for(auto s: server::all)
-			s.second->sock->send(&p);
-		master::world.old_npcs.clear();
 		/////
 		if (timestamp-timestamps.servers_check>5){
 			server::check();

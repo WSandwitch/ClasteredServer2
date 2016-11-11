@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "get_type.h"
+
 #define map_cont std::unordered_map
 //for npc attributes
 namespace share {
@@ -14,6 +16,7 @@ namespace share {
 			map_cont<char, unsigned short> attr_size;
 			map_cont<char, void*> attr_shift;
 			map_cont<void*, char> shift_attr;	
+			map_cont<void*, char> attr_type;	
 		
 		public:
 			attrs_map(): _size(1) {
@@ -22,6 +25,7 @@ namespace share {
 				void push_back(T& attr){
 					attr_size[_size]=sizeof(attr);
 					attr_shift[_size]=&attr;
+					attr_type[&attr]=get_type(attr);
 					shift_attr[&attr]=_size;
 					_size++;
 				};
@@ -30,6 +34,9 @@ namespace share {
 			};
 			char operator()(void* attr){
 				return shift_attr[attr];
+			};
+			char type(void* attr){
+				return attr_type[attr];
 			};
 			unsigned short size(){
 				return attr_size.size();

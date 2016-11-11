@@ -32,12 +32,17 @@ namespace share {
 	typedef void (npc:: *shoot_func)(typeof(point::x) x, typeof(point::y) y);
 	typedef void (npc:: *move_func)(typeof(point::x) x, typeof(point::y) y);
 	
+	#define attr3b_key(b1, b2, b3) ((b1?1:0)|(b2?2:0)|(b3?4:0))
+	
 	template<class T>
-		struct multi_map{
-			std::unordered_map<int, T> p;
-			T* operator()(bool b1=0, bool b2=0, bool b3=0){
-				return &p[b1?1:0+b2?10:0+b3?100:0];
-			}
+		struct map3b{
+			std::unordered_map<short, T> p;
+			T& operator()(bool b1=0, bool b2=0, bool b3=0){
+				return p[attr3b_key(b1,b2,b3)];
+			};
+			typeof(p.begin()) begin(){return p.begin();};
+			typeof(p.end()) end(){return p.end();};
+			typeof(p.size()) size(){return p.size();};
 		};
 	
 	struct bot {
@@ -69,21 +74,14 @@ namespace share {
 				short next_shot;
 			} weapon;
 				
-			share::packet p;
+			map3b<share::packet> packs;
+			map3b<std::vector<void*>> pack_attrs;
 			share::mutex m;
 			int slave_id;
 			int cell_id;
 			int r; //radius of collision
 			std::list<int> cells;
 			std::set<int> slaves;
-			struct{
-				struct{
-					bool done;
-					bool all; //static parameters
-					bool server;
-					bool to_slave;
-				} pack;
-			} _updated;
 			attrs_map attr;
 			std::unordered_map<char, bool> attrs; //attributes updated flags
 			
@@ -121,6 +119,7 @@ namespace share {
 		protected:
 			float vel;
 			timestamp_t timestamp;
+			map3b<bool> _packs;
 			
 			bool check_point(typeof(point::x) x, typeof(point::y) y);
 		
