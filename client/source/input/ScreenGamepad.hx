@@ -93,10 +93,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		_buttonSize = buttonSize;
 		_offset = offset;
 		if (M == null)
-			M = XBOX;
-		if (useStartBack != null)
-			SB = useStartBack;
-		
+			M = XBOX;		
 		_distanse.x = 1.1 * _buttonSize.x;
 		_distanse.y = 1.1 * _buttonSize.y;
 		
@@ -288,9 +285,10 @@ class ScreenGamepad extends FlxSpriteGroup{
 		button.solid = false;
 		button.immovable = true;
 		button.scrollFactor.set();
+	#if FLX_JOYSTICK_API
 		button.onDown.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_DOWN, true, false, id, I));};
 		button.onOut.callback = button.onUp.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_UP, true, false, id, I));};
-		
+	#end	
 		#if FLX_DEBUG
 		button.ignoreDrawDebug = true;
 		#end
@@ -306,9 +304,11 @@ class ScreenGamepad extends FlxSpriteGroup{
 		_acc[4] = analogRight.acceleration.y/_radius;
 		_acc[5] = 0;
 //		trace(_acc);
+	#if FLX_JOYSTICK_API
 		var event = new JoystickEvent(JoystickEvent.AXIS_MOVE, true, false, id);//??
 		event.axis = _acc;
 		FlxG.stage.dispatchEvent(event);
+	#end
 	}
 
 	public function setAlpha(a){

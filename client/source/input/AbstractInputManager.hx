@@ -18,7 +18,7 @@ import flixel.system.macros.FlxMacroUtil;
  * @author Yarikov Denis
  */
 
- typedef KeyType = String;
+ typedef KeyType = Int;
  
 class AbstractInputManager{
 	
