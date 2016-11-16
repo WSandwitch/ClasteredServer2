@@ -17,6 +17,7 @@ namespace master {
 			int id;
 			bool checked;
 			bool ready;
+			bool remote;
 			share::socket* sock;
 			std::string host;
 			int port;

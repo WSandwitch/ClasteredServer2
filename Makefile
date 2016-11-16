@@ -25,6 +25,7 @@ SLAVE_OBJECTS=$(SLAVE_SOURCES:.cpp=.o)
 ifeq ($(DEBUG),1)
     CFLAGS +=-g -ggdb -rdynamic
     CPPFLAGS +=-g -ggdb -rdynamic
+	DEFINES += -DDEBUG
 endif
 
 ifeq ($(OPTIMISATION),1)
@@ -32,16 +33,16 @@ ifeq ($(OPTIMISATION),1)
     CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
 endif
 
-all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(PUBLIC) $(SLAVE)
+all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
 	
-$(PUBLIC): $(SHARE_OBJECTS) $(PUBLIC_OBJECTS)
-	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(LDFLAGS) -DMASTER -o $@
+$(PUBLIC): $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS)
+	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS) $(LDFLAGS) -o $@
 
 $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS) 
 	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(LDFLAGS) -o $@
 
-$(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) 
-	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(LDFLAGS) -o $@
+$(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o
+	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o $(LDFLAGS) -o $@
 
 %.o: %.c
 	$(GCC) -c $(CFLAGS) $(DEFINES) $< -o $@
@@ -58,4 +59,4 @@ $(PUBLIC)_fast:
 	$(GCC) $(CFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) -o $(PUBLIC)
 
 clean:
-	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(PUBLIC) $(TEST) $(PUBLIC).exe $(SLAVE) $(SLAVE).exe $(TEST).exe generator.exe generator
+	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(PUBLIC) $(TEST) $(PUBLIC).exe $(SLAVE) $(SLAVE).exe $(TEST).exe generator.exe generator src/slave_main.o

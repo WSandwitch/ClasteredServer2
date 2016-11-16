@@ -30,8 +30,9 @@ namespace master {
 
 	
 	server::server(socket* sock, std::string host, int port):
-		checked(0), 	
+		checked(1), 	
 		ready(0), 
+		remote(1), 
 		sock(sock), 
 		host(host), 
 		port(port)
@@ -121,7 +122,9 @@ namespace master {
 		std::list<server*> l;
 		m.lock();
 			for (auto i:all){
-				i.second->checked=0;
+				if (i.second->remote){
+					i.second->checked=0;
+				}
 			}
 		m.unlock();
 		storageSlaves(checkSlaves, 0);

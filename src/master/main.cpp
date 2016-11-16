@@ -1,3 +1,4 @@
+#include <string> 
 #include <map> 
 #include <set> 
 #include <unordered_map> 
@@ -34,6 +35,7 @@
 #include "../share/system/log.h"
 #include "../share/world.h"
 #include "../share/messages.h"
+#include "../slave/main.h"
 
 #define CONFIG_FILE "config.cfg"
 #ifndef VIEW_AREA_X
@@ -80,6 +82,12 @@ static int readConfig(){
 				listeners::add(l);
 //				printf("Listener %d added\n",l->sockfd);
 			}
+		}else
+		if (strcmp(buf, "slaves")==0){
+			fscanf(f, "%hd", &config.slaves.total);
+		}else
+		if (strcmp(buf, "tps")==0){
+			fscanf(f, "%hd", &config.slaves.start_port);
 		}else
 		if (strcmp(buf, "tps")==0){
 			fscanf(f, "%hd", &config.tps);
@@ -169,10 +177,27 @@ int main(int argc,char* argv[]){
 	config.listenworkers.tps=3;
 	config.tps=52;
 	config.log.debug=1;
+	config.slaves.total=0;
+	config.slaves.start_port=0;
 		
 	readConfig();
-	storageInit(&config.storage);
 	log_config::config=config.log;
+	
+#ifndef __CYGWIN__
+	short port=config.slaves.start_port;
+	std::string sname="localhost";
+	for(int i=0;i<config.slaves.total;i++){
+		start_slave_fork(port+i);
+	}
+	sleep(5);
+	for(int i=0;i<config.slaves.total;i++){
+		server *s=server::create(sname, port+i);
+		if (s)
+			server::add(s);
+	}
+#endif
+
+	storageInit(&config.storage);
 	grid=new master::special::grid(master::world.map.map_size, master::world.map.offset);
 	
 	clientMessageProcessorInit();

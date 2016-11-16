@@ -16,6 +16,10 @@ namespace master {
 		}	serverworkers, 
 			socketworkers,
 			listenworkers;
+		struct{
+			short start_port;
+			short total;
+		}slaves;
 	} config;
 }
 #endif

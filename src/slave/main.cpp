@@ -50,41 +50,7 @@ static void segfault_sigaction(int sig){
 }
 #endif
 
-#ifdef MASTER
-//start slave as thread of master
-#define main slave_main
-int slave_main(int argc, char* argv[]);
-
-void* slave_func(void* a){
-	slave_main(2, (char**)a);
-	return 0;
-}
-
-int start_slave(int port){
-	static char ps[30];
-	sprintf(ps, "%d", port);
-	static const char* argv[]={"", ps};	
-	pthread_t pid=0;
-	if(pthread_create(&pid, 0, slave_func, (void*)argv)!=0)
-		exit(1);
-	return pid;
-}
-
-int start_slave_fork(int port){
-	static char ps[30];
-	sprintf(ps, "%d", port);
-	static const char* argv[]={"", ps};	
-	int pid=fork();
-	if (pid==0){
-		slave_func((void*)argv);
-		exit(0);
-	}
-	return pid;
-}
-
-#endif
-
-int main(int argc, char* argv[]){
+int slave_main(int argc, char* argv[]){
 	int TPS=24;
 	share::sync syncer;
 	struct sigaction sa;
@@ -102,7 +68,9 @@ int main(int argc, char* argv[]){
 #endif	
 	if (argc>1)
 		sscanf(argv[1], "%d", &port);
-	
+#ifndef DEBUG
+	//add log init
+#endif
 	srand(share::time(0));
 	//init map
 	{
@@ -187,4 +155,40 @@ int main(int argc, char* argv[]){
 	//pthread_join(pid,0);
 	sleep(1);
 	return 1;
+}
+
+
+//start slave as thread of master
+#define main slave_main
+
+void* slave_func(void* a){
+	slave_main(2, (char**)a);
+	return 0;
+}
+
+int start_slave(int port){
+	static char ps[30];
+	sprintf(ps, "%d", port);
+	static const char* argv[]={"", ps};	
+	pthread_t pid=0;
+	if(pthread_create(&pid, 0, slave_func, (void*)argv)!=0)
+		exit(1);
+	return pid;
+}
+
+int start_slave_fork(int port){
+#ifndef __CYGWIN__
+	static char ps[30];
+	sprintf(ps, "%d", port);
+	static const char* argv[]={"", ps};	
+	int pid=fork();
+	if (pid==0){
+		slave_func((void*)argv);
+		exit(0);
+	}
+	return pid;
+#else
+	printf("Could not create forked slave on CYGWIN\n");
+	return 0;
+#endif
 }
