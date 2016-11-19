@@ -72,6 +72,13 @@ class AbstractInputManager{
 		return actions.get(name).justReleased;
 	}
 	
+	public function anyChanged(names:Array<KeyType>):Bool{
+		for (name in names)
+			if (justReleased(name) || justPressed(name))
+				return true;
+		return false;
+	}
+	
 	public function pressed(name:KeyType):Bool{
 		if (!actions.exists(name))
 			return false;
@@ -214,13 +221,15 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 	public var key:GamepadAxisID;
 	public var gamepad_id:Null<Int> = null;
 	private var _value:Float = 0;
+	private var _treshhold:Float = 0;
 	
 	
-	public function new(manager:AbstractInputManager, key:GamepadAxisID, ?id){
+	public function new(manager:AbstractInputManager, key:GamepadAxisID, treshhold=0.1, ?id){
 		super(manager);
 		this.key = key;
 		this.gamepad_id = id;
 		this.type = GAMEPADAXIS;
+		_treshhold = treshhold;
 	}
 		
 	override
@@ -245,105 +254,105 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 		switch(key){
 			case LEFT_STICK_X_PLUS:
 				var value = gamepad.getXAxis(FlxGamepadInputID.LEFT_ANALOG_STICK);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case LEFT_STICK_X_MINUS:
 				var value = gamepad.getXAxis(FlxGamepadInputID.LEFT_ANALOG_STICK);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case LEFT_STICK_Y_PLUS:
 				var value = gamepad.getYAxis(FlxGamepadInputID.LEFT_ANALOG_STICK);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case LEFT_STICK_Y_MINUS:
 				var value = gamepad.getYAxis(FlxGamepadInputID.LEFT_ANALOG_STICK);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case RIGHT_STICK_X_PLUS:
 				var value = gamepad.getXAxis(FlxGamepadInputID.RIGHT_ANALOG_STICK);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case RIGHT_STICK_X_MINUS:
 				var value = gamepad.getXAxis(FlxGamepadInputID.RIGHT_ANALOG_STICK);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case RIGHT_STICK_Y_PLUS:
 				var value = gamepad.getYAxis(FlxGamepadInputID.RIGHT_ANALOG_STICK);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case RIGHT_STICK_Y_MINUS:
 				var value = gamepad.getYAxis(FlxGamepadInputID.RIGHT_ANALOG_STICK);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case LEFT_TRIGGER_PLUS:
 				
 				var value = gamepad.getAxis(FlxGamepadInputID.LEFT_TRIGGER);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case LEFT_TRIGGER_MINUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.LEFT_TRIGGER);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case RIGHT_TRIGGER_PLUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.RIGHT_TRIGGER);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case RIGHT_TRIGGER_MINUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.RIGHT_TRIGGER);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case POINTER_X_PLUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.POINTER_X);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case POINTER_X_MINUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.POINTER_X);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case POINTER_Y_PLUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.POINTER_Y);
-				if (value > 0 && value > action.value){
+				if (value > _treshhold && value > action.value){
 					action.pressed = true;
 					action.value = value;
 				}
 			case POINTER_Y_MINUS:
 				var value = gamepad.getAxis(FlxGamepadInputID.POINTER_Y);
-				if (value < 0 && -value > action.value){
+				if (value < -_treshhold && -value > action.value){
 					action.pressed = true;
 					action.value = -value;
 				}
 			case NONE:
 		}
 		if (_value != action.value){
-			if (action.value == 0){
+			if (action.value < _treshhold){
 				action.justReleased = true;
 			}
 			action.justPressed = true; //value has been changed

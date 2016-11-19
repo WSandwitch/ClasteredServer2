@@ -53,12 +53,13 @@ namespace share{
 				bot.dist+=vel;
 				attrs[attr(&position.x)]=1;
 			} else {
-				hurt(100);//suicide
+				suicide();//suicide
 			}
 		}
 		
-		if (bot.used){
+		if (bot.used){//TODO: move to shoot
 			//TODO: add check for touch enemy and suicude if need
+			
 		}
 		//dont need to update cells
 	}
@@ -78,7 +79,6 @@ namespace share{
 					attrs[attr(&position.y)]=1;
 				}
 			}
-			//TODO: add check for touch enemy and suicude if need
 		}
 	}
 }

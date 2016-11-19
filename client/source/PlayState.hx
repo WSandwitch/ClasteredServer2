@@ -17,7 +17,12 @@ import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
 
+import flixel.input.keyboard.FlxKey;
+import input.AbstractInputManager;
+import input.AbstractInputManager.*;
+
 using flixel.util.FlxSpriteUtil;
+import flixel.system.macros.FlxMacroUtil;
 
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -30,6 +35,7 @@ class PlayState extends FlxState
 	static var LEVEL_MIN_Y;
 	static var LEVEL_MAX_Y;
 
+	private var actions:AbstractInputManager = new AbstractInputManager();
 	private var game:CSGame;
 	private var orb:Npc;
 	private var orbShadow:FlxSprite;
@@ -165,6 +171,20 @@ class PlayState extends FlxState
 		hudCam.follow(hud.background, FlxCameraFollowStyle.NO_DEAD_ZONE);
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
+		
+		//change to normal mapping
+		var a = actions.addAction(GO_UP);
+		a.addKey(FlxKey.W);
+		a.addKey(FlxKey.UP);
+		a=actions.addAction(GO_DOWN);
+		a.addKey(FlxKey.S);
+		a.addKey(FlxKey.DOWN);
+		a=actions.addAction(GO_LEFT);
+		a.addKey(FlxKey.A);
+		a.addKey(FlxKey.LEFT);
+		a=actions.addAction(GO_RIGHT);
+		a.addKey(FlxKey.D);
+		a.addKey(FlxKey.RIGHT);
 	}
 	
 	function drawDeadzone() 
@@ -274,47 +294,14 @@ class PlayState extends FlxState
 		var speed = 200;
 		var p:Packet = new Packet();
 		var keys_changed:Bool = false;
-
-		if (FlxG.keys.anyJustPressed([A, LEFT])){
-			keys[0] -= 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustReleased([A, LEFT])){
-			keys[0] += 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustPressed([D, RIGHT])){
-			keys[0] += 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustReleased([D, RIGHT])){
-			keys[0] -= 100;
-			keys_changed = true;
-		}
-
-		if (FlxG.keys.anyJustPressed([S, DOWN])){
-			keys[1] += 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustReleased([S, DOWN])){
-			keys[1] -= 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustPressed([W, UP])){
-			keys[1] -= 100;
-			keys_changed = true;
-		}
-		if (FlxG.keys.anyJustReleased([W, UP])){
-			keys[1] += 100;
-			keys_changed = true;
-		}
-		if (keys_changed){
+		actions.update();
+		if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
 			p.addChar(0);
-			p.addChar(keys[0]);
+			p.addChar(Math.floor((actions.value(GO_RIGHT)-(actions.value(GO_LEFT)))*100));
 			p.addChar(1);
-			p.addChar(keys[1]);
+			p.addChar(Math.floor((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
 		}
-		
+
 		if (p.chanks.length>0){
 			p.type = MSG_SET_DIRECTION;
 //			trace(connection);
@@ -403,4 +390,32 @@ class PlayState extends FlxState
 		hud.updateCamLerp(cam.followLerp);
 	}
 	
+}
+
+@:enum
+abstract ActionID(Int) from Int to Int{
+	public static var fromStringMap(default, null):Map<String, ActionID>
+		= FlxMacroUtil.buildMap("PlayState.ActionID");
+		
+	public static var toStringMap(default, null):Map<ActionID, String>
+		= FlxMacroUtil.buildMap("PlayState.ActionID", true);
+
+	var NONE = -1;	
+	var GO_UP = 1;
+	var GO_DOWN = 2;
+	var GO_LEFT = 3;
+	var GO_RIGHT = 4;
+	
+	@:from
+	public static inline function fromString(s:String)
+	{
+		s = s.toUpperCase();
+		return fromStringMap.exists(s) ? fromStringMap.get(s) : NONE;
+	}
+	
+	@:to
+	public inline function toString():String
+	{
+		return toStringMap.get(this);
+	}
 }

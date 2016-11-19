@@ -135,7 +135,7 @@ namespace master {
 							master::world.npcs_m.unlock();
 							printf("token OK\n");
 							p.init();
-							p.setType(MSG_CLIENT_UPDATE);
+							p.setType(MESSAGE_CLIENT_UPDATE);
 							p.add((char)1);//index
 							p.add(cl->npc->id);
 							cl->sock->send(&p);

@@ -244,8 +244,10 @@ int main(int argc,char* argv[]){
 					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 //					printf("%d %d\n", slave_id, n->slave_id);
-					if (slave_id!=n->slave_id)
+					if (slave_id!=n->slave_id){
+						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
 						slave_id=n->set_attr(n->slave_id, slave_id);
+					}
 					//move in map
 					n->update_cells();
 					//update n->slaves
@@ -276,13 +278,8 @@ int main(int argc,char* argv[]){
 									break;
 								case 3: //already had npc
 									if (n->updated()){
-										if (slave_id!=n->slave_id){ //if attrs updated
-											n->pack(1);
-											s->sock->send(&n->packs(1));
-										}else{ //send only needed attrs
-											n->pack(1,0,1);
-											s->sock->send(&n->packs(1,0,1));
-										}
+										n->pack(1,0,1);
+										s->sock->send(&n->packs(1,0,1));									
 									}
 									n->slaves.insert(slave.first);
 									break;
@@ -351,13 +348,19 @@ int main(int argc,char* argv[]){
 						}
 					}
 				}
-			}		
+			}
+			std::list<npc*> l;
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
-					n->clear();
+					if(n->clear())
+						l.push_back(n);
 					n->m.unlock();
 				}
+			}
+			for(auto n: l){
+				master::world.npcs.erase(n->id);
+				delete n;
 			}
 			master::world.npcs_m.lock();
 				if (master::world.old_npcs.size()>0){

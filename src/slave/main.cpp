@@ -99,7 +99,7 @@ int slave_main(int argc, char* argv[]){
 				npc* n=it->second;
 				if (n){
 //					n->m.lock();
-//					printf("%d %d, %d\n", world.id, n->slave_id, world.id==n->slave_id);
+					printf("%d %d, %g %g\n", world.id, n->slave_id, n->position.x, n->position.y);
 					if (world.id==n->slave_id){
 						n->move();
 					}
@@ -173,7 +173,7 @@ int start_slave(int port){
 	pthread_t pid=0;
 	if(pthread_create(&pid, 0, slave_func, (void*)argv)!=0)
 		exit(1);
-	return pid;
+	return (int)pid;
 }
 
 int start_slave_fork(int port){

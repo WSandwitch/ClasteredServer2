@@ -109,7 +109,7 @@ namespace master {
 			
 			if ((s=server::create(host, si->port))!=0){
 				server::add(s);
-				//fist message to serer is server_connected 
+				//fist message to server is server_connected 
 			}
 		}
 		if (s){
@@ -149,10 +149,9 @@ namespace master {
 	}
 
 	int server::idByAddress(std::string address, int port){ //return 6 bytes integer
-		std::string str=address;
-		address+=':';
-		address+=port;
-		return crc32((const void*)str.data(), (size_t)str.size());
+		char str[100];
+		sprintf(str, "%s:%d", address.data(), port);
+		return crc32((const void*)str, (size_t)strlen(str));
 	}
 
 	void server::sendAll(packet* p){

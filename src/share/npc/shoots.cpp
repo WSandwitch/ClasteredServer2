@@ -31,8 +31,19 @@ namespace share{
 	}
 	
 	//bullet shoot
+	//if enemy near self, attack it than suicide
 	void npc_shoots::shoot1(typeof(point::x) x, typeof(point::y) y){
-		
+		share::cell *cell=world->map.cells(position);
+		if(cell){
+			for(auto ni: cell->npcs){
+				npc *n=ni.second;
+				if(position.distanse2(n->position)<r*r){
+					n->hurt(this);
+					suicide();
+					break;
+				}
+			}
+		}
 		
 		if (bot.used){
 			//TODO: add check for touch enemy and suicude if need

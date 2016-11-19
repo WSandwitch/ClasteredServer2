@@ -55,7 +55,7 @@ namespace share {
 			changes to master, slave can change it
 			changes to slave
 		*/
-		///(attr, client_all, client, master_slave, from_slave, to_slave)
+		///(attr, client_all, client, master_slave_all, from_slave, to_slave)
 		packAttr(position.x,1,1,1,1,0); //1cm
 		packAttr(position.y,1,1,1,1,0); //2cm
 		packAttr(direction.x,1,1,1,1,1); //3cms
@@ -98,16 +98,15 @@ namespace share {
 	}
 		
 	bool npc::clear(){
-//		if (health<=0 || (time(0)-timestamp>15 && (gridOwner()!=world->id || (!bot.used)))){
-//			return 1;
-//		}
-		
 		for(auto i: attrs){
 			attrs[i.first]=0;
 		}
 		for(auto i: _packs){
 			_packs.p[i.first]=0;
 		}
+		if (health<=0){
+			return 1;
+		}		
 		return 0;
 	}
 	
@@ -142,7 +141,7 @@ namespace share {
 		}
 	}
 	
-	void npc::move(){ //TODO: check if it works
+	void npc::move(){
 		auto $=moves[move_id];
 		if ($)
 			(this->*$)(direction.x*vel, direction.y*vel);//TODO:add angle correction
@@ -214,6 +213,14 @@ namespace share {
 		p.add(id);
 		p.add(n->id);
 		world->sock->send(&p);
+	}
+	
+	bool npc::suicide(){
+		packet p;
+		p.setType(MESSAGE_NPC_SUICIDE);
+		p.add(id);
+		world->sock->send(&p);
+		return 1;
 	}
 	
 	void npc::update(packet * p){
