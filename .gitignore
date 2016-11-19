@@ -82,3 +82,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.stackdump
+config.cfg
+storage_text.cfg
+/storage/*
