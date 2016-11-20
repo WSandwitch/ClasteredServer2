@@ -173,6 +173,9 @@ namespace master {
 						y=p->chanks[i].value.c/100.0;
 						dir++;
 						break;
+					case 2://amgle
+						cl->npc->set_attr(cl->npc->angle, p->chanks[i].value.c);
+						break;
 				}
 			}
 			if (dir==2){

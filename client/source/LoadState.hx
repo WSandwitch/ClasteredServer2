@@ -39,7 +39,7 @@ class LoadState extends FlxState
 		game.pass = "qwer";
 		
 		try{
-			var conn = new Connection("172.16.1.40", 8000);
+			var conn = new Connection("localhost", 8000);
 			game.connection = conn;
 			delay(function(){
 				if (game.id == null)

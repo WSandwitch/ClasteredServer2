@@ -43,13 +43,15 @@ class PlayState extends FlxState
 	private var hudCam:FlxCamera;
 	private var overlayCamera:FlxCamera;
 	private var deadzoneOverlay:FlxSprite;
-	private var keys:Array<Int> = [0,0,0,0];
 
 	///network attrs
 	public var id:Int;
 	public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
+	private var _angle:Float = 0;
+	private static inline var _d_angle:Float = 2*3.14/180; //2 degree
+	
 	
 	public var l:Lock = new Lock();
 	public var connection:Null<Connection> = null;
@@ -85,7 +87,7 @@ class PlayState extends FlxState
 		recv_loop = true;
 		receiver = new Receiver(this);
 		
-		FlxG.mouse.visible = false;
+//		FlxG.mouse.visible = false;
 		
 		FlxNapeSpace.velocityIterations = 5;
 		FlxNapeSpace.positionIterations = 5;
@@ -297,11 +299,19 @@ class PlayState extends FlxState
 		actions.update();
 		if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
 			p.addChar(0);
-			p.addChar(Math.floor((actions.value(GO_RIGHT)-(actions.value(GO_LEFT)))*100));
+			p.addChar(Math.round((actions.value(GO_RIGHT)-(actions.value(GO_LEFT)))*100));
 			p.addChar(1);
-			p.addChar(Math.floor((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
+			p.addChar(Math.round((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
 		}
-
+		if(npc != null){
+			var angle = Math.atan2(FlxG.mouse.y-npc.y, FlxG.mouse.x-npc.x);
+			if (Math.abs(_angle-angle)>=_d_angle){
+				p.addChar(2);
+				p.addChar(Math.round(angle/3.14*120));	
+			}
+//			trace(angle / 3.14 * 180);
+//			npc.angle = Math.round(angle / 3.14 * 180);
+		}
 		if (p.chanks.length>0){
 			p.type = MSG_SET_DIRECTION;
 //			trace(connection);
@@ -364,7 +374,7 @@ class PlayState extends FlxState
 						}
 				}
 			}
-		}while (p != null);
+		}while(p != null);
 	}
 	
 	private function setLead(lead:Float) 
