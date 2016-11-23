@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+#include <iostream>
 extern "C"{
 #include <time.h>
 #include <signal.h>

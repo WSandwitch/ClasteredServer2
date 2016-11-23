@@ -53,8 +53,22 @@ namespace share {
 //		printf("%g %g | %g %g\n",(p.x-this->a.x),(p.y-this->a.y),(this->b.x-this->a.x),(this->b.y-this->a.y));
 		return (this->b.x-this->a.x)*(p.y-this->a.y)-(this->b.y-this->a.y)*(p.x-this->a.x);
 	}
-
+		
 }
+
+namespace std {
+		
+
+	ostream& operator<<(ostream &stream, share::segment &s) {
+		cout << "[";
+		cout << s.a;
+		cout << " ";
+		cout << s.b;
+		cout << "]";
+		return stream;
+	}
+}
+
 
 /*
 using namespace clasteredServerSlave;

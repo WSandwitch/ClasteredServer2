@@ -304,8 +304,10 @@ class PlayState extends FlxState
 			p.addChar(Math.round((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
 		}
 		if(npc != null){
-			var angle = Math.atan2(FlxG.mouse.y-npc.y, FlxG.mouse.x-npc.x);
-			if (Math.abs(_angle-angle)>=_d_angle){
+			var angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);
+//			trace(Math.abs(_angle-angle));
+			if (Math.abs(_angle-angle) >= _d_angle){
+				_angle = angle;
 				p.addChar(2);
 				p.addChar(Math.round(angle/3.14*120));	
 			}

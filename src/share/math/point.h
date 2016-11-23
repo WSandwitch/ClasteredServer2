@@ -14,19 +14,22 @@ namespace share {
 				point_(T _x, T _y);
 				void normalize();
 				char to_angle();
-				void by_angle(char angle, T l=1);
+				template <class T1>
+					void by_angle(char angle, T1 l=1);
 				template<class T1>
 					float distanse(point_<T1> &b);
 				template<class T1>
 					T distanse2(point_<T1> &b);
 			
-				static point_ from_angle(char angle, T l=1);//l is length of vector
+				template <class T1>
+					static point_ from_angle(char angle, T1 l=1);//l is length of vector
 				template<class T1, class T2>
 					static T scalar(point_<T1> &&a, point_<T2> &&b);
 				template<class T1, class T2>
 					static point_<T> toVector(point_<T1> &a, point_<T2> &b);
 				template<class T1, class T2>		
 					static float length(T1 x, T2 y);
+				static float length(point_ &p);
 		};
 	
 	template <class T>
@@ -42,4 +45,15 @@ namespace share {
 
 #include "point_definition.h"
 
+namespace std {
+	template <class T>
+	ostream& operator<<(ostream &stream, share::point_<T> &p) {
+		cout << "(";
+		cout << p.x;
+		cout << " ";
+		cout << p.y;
+		cout << ")";
+		return stream;
+	}
+}
 #endif

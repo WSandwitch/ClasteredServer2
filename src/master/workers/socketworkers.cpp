@@ -65,7 +65,7 @@ namespace master {
 				c->timestamp=share::time(0);
 				do{
 					if (c->sock->recv(&p)){
-						printf("(client) got message %d\n", ((char*)p.data())[0]);
+//						printf("(client) got message %d\n", ((char*)p.data())[0]);
 						if (c->proceed(&p)==0)
 							break;
 					}

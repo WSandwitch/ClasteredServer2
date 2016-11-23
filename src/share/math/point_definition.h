@@ -28,18 +28,24 @@ namespace share {
 			return to_pdegrees(atan2f(y,x));  //pseudo radians [-120, 120]
 		}
 
-	template<class T>		
-		void point_<T>::by_angle(char angle, T l){
-			float rad=from_pdegrees(angle);
-			x=l*cosf(rad);//TODO:check
-			y=l*sinf(rad);
-		}
+	template<class T>
+		template<class T1>
+			void point_<T>::by_angle(char angle, T1 l){
+				float rad=from_pdegrees(angle);
+				x=roundf(l*cosf(rad));//TODO:check
+				y=roundf(l*sinf(rad));
+			}
 		
 	template<class T>
 		template<class T1, class T2>		
 			float point_<T>::length(T1 x, T2 y){
 				return sqrtf(sqr(x)+sqr(y));
 			}
+		
+	template<class T>
+		float point_<T>::length(point_<T> &p){
+			return length(p.x,p.y);
+		}
 		
 	template<class T>
 	template<class T1>		
@@ -53,8 +59,9 @@ namespace share {
 			return sqr(b.x-x)+sqr(b.y-y);
 		}
 
-	template<class T>		
-		point_<T> point_<T>::from_angle(char angle, T l){
+	template<class T>
+	template<class T1>		
+		point_<T> point_<T>::from_angle(char angle, T1 l){
 			point_<T> p;
 			p.by_angle(angle,l);
 			return p;
