@@ -108,46 +108,6 @@ class PlayState extends FlxState
 		//add(orb);
 		
 		//orb.shadow = orbShadow;
-		
-		// Other orbs
-		for (i in 0...5) 
-		{
-			var otherOrbShadow = new FlxSprite(100, 100, "assets/OtherOrbShadow.png");
-			otherOrbShadow.centerOffsets();
-			otherOrbShadow.blend = BlendMode.MULTIPLY;
-			
-			var otherOrb = new Orb();
-			otherOrb.loadGraphic("assets/OtherOrb.png", true, 140, 140);
-			otherOrb.createCircularBody(50);
-			otherOrb.setBodyMaterial(1, 0.2, 0.4, 0.5);
-			otherOrb.antialiasing = true;
-			otherOrb.setDrag(1, 1);
-			
-			add(otherOrbShadow);
-			add(otherOrb);
-			
-			otherOrb.shadow = otherOrbShadow;
-			
-			switch (i) 
-			{
-				case 0: 
-					otherOrb.body.position.setxy(320 - 400, 240 - 400);
-					otherOrb.animation.frameIndex = 0;
-				case 1: 
-					otherOrb.body.position.setxy(320 + 400, 240 - 400); 
-					otherOrb.animation.frameIndex = 4;
-				case 2:
-					otherOrb.body.position.setxy(320 + 400, 240 + 400); 
-					otherOrb.animation.frameIndex = 3;
-				case 3:
-					otherOrb.body.position.setxy(-300, 240); 
-					otherOrb.animation.frameIndex = 2;
-				case 4:
-					otherOrb.body.position.setxy(0, 240 + 400); 
-					otherOrb.animation.frameIndex = 1;
-			}
-			otherOrb.body.velocity.setxy(FlxG.random.int(75, 150), FlxG.random.int(75, 150));
-		}
 
 		hud = new HUD();
 		add(hud);
@@ -155,7 +115,7 @@ class PlayState extends FlxState
 		// Camera Overlay
 		deadzoneOverlay = new FlxSprite(-10000, -10000);
 		deadzoneOverlay.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
-		deadzoneOverlay.antialiasing = true;
+		//deadzoneOverlay.antialiasing = true;
 
 		overlayCamera = new FlxCamera(0, 0, 640, 720);
 		overlayCamera.bgColor = FlxColor.TRANSPARENT;

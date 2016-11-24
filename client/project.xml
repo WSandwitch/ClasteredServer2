@@ -33,6 +33,8 @@
 	<set name="BUILD_DIR" value="export" />
 	<classpath name="source" />
 	<assets path="assets" />
+	<assets path="map.tmx" rename="assets/map.tmx" if="debug" />
+	<assets path="map.tmx" rename="assets/map.tmx"  embed="true" unless="debug" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
 

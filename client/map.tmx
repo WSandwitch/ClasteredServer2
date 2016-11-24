@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="22">
+ <tileset firstgid="1" name="1" tilewidth="140" tileheight="140" tilecount="5" columns="0">
+  <tile id="1">
+   <image width="112" height="128" source="assets/FloorTexture.png"/>
+  </tile>
+  <tile id="2">
+   <image width="52" height="52" source="assets/Orb — копия.png"/>
+  </tile>
+  <tile id="3">
+   <image width="52" height="52" source="assets/Orb.png"/>
+  </tile>
+  <tile id="4">
+   <image width="52" height="52" source="assets/OrbShadow.png"/>
+  </tile>
+  <tile id="6">
+   <image width="140" height="140" source="assets/OtherOrbShadow.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="10" name="2" tilewidth="32" tileheight="32" tilecount="12" columns="3">
+  <image source="assets/FloorTexture.png" width="112" height="128"/>
+ </tileset>
+ <layer name="tiles" width="20" height="20">
+  <data encoding="csv">
+10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
+16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
+19,20,19,20,19,20,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
+16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
+19,20,19,20,19,20,19,20,21,0,0,0,0,0,0,0,0,0,0,0,
+10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
+13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
+16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
+19,20,19,20,19,20,19,20,21,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup color="#ff0000" name="collision">
+  <object id="1" x="117.667" y="254.333">
+   <polygon points="0,0 101,12 96,82 33,108 -47,87 -45,24"/>
+  </object>
+  <object id="4" x="481" y="75">
+   <polygon points="0,0 96,100 48,346 -10,442 -34,196"/>
+  </object>
+  <object id="6" x="96" y="448" width="170" height="115"/>
+  <object id="17" x="182" y="38">
+   <polyline points="0,0 123,-15 174,66 116,173"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="areas">
+  <object id="18" x="35" y="33" width="69" height="75"/>
+ </objectgroup>
+</map>
