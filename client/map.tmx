@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="22">
- <tileset firstgid="1" name="1" tilewidth="140" tileheight="140" tilecount="5" columns="0">
+ <tileset firstgid="1" name="1" tilewidth="140" tileheight="140" tilecount="4" columns="0">
   <tile id="1">
    <image width="112" height="128" source="assets/FloorTexture.png"/>
   </tile>
   <tile id="2">
-   <image width="52" height="52" source="assets/Orb — копия.png"/>
+   <image width="52" height="52" source="assets/Orb.png"/>
   </tile>
   <tile id="3">
    <image width="52" height="52" source="assets/Orb.png"/>
@@ -13,27 +13,33 @@
   <tile id="4">
    <image width="52" height="52" source="assets/OrbShadow.png"/>
   </tile>
+  <tile id="5">
+   <image width="52" height="52" source="assets/OrbShadow.png"/>
+  </tile>
   <tile id="6">
    <image width="140" height="140" source="assets/OtherOrbShadow.png"/>
   </tile>
+  <tile id="7">
+   <image width="140" height="140" source="assets/OtherOrbShadow.png"/>
+  </tile>
  </tileset>
- <tileset firstgid="10" name="2" tilewidth="32" tileheight="32" tilecount="12" columns="3">
+ <tileset firstgid="8" name="2" tilewidth="32" tileheight="32" tilecount="12" columns="3">
   <image source="assets/FloorTexture.png" width="112" height="128"/>
  </tileset>
  <layer name="tiles" width="20" height="20">
   <data encoding="csv">
-10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
-13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
-16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
-19,20,19,20,19,20,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
-10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
-13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
-16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
-19,20,19,20,19,20,19,20,21,0,0,0,0,0,0,0,0,0,0,0,
-10,11,10,11,10,11,10,11,12,0,0,0,0,0,0,0,0,0,0,0,
-13,14,13,14,13,14,13,14,15,0,0,0,0,0,0,0,0,0,0,0,
-16,17,16,17,16,17,16,17,18,0,0,0,0,0,0,0,0,0,0,0,
-19,20,19,20,19,20,19,20,21,0,0,0,0,0,0,0,0,0,0,0,
+8,9,8,9,8,9,8,9,10,0,0,0,0,0,0,0,0,0,0,0,
+11,12,11,12,11,12,11,12,13,0,0,0,0,0,0,0,0,0,0,0,
+14,15,14,15,14,15,14,15,16,0,0,0,0,0,0,0,0,0,0,0,
+17,18,17,18,17,18,8,9,10,0,0,0,0,0,0,0,0,0,0,0,
+8,9,8,9,8,9,8,9,10,0,0,0,0,0,0,0,0,0,0,0,
+11,12,11,12,11,12,11,12,13,0,0,0,0,0,0,0,0,0,0,0,
+14,15,14,15,14,15,14,15,16,0,0,0,0,0,0,0,0,0,0,0,
+17,18,17,18,17,18,17,18,19,0,0,0,0,0,0,0,0,0,0,0,
+8,9,8,9,8,9,8,9,10,0,0,0,0,0,0,0,0,0,0,0,
+11,12,11,12,11,12,11,12,13,0,0,0,0,0,0,0,0,0,0,0,
+14,15,14,15,14,15,14,15,16,0,0,0,0,0,0,0,0,0,0,0,
+17,18,17,18,17,18,17,18,19,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

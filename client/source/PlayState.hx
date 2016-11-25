@@ -68,7 +68,7 @@ class PlayState extends FlxState
 	private static inline var MSG_NPC_UPDATE:Int=3;
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
-
+	private var map:TiledLevel;
 	
 	override public function create():Void 
 	{	
@@ -91,11 +91,14 @@ class PlayState extends FlxState
 		
 		FlxNapeSpace.velocityIterations = 5;
 		FlxNapeSpace.positionIterations = 5;
-		
-		createFloorTiles();
-		FlxNapeSpace.createWalls(LEVEL_MIN_X, LEVEL_MIN_Y, LEVEL_MAX_X, LEVEL_MAX_Y);
+
+		map = new TiledLevel();
+		add(map);
+
+//		createFloorTiles();
+//		FlxNapeSpace.createWalls(LEVEL_MIN_X, LEVEL_MIN_Y, LEVEL_MAX_X, LEVEL_MAX_Y);
 		// Walls border.
-		add(new FlxSprite(-FlxG.width / 2, -FlxG.height / 2, "assets/Border.png"));
+//		add(new FlxSprite(-FlxG.width / 2, -FlxG.height / 2, "assets/Border.png"));
 		
 		// Player orb
 		//orbShadow = new FlxSprite(FlxG.width / 2, FlxG.height / 2, "assets/OrbShadow.png");
@@ -123,16 +126,18 @@ class PlayState extends FlxState
 		FlxG.cameras.add(overlayCamera);
 		add(deadzoneOverlay);
 		
-		FlxG.camera.setScrollBoundsRect(LEVEL_MIN_X, LEVEL_MIN_Y,
-			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X), LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y), true);
-		//FlxG.camera.follow(orb, FlxCameraFollowStyle.NO_DEAD_ZONE);
-		drawDeadzone(); // now that deadzone is present
 		
+//		FlxG.camera.setScrollBoundsRect(LEVEL_MIN_X, LEVEL_MIN_Y,
+//			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X), LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y), true);
+		//FlxG.camera.follow(orb, FlxCameraFollowStyle.NO_DEAD_ZONE);
+
+/*
 		hudCam = new FlxCamera(440, 0, hud.width, hud.height);
 		hudCam.zoom = 1; // For 1/2 zoom out.
 		hudCam.follow(hud.background, FlxCameraFollowStyle.NO_DEAD_ZONE);
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
+*/
 		
 		//change to normal mapping
 		var a = actions.addAction(GO_UP);

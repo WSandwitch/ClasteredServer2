@@ -30,9 +30,15 @@ class Npc extends FlxSprite
 		//moves = false;
 		//this.field("aaa")();
         //untyped this["aaa"]();
-		updater[1] = function(a:Dynamic){that.dest_x = a;};
-		updater[2] = function(a:Dynamic){that.dest_y = a;};
-		updater[9] = function(a:Dynamic){that.setAngle(Math.round(a / 120.0 * 180)); };
+		updater[1] = function(a:Dynamic){
+			that.dest_x = a;
+		};
+		updater[2] = function(a:Dynamic){
+			that.dest_y = a;
+		};
+		updater[9] = function(a:Dynamic){
+			that.setAngle(Math.round(a / 120.0 * 180)); 
+		};
 		//antialiasing = true;
 	}
 	

@@ -100,7 +100,7 @@ int slave_main(int argc, char* argv[]){
 				npc* n=it->second;
 				if (n){
 //					n->m.lock();
-					printf("%d %d, %g %g\n", world.id, n->slave_id, n->position.x, n->position.y);
+//					printf("%d %d, %g %g\n", world.id, n->slave_id, n->position.x, n->position.y);
 					if (world.id==n->slave_id){
 						n->move();
 					}
