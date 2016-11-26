@@ -293,9 +293,9 @@ int main(int argc,char* argv[]){
 				if (c){
 					auto cells=master::world.map.cells(
 						c->npc->position.x-VIEW_AREA_X/2, //l
-						c->npc->position.x-VIEW_AREA_Y/2, //t
+						c->npc->position.y-VIEW_AREA_Y/2, //t
 						c->npc->position.x+VIEW_AREA_X/2, //r
-						c->npc->position.x+VIEW_AREA_Y/2 //b
+						c->npc->position.y+VIEW_AREA_Y/2 //b
 					);
 					std::unordered_map<int, short> npcs;
 					for(auto n: c->npcs){
@@ -322,6 +322,7 @@ int main(int argc,char* argv[]){
 						switch(i.second){
 							case 2: //need to remove
 								{
+									printf("need to remove %d \n", i.first);
 									packet p;
 									p.setType(MESSAGE_NPC_REMOVE);
 									p.add(i.first);
