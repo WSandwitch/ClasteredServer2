@@ -182,6 +182,7 @@ int main(int argc,char* argv[]){
 		
 	readConfig();
 	log_config::config=config.log;
+	master::world.tps=config.tps;
 	
 #ifndef __CYGWIN__
 	short port=config.slaves.start_port;
@@ -386,7 +387,7 @@ int main(int argc,char* argv[]){
 //		if (timestamp-timestamps.start>25){//debug feature
 //			main_loop=0;
 //		}
-		tv.syncTPS(config.tps);
+		tv.syncTPS(master::world.tps);
 	}while(main_loop);
 	//clearing
 	sleep(2);

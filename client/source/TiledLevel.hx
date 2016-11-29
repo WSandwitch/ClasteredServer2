@@ -6,6 +6,7 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.addons.editors.tiled.TiledImageLayer;
 import flixel.addons.editors.tiled.TiledImageTile;
+import flixel.addons.editors.tiled.TiledLayer;
 import flixel.addons.editors.tiled.TiledLayer.TiledLayerType;
 import flixel.addons.editors.tiled.TiledMap;
 import flixel.addons.editors.tiled.TiledObject;
@@ -16,6 +17,7 @@ import flixel.graphics.frames.FlxTileFrames;
 import flixel.group.FlxGroup;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxSpriteUtil;
 import haxe.io.Path;
 import openfl.Assets;
 
@@ -35,13 +37,40 @@ class TiledLevel extends FlxTilemap{
 		
 		var tiles:Null<TiledTileLayer> = cast tiledmap.getLayer("tiles");
 		if (tiles != null){
-			for(ts in tiledmap.tilesetArray){
+			var bm_blank:BitmapData = new BitmapData(tiledmap.tileWidth, tiledmap.tileHeight);
+			var gid = 1;
+			for (ts in tiledmap.tilesetArray){
+				trace(gid, ts.firstGID);
+				if (gid < ts.firstGID){
+					for (i in 0...(ts.firstGID - gid))
+						fr.push(bm_blank); //fill missed tile images
+				}
 				if (ts.tileImagesSources == null){
-					fr.push(Assets.getBitmapData(ts.imageSource));
+					var bitmap:Null<BitmapData> = Assets.getBitmapData(ts.imageSource);
+					if (bitmap == null){
+						bitmap = bm_blank;
+						for (i in 1...ts.numTiles)
+							fr.push(bitmap);
+					}else{
+						var tilenum = Math.floor(bitmap.width / ts.tileWidth) * Math.floor(bitmap.height / ts.tileHeight);
+						if (tilenum < ts.numTiles){
+							for (i in 1...(ts.numTiles-tilenum))
+								fr.push(bm_blank);
+						}else if (tilenum < ts.numTiles){
+							trace("wrong size of tileset " + ts.imageSource);
+							//TODO: add crop
+						}
+					}
+					fr.push(bitmap);
+					gid += ts.numTiles;
 				}else{
 					for (t in ts.tileImagesSources){
 						if (t != null){
-							fr.push(Assets.getBitmapData(t.source));
+							var bitmap:Null<BitmapData> = Assets.getBitmapData(t.source);
+							if (bitmap == null)
+								bitmap = bm_blank;
+							fr.push(bitmap);
+							gid++;
 						}
 					}
 				}
@@ -55,6 +84,7 @@ class TiledLevel extends FlxTilemap{
 				tiledmap.tileHeight, 
 				OFF, 1, 1, 1
 			);
+			
 		}
 		
 	}

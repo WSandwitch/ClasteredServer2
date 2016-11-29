@@ -52,7 +52,7 @@ static void segfault_sigaction(int sig){
 #endif
 
 int slave_main(int argc, char* argv[]){
-	int TPS=24;
+	world.tps=24;
 	share::sync syncer;
 	struct sigaction sa;
 	//pthread_t pid;
@@ -149,7 +149,7 @@ int slave_main(int argc, char* argv[]){
 				world.old_npcs.clear();
 			world.npcs_m.unlock();			
 		world.m.unlock();
-		syncer.syncTPS(TPS);
+		syncer.syncTPS(world.tps);
 	}
 	sleep(1);
 	//cleanup

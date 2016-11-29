@@ -200,7 +200,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
         objectgroupnode = objectgroupnode->next_sibling( "objectgroup" );
     }
     
-    free( (void*) xml );
+//    free( (void*) xml );
     
     return map;
 }

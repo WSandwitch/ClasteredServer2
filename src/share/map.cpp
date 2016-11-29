@@ -32,15 +32,17 @@ namespace share{
 	map::map(int x, int y): offset(10){
 		cell.x=x;
 		cell.y=y;
-		grid=0;
+//		grid=0;
 		map_size[0]=200;
 		map_size[1]=200;
+		clean_segments();
 		reconfigure();
 	}
 	
 	map::~map(){
-		if (grid)
-			delete[] grid;
+//		if (grid)
+//			delete[] grid;
+		grid.resize(0);
 		clean_segments();
 	}
 	
@@ -61,15 +63,21 @@ namespace share{
 			for(auto group: map->groups){
 				if (group->name==std::string("collision"))
 					for(auto obj: group->objects)
-						for(int i=1, end=obj->points.size();i<end;i++)
-							segments.push_back(new segment(obj->points[i-1].x, obj->points[i-1].y, obj->points[i].x, obj->points[i].y));
+						if (obj->type==OBJECT_QUAD){
+							segments.push_back(new segment(obj->x, obj->y, obj->x+obj->width, obj->y));
+							segments.push_back(new segment(obj->x+obj->width, obj->y, obj->x+obj->width, obj->y+obj->height));
+							segments.push_back(new segment(obj->x+obj->width, obj->y+obj->height, obj->x, obj->y+obj->height));
+							segments.push_back(new segment(obj->x, obj->y+obj->height, obj->x, obj->y));
+						}else
+							for(int i=1, end=obj->points.size();i<end;i++)
+								segments.push_back(new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y));
 			}
 			delete map;
 			free(xml);
 		}
-		if (grid)
-			delete[] grid;
-		clean_segments();
+//		if (grid)
+//			delete[] grid;
+		
 		{//set main map borders
 			point lt(0, 0);
 			point rt(0, map_size[1]-1);
@@ -83,7 +91,10 @@ namespace share{
 		size.x=ceil((1.0*map_size[0])/cell.x);//TODO: change to local server area
 		size.y=ceil((1.0*map_size[1])/cell.y);
 		int grid_size=size.x*size.y;
-		grid=new share::cell[grid_size+1];
+//		printf("size %d %d\n", grid_size, grid_size*sizeof(share::cell));
+		
+//		grid=new share::cell[grid_size+1];
+		grid.resize(grid_size+1);
 		for(int i=0;i<grid_size;i++){
 			vector<segment> &&borders=cell_borders(i);
 //			printf("%d: ",i);

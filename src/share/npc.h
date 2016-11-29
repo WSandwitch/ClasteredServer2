@@ -12,7 +12,7 @@
 #include "math/point.h"
 #include "attrs_map.h"
 
-#define NPC_FULL_TEMP 10000
+#define NPC_FULL_TEMP 30000
 #define STATE_IDLE 0
 #define STATE_WARMUP 1
 #define STATE_ATTACK 2

@@ -32,6 +32,7 @@ namespace share {
 		float map_size[2];
 		float map_offset;
 		bool main_loop;
+		short tps;
 		share::mutex m;
 		share::mutex npcs_m;
 		share::socket* sock;

@@ -112,9 +112,9 @@ namespace share {
 	
 	void npc::attack(){
 		//TODO: check	
-		short warmup=1000; //set
-		short cooldown=1000; //set
-		short latency=10; //tiks
+		short warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+		short cooldown=NPC_FULL_TEMP/world->tps/1; //set
+		short latency=0.5*world->tps; //tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
 			if(weapon.temp<NPC_FULL_TEMP){

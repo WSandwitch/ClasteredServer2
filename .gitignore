@@ -85,3 +85,5 @@ $RECYCLE.BIN/
 config.cfg
 storage_text.cfg
 /storage/*
+
+data/map.tmx

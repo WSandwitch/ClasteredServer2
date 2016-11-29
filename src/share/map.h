@@ -30,7 +30,8 @@ namespace share {
 			point source;
 			pointi size;
 			point cell;
-			share::cell *grid;
+//			share::cell *grid;
+			std::vector<share::cell> grid;
 			std::vector<segment*> segments;
 			int map_size[2];
 			int offset;
