@@ -222,6 +222,11 @@ int main(int argc,char* argv[]){
 //	printf("Start main loop\n");
 	timestamp_t timestamp;
 	timestamps.start=share::time(0);
+	
+	npc *n=new npc(&master::world, 100);
+	n->health=30000;
+	master::world.new_npcs.push_back(n);
+	
 	do{
 		timestamp=share::time(0);
 		tv.timePassed(); //start timer
@@ -362,7 +367,7 @@ int main(int argc,char* argv[]){
 			}
 			for(auto n: l){
 				master::world.npcs.erase(n->id);
-				delete n;
+				delete n; //auto added to old_npcs
 			}
 			master::world.npcs_m.lock();
 				if (master::world.old_npcs.size()>0){

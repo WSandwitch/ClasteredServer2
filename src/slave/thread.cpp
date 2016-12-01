@@ -33,7 +33,7 @@ static void* threadFunc(void *arg){
 		processor f;
 		if (world.sock->recv(&p)<=0)
 			break;
-		printf("packet %d\n", p.type());
+//		printf("packet %d\n", p.type());
 		//some work
 		if((f=processors::messages[p.type()])!=0)
 			f(&p);

@@ -41,6 +41,8 @@ namespace share {
 			share::cell* cells(int id);
 			share::cell* cells(point &p);
 			share::cell* cells(typeof(point::x) x, typeof(point::y) y);
+			std::list<int> cells(point &l, float r);
+			std::list<int> cells(point &&l, point &&b);
 			std::list<int> cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b);
 			int to_grid(typeof(point::x) x, typeof(point::y) y);
 			int to_grid_x(typeof(point::x) x);

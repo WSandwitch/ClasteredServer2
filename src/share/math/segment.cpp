@@ -16,10 +16,8 @@ namespace share {
 	}
 	
 	segment::segment(typeof(point::x) _ax, typeof(point::y) _ay, typeof(point::x) _bx, typeof(point::y) _by){
-		point _a(_ax,_ay);
-		point _b(_bx,_by);
-		a=_a;
-		b=_b;
+		a=point(_ax, _ay);
+		b=point(_bx, _by);
 	}
 	
 	float segment::distanse(point &p){
@@ -27,7 +25,11 @@ namespace share {
 			return a.distanse(p);
 		if (point::scalar(point::toVector(b,p), point::toVector(b,a))<0)
 			return b.distanse(p);
-		return fabs(((b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x))/length());
+		return fabs(signed_area2(p)/length());
+	}
+
+	float segment::signed_area2(point &p){
+		return (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);
 	}
 
 	float segment::length(){
@@ -57,8 +59,6 @@ namespace share {
 }
 
 namespace std {
-		
-
 	ostream& operator<<(ostream &stream, share::segment &s) {
 		cout << "[";
 		cout << s.a;

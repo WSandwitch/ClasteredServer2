@@ -127,6 +127,14 @@ namespace share{
 		return cells(to_grid(x, y));
 	}
 	
+	std::list<int> map::cells(point &a, float r){
+		return cells(a.x-r, a.y-r, a.x+r, a.y+r);
+	}
+	
+	std::list<int> map::cells(point &&a, point &&b){
+		return cells(a.x, a.y, b.x, b.y);;
+	}
+	
 	std::list<int> map::cells(typeof(point::x) l, typeof(point::y) t, typeof(point::x) r, typeof(point::y) b){
 		std::list<int> v;
 		//TODO: check returned ids

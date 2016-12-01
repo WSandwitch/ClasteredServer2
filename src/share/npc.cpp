@@ -38,12 +38,14 @@ namespace share {
 		health(1),
 		type(t), 
 //		bot({0}), 
+		angle(0),
 		world(w),
 		slave_id(slave),
 		cell_id(0)
 	{
 //		slave_id=slave?:world->id;
 		memset(&bot,0,sizeof(bot));
+		memset(&weapon,0,sizeof(weapon));
 //		memset(&direction,0,sizeof(direction));
 		
 		//why it doesn't work from 0?
@@ -75,6 +77,7 @@ namespace share {
 		}
 		
 		move_id=type;
+		shoot_id=0;
 		timestamp=time(0);
 		//TODO: add normal spawn position
 		///
@@ -82,6 +85,7 @@ namespace share {
 		position.y=20;
 		vel=10;
 		r=5;
+		damage=1;
 	}
 	
 	npc::~npc(){
@@ -93,8 +97,8 @@ namespace share {
 			world->npcs_m.lock();
 				world->old_npcs.insert(id);
 			world->npcs_m.unlock();
+			//TODO: add auto respawn with the same id, if needed
 		}
-		//add returning of id
 	}
 		
 	bool npc::clear(){
@@ -117,6 +121,7 @@ namespace share {
 		short latency=0.5*world->tps; //tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
+//			printf("warmup %hd/%hd\n", weapon.temp,NPC_FULL_TEMP);
 			if(weapon.temp<NPC_FULL_TEMP){
 				weapon.temp+=warmup;
 			}else{
@@ -124,6 +129,7 @@ namespace share {
 			}
 		}
 		if (state==STATE_ATTACK){//attacking
+//			printf("nextshot %hd\n", weapon.next_shot);
 			if (weapon.next_shot==0){
 				shoot();
 				weapon.next_shot=latency;
@@ -132,6 +138,7 @@ namespace share {
 			}
 		}
 		if (state==STATE_COOLDOWN){//after attack			
+//			printf("cooldown %hd\n", weapon.temp);
 			if(weapon.temp>0){
 				weapon.temp-=cooldown;
 			}else{

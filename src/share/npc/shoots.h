@@ -12,6 +12,7 @@ namespace share{
 		private:
 			void shoot0(typeof(point::x) x, typeof(point::y) y);
 			void shoot1(typeof(point::x) x, typeof(point::y) y);///bullet
+			void shoot2(typeof(point::x) x, typeof(point::y) y);
 	};
 }	
 

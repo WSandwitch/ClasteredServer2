@@ -60,6 +60,18 @@ namespace share {
 		}
 
 	template<class T>
+	template<class T1>
+		point_<T> point_<T>::operator+(point_<T1> &&b){
+			return point_<T>(x+b.x,y+b.y);
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T> point_<T>::operator-(point_<T1> &&b){
+			return point_<T>(x-b.x,y-b.y);
+		}
+
+	template<class T>
 	template<class T1>		
 		point_<T> point_<T>::from_angle(char angle, T1 l){
 			point_<T> p;

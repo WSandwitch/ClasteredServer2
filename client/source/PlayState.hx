@@ -152,6 +152,8 @@ class PlayState extends FlxState
 		a=actions.addAction(GO_RIGHT);
 		a.addKey(FlxKey.D);
 		a.addKey(FlxKey.RIGHT);
+		a=actions.addAction(ATTACK);
+		a.addMouseKey(MouseID.MOUSE_LEFT);
 	}
 	
 	function drawDeadzone() 
@@ -268,6 +270,10 @@ class PlayState extends FlxState
 			p.addChar(1);
 			p.addChar(Math.round((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
 		}
+		if (actions.anyChanged([ATTACK])){
+			p.addChar(3);
+			p.addChar(Math.round(actions.value(ATTACK)));
+		}
 		if(npc != null){
 			var angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);
 //			trace(Math.abs(_angle-angle));
@@ -382,6 +388,7 @@ abstract ActionID(Int) from Int to Int{
 	var GO_DOWN = 2;
 	var GO_LEFT = 3;
 	var GO_RIGHT = 4;
+	var ATTACK = 5;
 	
 	@:from
 	public static inline function fromString(s:String)

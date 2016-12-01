@@ -85,6 +85,8 @@ namespace share {
 			attrs_map attr;
 			std::unordered_map<char, bool> attrs; //attributes updated flags
 			
+			std::unordered_map<int, short> damagers; 
+			
 			npc(){};
 			npc(share::world *w, int id, int slave=0, short type=0);
 			~npc();

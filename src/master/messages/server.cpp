@@ -43,8 +43,11 @@ namespace master {
 			npc *e=master::world.npcs[p->chanks[1].value.i];
 			if (n && e){
 				n->m.lock();
-					n->hurt(withLock(e->m, e->damage));
+					auto d=withLock(e->m, e->damage);
+					n->hurt(d);
+					n->damagers[e->id]+=d;
 				n->m.unlock();
+				printf("%d hurts by %d for %d\n", n->id, e->id, d);
 			}
 		master::world.m.unlock();
 		return 0;

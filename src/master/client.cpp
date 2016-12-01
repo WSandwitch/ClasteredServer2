@@ -59,6 +59,7 @@ namespace master {
 		login[0]=0;
 		passwd[0]=0;
 		npc=new share::npc(&master::world, master::world.getId());
+		npc->owner_id=id;
 	}
 	
 	client::~client(){

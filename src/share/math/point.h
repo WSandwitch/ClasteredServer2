@@ -20,6 +20,10 @@ namespace share {
 					float distanse(point_<T1> &b);
 				template<class T1>
 					T distanse2(point_<T1> &b);
+				template<class T1>
+					point_ operator+(point_<T1> &&b);
+				template<class T1>
+					point_ operator-(point_<T1> &&b);
 			
 				template <class T1>
 					static point_ from_angle(char angle, T1 l=1);//l is length of vector
@@ -30,10 +34,11 @@ namespace share {
 				template<class T1, class T2>		
 					static float length(T1 x, T2 y);
 				static float length(point_ &p);
+				
+				template <class T1>
+					friend std::ostream& operator<<(std::ostream &stream, const point_<T1> &p);
 		};
 	
-	template <class T>
-		std::ostream& operator<<(std::ostream &stream, const point_<T> &p);
 	
 	typedef point_<float> point;
 	

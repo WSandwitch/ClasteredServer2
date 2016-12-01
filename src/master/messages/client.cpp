@@ -173,8 +173,11 @@ namespace master {
 						y=p->chanks[i].value.c/100.0;
 						dir++;
 						break;
-					case 2://amgle
+					case 2://angle
 						cl->npc->set_attr(cl->npc->angle, p->chanks[i].value.c);
+						break;
+					case 3://attack
+						cl->npc->set_attr(cl->npc->state, p->chanks[i].value.c ? STATE_WARMUP : STATE_COOLDOWN);
 						break;
 				}
 			}
