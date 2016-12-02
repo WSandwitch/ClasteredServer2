@@ -9,7 +9,8 @@
 #define map_cont std::unordered_map
 //for npc attributes
 namespace share {
-
+	class attrs_map;
+	
 	class attrs_map{
 		private:
 			char _size;//max 250 elements
@@ -19,8 +20,9 @@ namespace share {
 			map_cont<void*, char> attr_type;	
 		
 		public:
-			attrs_map(): _size(1) {
-			};
+			attrs_map():_size(1){};
+			attrs_map(attrs_map &a):_size(1){};//can't be copyed
+			void clear(){_size=1;};
 			template<class T> 
 				void push_back(T& attr){
 					attr_size[_size]=sizeof(attr);

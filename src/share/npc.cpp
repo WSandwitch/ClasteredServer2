@@ -31,16 +31,16 @@ using namespace share;
 	}while(0)
 
 namespace share {
-	
-	npc::npc(share::world *w, int id, int slave, short t): 
+
+	npc::npc(share::world *w, int id, short t): 
 		id(id), 
 		state(0), 
-		health(1),
+		health(100),
 		type(t), 
 //		bot({0}), 
 		angle(0),
 		world(w),
-		slave_id(slave),
+		slave_id(0),
 		cell_id(0)
 	{
 //		slave_id=slave?:world->id;
@@ -48,6 +48,55 @@ namespace share {
 		memset(&weapon,0,sizeof(weapon));
 //		memset(&direction,0,sizeof(direction));
 		
+		init_attrs();
+		init_position();
+		recalculate_type();
+	}
+	
+	npc::~npc(){
+		if (world){
+			for(auto i: cells){
+				auto cell=world->map.cells(i);
+				cell->npcs.erase(id);
+			}
+			world->npcs_m.lock();
+				world->old_npcs.insert(id);
+			world->npcs_m.unlock();
+		
+			//TODO: add auto respawn with the same id, if needed
+			if (bot.used || (owner_id!=0)){//TODO: add respawn mark
+				world->npcs_m.lock();
+					world->new_npcs.push_back(clone());
+				world->npcs_m.unlock();
+			}
+		}
+	}
+	
+	npc* npc::clone(){
+		npc* n=new npc(*this);
+		n->clear();
+		n->init_attrs();
+		n->init_position();
+		n->recalculate_type();
+		n->damagers.clear();
+		//set health and position
+		return n;
+	}
+
+	bool npc::clear(){
+		for(auto i: attrs){
+			attrs[i.first]=0;
+		}
+		for(auto i: _packs){
+			_packs.p[i.first]=0;
+		}
+		if (health<=0){
+			return 1;
+		}		
+		return 0;
+	}
+	
+	void npc::init_attrs(){
 		//why it doesn't work from 0?
 		/*
 			attribute
@@ -75,43 +124,27 @@ namespace share {
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
+	}
+			
+	void npc::init_position(){
+		//TODO: add normal spawn position
+		//if bot rand in square
+		//else nearest safe zone
 		
+		///for testing
+		position.x=20;
+		position.y=20;
+	}
+	
+	void npc::recalculate_type(){
+		//update dinamic attrs like damage, health from chosen type and other
 		move_id=type;
 		shoot_id=0;
 		timestamp=time(0);
-		//TODO: add normal spawn position
-		///
-		position.x=20;
-		position.y=20;
+		///for testing
 		vel=10;
 		r=5;
 		damage=1;
-	}
-	
-	npc::~npc(){
-		if (world){
-			for(auto i: cells){
-				auto cell=world->map.cells(i);
-				cell->npcs.erase(id);
-			}
-			world->npcs_m.lock();
-				world->old_npcs.insert(id);
-			world->npcs_m.unlock();
-			//TODO: add auto respawn with the same id, if needed
-		}
-	}
-		
-	bool npc::clear(){
-		for(auto i: attrs){
-			attrs[i.first]=0;
-		}
-		for(auto i: _packs){
-			_packs.p[i.first]=0;
-		}
-		if (health<=0){
-			return 1;
-		}		
-		return 0;
 	}
 	
 	void npc::attack(){
@@ -331,7 +364,7 @@ namespace share {
 //	}
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
-		npc* n=new npc(world, id, 0, type);
+		npc* n=new npc(world, id, type);
 		n->position.x=x;
 		n->position.y=y;
 		n->direction.y=0.1;

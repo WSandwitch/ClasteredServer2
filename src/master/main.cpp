@@ -224,7 +224,7 @@ int main(int argc,char* argv[]){
 	timestamps.start=share::time(0);
 	
 	npc *n=new npc(&master::world, 100);
-	n->health=30000;
+	n->health=5;
 	master::world.new_npcs.push_back(n);
 	
 	do{

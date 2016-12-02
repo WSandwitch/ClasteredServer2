@@ -53,6 +53,19 @@ namespace master {
 		return 0;
 	}
 
+	///[nid]
+	static void* message_NPC_SUICIDE(server *sv, packet *p){
+		if (p->chanks.size()<1)
+			return p;//strange
+		//find npc kill it
+		master::world.m.lock();
+			npc *n=master::world.npcs[p->chanks[0].value.i];
+			withLock(n->m, n->set_attr(n->health, 0));
+		master::world.m.unlock();
+		printf("npc %d suiside\n", n->id);
+		return 0;
+	}
+
 	///[sid]
 	static void* message_SERVER_READY(server *sv, packet *p_){
 		master::world.m.lock();
@@ -87,6 +100,7 @@ namespace master {
 	void serverMessageProcessorInit(){
 //		serverMessageProcessor(1);
 		messageprocessorServerAdd(MESSAGE_NPC_HURT, (void*)&message_NPC_HURT);
+		messageprocessorServerAdd(MESSAGE_NPC_SUICIDE, (void*)&message_NPC_SUICIDE);
 		messageprocessorServerAdd(MESSAGE_SERVER_READY, (void*)&message_SERVER_READY);
 		messageprocessorServerAdd(MESSAGE_NPC_UPDATE, (void*)&message_NPC_UPDATE);
 	}

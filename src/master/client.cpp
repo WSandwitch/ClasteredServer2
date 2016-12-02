@@ -73,6 +73,7 @@ namespace master {
 				npc->world->m.lock();
 					npc->world->npcs.erase(npc->id);
 				npc->world->m.unlock();
+				withLock(npc->m, npc->owner_id=0);//set to not respawn
 				delete npc;
 			}
 		mutex.unlock();

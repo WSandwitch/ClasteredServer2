@@ -37,9 +37,13 @@ namespace share {
 	template<class T>
 		struct map3b{
 			std::unordered_map<short, T> p;
+			
+			map3b(){};
+			map3b(map3b& a){};//can't be copyed
 			T& operator()(bool b1=0, bool b2=0, bool b3=0){
 				return p[attr3b_key(b1,b2,b3)];
 			};
+			void clear(){p.clear();};
 			typeof(p.begin()) begin(){return p.begin();};
 			typeof(p.end()) end(){return p.end();};
 			typeof(p.size()) size(){return p.size();};
@@ -88,9 +92,13 @@ namespace share {
 			std::unordered_map<int, short> damagers; 
 			
 			npc(){};
-			npc(share::world *w, int id, int slave=0, short type=0);
+			npc(share::world *w, int id, short type=0);
 			~npc();
+			npc* clone();
 			bool clear();
+			void init_attrs();
+			void init_position();
+			void recalculate_type();
 			void attack();
 			void move();
 			void shoot();
@@ -128,6 +136,7 @@ namespace share {
 		
 			static npc_moves _moves;
 			static npc_shoots _shoots;
+		
 	};
 	
 }

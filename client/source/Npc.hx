@@ -6,12 +6,13 @@ import flash.geom.Point;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.nape.FlxNapeSprite;
+import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class Npc extends FlxSprite
+class Npc extends FlxSpriteGroup
 {
 	public var id:Int;
 //	public var m:Lock=new Lock();
@@ -21,11 +22,17 @@ class Npc extends FlxSprite
 	public var dir_y:Null<Int> = 0;
 	public var updater:Map<Int, Null<Dynamic->Void>>=new Map<Int, Null<Dynamic->Void>>();
 	
+	public var sprite:Null<FlxSprite> = null;
 	public var shadow:Null<FlxSprite> = null;
 	
 	public function new (x:Float, y:Float, type:Int)
 	{
-		super(x, y, "assets/Orb.png");
+		super(x, y);
+		sprite = new FlxSprite(0, 0, "assets/Orb.png");
+		sprite.x =-sprite.width / 2;
+		sprite.y =-sprite.height / 2;
+		add(sprite);
+		
 		var that = this;
 		//moves = false;
 		//this.field("aaa")();
@@ -85,7 +92,9 @@ class Npc extends FlxSprite
 	}
 	
 	public function setAngle(a:Int){
-		angle = a;
+		forEach(function(s:FlxSprite){
+			s.angle = a; 
+		});
 	}
 	
 }
