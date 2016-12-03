@@ -18,7 +18,10 @@ namespace share{
 		addShootFunc(2);
 	}
 #undef addShootFunc
-	
+
+#define attackCheck(n)\
+		(n && n->attackable && n->id!=id)
+
 #define attack(n, n0, a)\
 	do{\
 		n->hurt(n0);\
@@ -26,7 +29,7 @@ namespace share{
 			break;\
 	}while(0)\
 	
-	//melee shoot
+	//melee shot
 	void npc_shoots::shoot0(typeof(point::x) x, typeof(point::y) y){
 		//init vars
 		short ang_diap=60;//pdegree
@@ -41,7 +44,7 @@ namespace share{
 		for(auto c: cells){
 			auto cell=world->map.cells(c);
 			for(auto n: cell->npcs)
-				if (n.second && n.second->id!=id){
+				if (attackCheck(n.second)){
 //					printf("added %d !=%d\n", n.second->id, id);
 					npcs.insert(n.second);
 				}
@@ -74,15 +77,25 @@ namespace share{
 	}
 #undef attack
 	
-	//bullet shoot
+	//bullet shot
 	//if enemy near self, attack it than suicide
 	void npc_shoots::shoot1(typeof(point::x) x, typeof(point::y) y){
-		share::cell *cell=world->map.cells(position);
-		if(cell){
-			for(auto ni: cell->npcs){
-				npc *n=ni.second;
-				if(position.distanse2(n->position)<r*r){
-					n->hurt(this);
+		short attacks=2;
+		
+		std::unordered_set<npc*> npcs;
+		auto cells=world->map.cells(position, r);
+		for(auto c: cells){
+			auto cell=world->map.cells(c);
+			for(auto n: cell->npcs)
+				if (attackCheck(n.second)){
+//					printf("added %d !=%d\n", n.second->id, id);
+					npcs.insert(n.second);
+				}
+		}
+		for(auto n: npcs){
+			if(position.distanse2(n->position)<=sqr(r+n->r)){//hurt f touch
+				n->hurt(this);
+				if(attacks--==0){
 					suicide();
 					break;
 				}

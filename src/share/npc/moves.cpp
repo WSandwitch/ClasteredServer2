@@ -47,38 +47,31 @@ namespace share{
 	
 	//bullet move, go straight for dist, enemy or wall, than suicide
 	void npc_moves::move1(typeof(point::x) x, typeof(point::y) y){
+		//it is not bot
 		if (x!=0 && y!=0){
 			if (check_point(position.x+x,position.y+y)){
 				set_attr(position.x, position.x+x);
 				set_attr(position.y, position.y+y);
 				bot.dist+=vel;
-				attrs[attr(&position.x)]=1;
 			} else {
 				suicide();//suicide
 			}
 		}
-		
-		if (bot.used){//TODO: move to shoot
-			//TODO: add check for touch enemy and suicude if need
-			
-		}
-		//dont need to update cells
 	}
 	
 	//stiky move (move to the same position as target npc)
 	void npc_moves::move2(typeof(point::x) x, typeof(point::y) y){
 		//char angle=point(1,2).to_angle();
 		//can't move independently
-		if (bot.used){
-			if (bot.target){
-				if (bot.target->attrs[bot.target->attr(&bot.target->position.x)]){
-					position.x=bot.target->position.x;
-					attrs[attr(&position.x)]=1;
-				}
-				if (bot.target->attrs[bot.target->attr(&bot.target->position.y)]){
-					position.y=bot.target->position.y;
-					attrs[attr(&position.y)]=1;
-				}
+		if (bot.target){
+			if (bot.target->attrs[bot.target->attr(&bot.target->position.x)]){
+				set_attr(position.x, bot.target->position.x);
+			}
+			if (bot.target->attrs[bot.target->attr(&bot.target->position.y)]){
+				set_attr(position.y, bot.target->position.y);
+			}
+			if (bot.target->attrs[bot.target->attr(&bot.target->angle)]){
+				set_attr(angle, bot.target->angle);
 			}
 		}
 	}

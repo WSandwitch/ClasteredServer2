@@ -41,7 +41,8 @@ namespace share {
 		angle(0),
 		world(w),
 		slave_id(0),
-		cell_id(0)
+		cell_id(0),
+		attackable(1)
 	{
 //		slave_id=slave?:world->id;
 		memset(&bot,0,sizeof(bot));
@@ -121,6 +122,7 @@ namespace share {
 		packAttr(bot.used,0,0,1,0,1); //12s
 		packAttr(move_id,0,0,1,0,1); //13s
 		packAttr(shoot_id,0,0,1,0,1); //14s 
+		packAttr(attackable,0,0,1,1,1); //15s //TODO: check can be got from info
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}

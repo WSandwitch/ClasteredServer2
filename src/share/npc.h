@@ -88,7 +88,8 @@ namespace share {
 			std::set<int> slaves;
 			attrs_map attr;
 			std::unordered_map<char, bool> attrs; //attributes updated flags
-			
+				
+			char attackable;
 			std::unordered_map<int, short> damagers; 
 			
 			npc(){};

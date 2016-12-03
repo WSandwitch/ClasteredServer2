@@ -224,7 +224,7 @@ namespace share {
 			::close(sockfd);
 			return 0;
 		}
-		printf("done\n");
+//		printf("done\n");
 		return new socket(sockfd);
 	}
 	
