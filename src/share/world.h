@@ -37,7 +37,6 @@ namespace share {
 		share::mutex npcs_m;
 		share::socket* sock;
 		share::map map;
-		std::queue<int> ids;
 		std::list<npc*> new_npcs;
 		std::unordered_set<int> old_npcs;
 		std::unordered_map<int, npc*> npcs;
@@ -46,6 +45,7 @@ namespace share {
 		~world();
 		
 		static int getId();
+		static void putId(int id);
 	};
 }
 

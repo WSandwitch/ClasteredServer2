@@ -1,3 +1,4 @@
+#include <queue>
 
 #include "../share/network/packet.h"
 #include "world.h"
@@ -39,10 +40,27 @@ namespace share {
 	std::unordered_map<int, npc*> world::npcs;
 	std::map<int, player*> world::players;
 */	
+	static mutex m_id;
+	static int last=1;
+	static std::queue<int> reuse;
+	
 	int world::getId(){
-		static mutex m;
-		static int id=1;
-		return withLock(m, id++);
+		int i;
+		if (reuse.size()>0){
+			m_id.lock();
+				i=reuse.front();
+				reuse.pop();
+			m_id.unlock();
+		}else{
+			i=withLock(m_id, last++);
+		}
+		return i;
+	}
+	
+	void world::putId(int i){
+		m_id.lock();
+			reuse.push(i);
+		m_id.unlock();
 	}
 	
 	world::world():

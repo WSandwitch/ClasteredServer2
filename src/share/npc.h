@@ -88,6 +88,7 @@ namespace share {
 			std::set<int> slaves;
 			attrs_map attr;
 			std::unordered_map<char, bool> attrs; //attributes updated flags
+			int spawn_wait;
 				
 			char attackable;
 			std::unordered_map<int, short> damagers; 
@@ -107,6 +108,7 @@ namespace share {
 			void set_dir(float x, float y);
 			bool hurt(short d);
 			void hurt(npc* n);
+			void make_shot(char angle);
 			bool suicide(); 			
 			void update(share::packet * p);
 			bool updated(); 			

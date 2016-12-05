@@ -233,10 +233,16 @@ int main(int argc,char* argv[]){
 		//////
 		master::world.m.lock();
 			master::world.npcs_m.lock();
-				for(auto n: master::world.new_npcs){
-					master::world.npcs[n->id]=n;
+				for(auto in=master::world.new_npcs.begin(), end=master::world.new_npcs.end();in!=end;){
+					npc *n=*in;
+					if (n->spawn_wait>0){
+						n->spawn_wait--;
+						++in;
+					}else{
+						master::world.npcs[n->id]=n;
+						in=master::world.new_npcs.erase(in);
+					}						
 				}
-				master::world.new_npcs.clear();
 			master::world.npcs_m.unlock();			
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;

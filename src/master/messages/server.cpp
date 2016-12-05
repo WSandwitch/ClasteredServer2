@@ -93,6 +93,16 @@ namespace master {
 		return 0;
 	}
 	
+	///[id, angle]
+	static void* message_NPC_MAKE_SHOT(server *sv, packet *p){
+		master::world.m.lock();
+			npc *n=master::world.npcs[p->chanks[0].value.i];
+			n->angle=p->chanks[0].value.c;
+		master::world.m.unlock();
+		printf("server %d ready\n", sv->id);
+		return 0;
+	}
+
 
 //	voidMessageProcessor(1)
 
@@ -103,5 +113,6 @@ namespace master {
 		messageprocessorServerAdd(MESSAGE_NPC_SUICIDE, (void*)&message_NPC_SUICIDE);
 		messageprocessorServerAdd(MESSAGE_SERVER_READY, (void*)&message_SERVER_READY);
 		messageprocessorServerAdd(MESSAGE_NPC_UPDATE, (void*)&message_NPC_UPDATE);
+		messageprocessorServerAdd(MESSAGE_NPC_MAKE_SHOT, (void*)&message_NPC_MAKE_SHOT);
 	}
 }

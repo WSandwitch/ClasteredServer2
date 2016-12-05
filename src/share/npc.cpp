@@ -42,6 +42,7 @@ namespace share {
 		world(w),
 		slave_id(0),
 		cell_id(0),
+		spawn_wait(0),
 		attackable(1)
 	{
 //		slave_id=slave?:world->id;
@@ -257,6 +258,14 @@ namespace share {
 		world->sock->send(&p);
 	}
 	
+	void npc::make_shot(char angle){
+		packet p;
+		p.setType(MESSAGE_NPC_MAKE_SHOT);
+		p.add(id);
+		p.add(angle);
+		world->sock->send(&p);
+	}
+		
 	bool npc::suicide(){
 		packet p;
 		p.setType(MESSAGE_NPC_SUICIDE);

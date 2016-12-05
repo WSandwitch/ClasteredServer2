@@ -17,7 +17,7 @@
 	<window width="640" height="480" fps="60" background="#000000" hardware="true" vsync="true" />
 	
 	<window hardware="true" allow-shaders="true" require-shaders="true" if="cpp"/>
-	<window antialiasing="4" if="cpp" />
+	<window vsync="true" antialiasing="4" if="cpp" />
 		
 	<!--HTML5-specific-->
 	<window if="html5" resizable="false" />
@@ -48,6 +48,7 @@
 	
 	<!--In case you want to use nape with flixel-->
 	<haxelib name="nape" />
+	<haxelib name="polygonal-ds" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->
 	
