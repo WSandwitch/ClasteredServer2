@@ -82,10 +82,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.stackdump
+
 config.cfg
 storage_text.cfg
-/storage/*
 
+
+client/map.tmx
 data/map.tmx
 connection_tester
 src/other/connection_tester.armv7l

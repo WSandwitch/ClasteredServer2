@@ -11,7 +11,7 @@
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
-║ 		text files storage implementation 			                       ║
+║ 		text files storage implementation, used for testing 			                       ║
 ║ created by Dennis Yarikov						                       ║
 ║ jul 2016									                       ║
 ╚══════════════════════════════════════════════════════════════╝
