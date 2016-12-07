@@ -88,3 +88,7 @@ storage_text.cfg
 
 data/map.tmx
 connection_tester
+src/other/connection_tester.armv7l
+src/other/connection_tester.ppc64
+src/other/connection_tester.x86_64
+src/other/connection_tester.unknown

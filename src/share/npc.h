@@ -49,13 +49,6 @@ namespace share {
 			typeof(p.size()) size(){return p.size();};
 		};
 	
-	struct bot {
-		char used;
-		point goal;
-		int dist; //moved distance
-		npc* target;
-	};
-	
 	class npc {
 		public:
 			int id;
@@ -63,7 +56,6 @@ namespace share {
 			point position;
 			pointf direction;
 			short health; //curent health
-			short damage; //calculated damage
 			short type; //
 			short move_id;
 			short shoot_id; 
@@ -71,11 +63,24 @@ namespace share {
 			int owner_id; //id of player
 			char angle; //angle of view
 //			char keys[4]; //x,y(l- r+ t- b+), angle	
-			share::bot bot;
 			share::world *world;
+			struct{
+				char used;
+				point goal;
+				int dist; //moved distance
+				npc* target;
+			} bot;
 			struct{
 				short temp;
 				short next_shot;
+				
+				char attackable;
+				short damage; //calculated damage
+				
+				short ang_diap;//pdegree
+				short ang_shift;//pdegree
+				short attacks;
+				int dist;
 			} weapon;
 				
 			map3b<share::packet> packs;

@@ -1,1 +1,1 @@
-gcc connection_tester.cpp ../share/*.cpp  ../share/*/*.cpp -Wall -fsigned-char -std=gnu++0x -pthread -lpthread -lm -lstdc++ -o connection_tester
+gcc connection_tester.cpp ../share/*.cpp  ../share/*/*.cpp -Wall -fsigned-char -std=gnu++0x -pthread -lpthread -lm -lstdc++ -o connection_tester.$(uname -i)

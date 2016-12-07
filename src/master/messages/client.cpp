@@ -130,6 +130,7 @@ namespace master {
 							cl->sock->send(&p);
 //							cl->messages_add(new client_message(p.data(), p.size()));
 							///set npc data and add npc to world
+							cl->npc->owner_id=cl->id;
 							master::world.npcs_m.lock();
 								master::world.new_npcs.push_back(cl->npc);
 							master::world.npcs_m.unlock();

@@ -43,7 +43,7 @@ namespace master {
 			npc *e=master::world.npcs[p->chanks[1].value.i];
 			if (n && e){
 				n->m.lock();
-					auto d=withLock(e->m, e->damage);
+					auto d=withLock(e->m, e->weapon.damage);
 					n->hurt(d);
 					n->damagers[e->id]+=d;
 				n->m.unlock();
@@ -97,8 +97,24 @@ namespace master {
 	static void* message_NPC_MAKE_SHOT(server *sv, packet *p){
 		master::world.m.lock();
 			npc *n=master::world.npcs[p->chanks[0].value.i];
-			n->angle=p->chanks[0].value.c;
+			if (n)
+				n->m.lock();
 		master::world.m.unlock();
+		if (n){
+			npc *nn = new npc(n->world, n->world->getId());
+			//set params
+			nn->angle=p->chanks[1].value.c;
+			nn->direction.by_angle(nn->angle, 1); //right dir and full speed
+			nn->weapon.damage=n->weapon.damage;
+			nn->weapon.dist=n->weapon.dist; //set max move dist
+			nn->weapon.attacks=n->weapon.attacks; //set max targets
+			nn->attackable=n->weapon.attackable;
+			
+			n->m.unlock();
+			master::world.npcs_m.lock();
+				master::world.new_npcs.push_back(nn);
+			master::world.npcs_m.unlock();
+		}
 		printf("server %d ready\n", sv->id);
 		return 0;
 	}

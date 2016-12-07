@@ -3,7 +3,8 @@
 
 #define sqr(x) ({typeof(x) _x=x; _x*_x;})
 
-#define to_pdegrees(a) (120/3.14f*(a))
-#define from_pdegrees(a) (3.14f/120*(a))
+#define PPI 120
+#define to_pdegrees(a) (PPI/3.14f*(a))
+#define from_pdegrees(a) (3.14f/PPI*(a))
 
 #endif

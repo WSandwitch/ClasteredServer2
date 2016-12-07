@@ -32,11 +32,12 @@ namespace share{
 	//melee shot
 	void npc_shoots::shoot0(typeof(point::x) x, typeof(point::y) y){
 		//init vars
-		short ang_diap=60;//pdegree
-		short ang_shift=10;//pdegree
+		short ang_diap=60;//weapon.ang_diap//pdegree
+		short ang_shift=10;//weapon.ang_shift//pdegree
+		short attacks=1;//weapon.attacks
+		int dist=20;//weapon.dist
+
 		short ang=angle+ang_shift;
-		int dist=20;
-		int attacks=1;
 
 		//for cells
 		std::unordered_set<npc*> npcs;
@@ -79,8 +80,10 @@ namespace share{
 	
 	//bullet shot
 	//if enemy near self, attack it than suicide
+	//bullet r is attack dist
+	//bullet weapon.dist is  move dist
 	void npc_shoots::shoot1(typeof(point::x) x, typeof(point::y) y){
-		short attacks=2;
+		short attacks=2;//weapon.attacks;
 		
 		std::unordered_set<npc*> npcs;
 		auto cells=world->map.cells(position, r);
@@ -93,7 +96,7 @@ namespace share{
 				}
 		}
 		for(auto n: npcs){
-			if(position.distanse2(n->position)<=sqr(r+n->r)){//hurt f touch
+			if(position.distanse2(n->position)<=sqr(r+n->r)){//hurt if touch
 				n->hurt(this);
 				if(attacks--==0){
 					suicide();
@@ -111,12 +114,15 @@ namespace share{
 	void npc_shoots::shoot2(typeof(point::x) x, typeof(point::y) y){
 		//spawn bullet npcs
 		//ask master to spawn
-/*
-		npc* n=npc::addBot(world, world->getId, position.x, position.y, 1);
-		n->keys[3]=(x || y)? point(x,y).to_angle() : keys[3];
-		point&& p=point::from_angle(n->keys[3]);
-		n->set_dir(p.x, p.y);
-*/
+		short ang_diap=60;//weapon.ang_diap//pdegree
+		short ang_shift=10;//weapon.ang_shift//pdegree
+		short attacks=1;//weapon.attacks
+
+		short ang=angle+ang_shift;
+
+		for (auto i =0;i<attacks;i++){
+			make_shot((char)(ang+(rand()%(ang_diap)-ang_diap/2)));//calc random angle in diap
+		}
 	}
 	
 	

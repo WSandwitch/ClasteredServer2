@@ -195,7 +195,8 @@ namespace share {
 	}
 
 	void socket::close(){
-		::close(sockfd);
+		if (sockfd)
+			::close(sockfd);
 		sockfd=0;
 	}
 
@@ -209,7 +210,7 @@ namespace share {
 			return 0;
 		}
 		
-		if((sockfd=::socket(AF_INET,SOCK_STREAM,0))<0){
+		if((sockfd=::socket(AF_INET,SOCK_STREAM,IPPROTO_TCP))<0){
 			perror("socket");
 			return 0;
 		}

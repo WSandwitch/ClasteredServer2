@@ -24,7 +24,7 @@ namespace share {
 	listener::listener(int port): broken(0){
 		struct sockaddr_in addr;
 //		printf("listener start on %d\n", port);
-		if((listenerfd = ::socket(AF_INET, SOCK_STREAM, 0))<0){
+		if((listenerfd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))<0){ //check for IPPROTO_SCTP
 			perror("socket");
 		}
 		
@@ -37,7 +37,7 @@ namespace share {
 			exit(1);
 		}
 		
-		if(::listen(listenerfd, 1)<0){
+		if(::listen(listenerfd, 128)<0){
 			perror("listen");
 			close(listenerfd);
 		}
@@ -50,7 +50,9 @@ namespace share {
 	
 	socket* listener::accept(){
 		int sockfd;
-		if ((sockfd = ::accept(listenerfd, 0, 0))<0){
+		sockaddr client;
+		socklen_t client_len = sizeof(client);
+		if ((sockfd = ::accept(listenerfd, &client, &client_len))<0){
 			perror("accept");
 		}else{
 			return new socket(sockfd);

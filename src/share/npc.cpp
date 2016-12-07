@@ -65,11 +65,14 @@ namespace share {
 				world->old_npcs.insert(id);
 			world->npcs_m.unlock();
 		
-			//TODO: add auto respawn with the same id, if needed
+			//respawn with same id
+			//if it is bot, or assigned to player
 			if (bot.used || (owner_id!=0)){//TODO: add respawn mark
 				world->npcs_m.lock();
 					world->new_npcs.push_back(clone());
 				world->npcs_m.unlock();
+			}else{
+				world->putId(id);
 			}
 		}
 	}
@@ -147,7 +150,8 @@ namespace share {
 		///for testing
 		vel=10;
 		r=5;
-		damage=1;
+		weapon.damage=1;
+		weapon.dist=30;
 	}
 	
 	void npc::attack(){
@@ -186,8 +190,10 @@ namespace share {
 	
 	void npc::move(){
 		auto $=moves[move_id];
-		if ($)
-			(this->*$)(direction.x*vel, direction.y*vel);//TODO:add angle correction
+		if ($){
+			auto v=vel*(1-0.4f*PPI/abs(direction.to_angle()-angle));//decrease vel by 0.6 (1-0.4) if we go back
+			(this->*$)(direction.x*v, direction.y*v);//TODO:add angle correction
+		}
 	}
 	
 	void npc::shoot(){

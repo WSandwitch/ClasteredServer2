@@ -47,9 +47,9 @@ namespace share{
 	
 	//bullet move, go straight for dist, enemy or wall, than suicide
 	void npc_moves::move1(typeof(point::x) x, typeof(point::y) y){
-		//it is not bot
+		//it is not bot (for disable respawn)
 		if (x!=0 && y!=0){
-			if (check_point(position.x+x,position.y+y)){
+			if (check_point(position.x+x,position.y+y) && bot.dist<weapon.dist){
 				set_attr(position.x, position.x+x);
 				set_attr(position.y, position.y+y);
 				bot.dist+=vel;

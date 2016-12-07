@@ -9,7 +9,9 @@
 
 using namespace share;
 int main(int argc, char* argv[]){
-	
+	listener *l=0;
+	socket *s=0;
+	int max=0;
 	if (argc<3){
 		printf("usage 'server port' or 'host port'\n");
 		return 0;
@@ -18,33 +20,38 @@ int main(int argc, char* argv[]){
 	std::list<socket*> sockets;
 	
 	if (strcmp(argv[1], "server")==0){
-		listener l(port);
-		socket *s;
+		l=new listener(port);
 		while((s=l.accept())!=0){
-			printf("connections %d\n", (int)sockets.size());
+			int curr=sockets.size();
+			if (curr>max)
+				max=curr;
+			printf("connections %d max %d\n", curr, max);
 			sockets.push_back(s);
-			for (auto sock: sockets){
+			for (auto i= sockets.begin(),end=sockets.end();i!=end;){
+				auto sock=*i;
 				if(sock->send(&port, 1)<=0){
 					perror("send");
-					return 1;
-				}
+					i=sockets.erase(i);
+				}else
+					++i;
 			}
 		}
 	}else{
-		socket *s;
 		while((s=socket::connect(argv[1], port))!=0){
 			printf("connections %d\n", (int)sockets.size());
 			s->blocking(1);
 			sockets.push_back(s);
-			for (auto sock: sockets){
-				char c;
-				if(sock->recv(&c, 1)<=0){
-					perror("recv");
-					return 1;
-				}
+			for (auto i= sockets.begin(),end=sockets.end();i!=end;){
+				auto sock=*i;
+				if(sock->recv(&port, 1)<=0){
+					perror("send");
+					i=sockets.erase(i);
+				}else
+					++i;
 			}
 		}
 	}
-	
+	if (l)
+		delete l;
 	return 0;
 }
