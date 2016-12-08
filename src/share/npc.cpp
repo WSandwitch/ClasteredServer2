@@ -154,6 +154,12 @@ namespace share {
 		weapon.dist=30;
 	}
 	
+	//example - shoot_type, warmup, cooldown, latency, angle_diap, attacks
+	//chainsaw - 0, 0.5, 0.3, 0.21, 0, 10
+	//flamethrower - 0, 2, 2, 0.2,  4, 8
+	//axe - 0, 0.8, 0.1, 1.6, 0, 3
+	//bat - 0, 0.2, 0.2, 0.8, 70, 1
+	//minigun - 1, 2, 2, 0.2, 4, 1
 	void npc::attack(){
 		//TODO: check	
 		short warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max

@@ -61,8 +61,7 @@ namespace share {
 			short shoot_id; 
 			short weapon_id; 
 			int owner_id; //id of player
-			char angle; //angle of view
-//			char keys[4]; //x,y(l- r+ t- b+), angle	
+			char angle; //angle of view in pdegrees
 			share::world *world;
 			struct{
 				char used;
@@ -71,10 +70,10 @@ namespace share {
 				npc* target;
 			} bot;
 			struct{
-				short temp;
-				short next_shot;
+				short temp; 
+				short next_shot; //tiks
 				
-				char attackable;
+				char attackable; //can be attacked
 				short damage; //calculated damage
 				
 				short ang_diap;//pdegree
@@ -96,7 +95,7 @@ namespace share {
 			int spawn_wait;
 				
 			char attackable;
-			std::unordered_map<int, short> damagers; 
+			std::unordered_map<int, int> damagers; 
 			
 			npc(){};
 			npc(share::world *w, int id, short type=0);

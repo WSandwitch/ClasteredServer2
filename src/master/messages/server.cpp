@@ -109,13 +109,13 @@ namespace master {
 			nn->weapon.dist=n->weapon.dist; //set max move dist
 			nn->weapon.attacks=n->weapon.attacks; //set max targets
 			nn->attackable=n->weapon.attackable;
+			nn->shoot_id=1;//TODO: change to choose bullet move id 
 			
 			n->m.unlock();
 			master::world.npcs_m.lock();
 				master::world.new_npcs.push_back(nn);
 			master::world.npcs_m.unlock();
 		}
-		printf("server %d ready\n", sv->id);
 		return 0;
 	}
 

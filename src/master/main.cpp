@@ -55,6 +55,7 @@ using namespace share;
 using namespace master; 
 
 static int main_loop;
+static std::vector<short> ports;
 
 static int readConfig(){
 	FILE* f;
@@ -77,16 +78,12 @@ static int readConfig(){
 		}else if (strcmp(buf, "port")==0){
 			short port;
 			fscanf(f, "%hd", &port);
-			listener* l=new listener(port);
-			if (l){
-				listeners::add(l);
-//				printf("Listener %d added\n",l->sockfd);
-			}
+			ports.push_back(port);
 		}else
 		if (strcmp(buf, "slaves")==0){
 			fscanf(f, "%hd", &config.slaves.total);
 		}else
-		if (strcmp(buf, "tps")==0){
+		if (strcmp(buf, "slaves_port")==0){
 			fscanf(f, "%hd", &config.slaves.start_port);
 		}else
 		if (strcmp(buf, "tps")==0){
@@ -183,18 +180,22 @@ int main(int argc,char* argv[]){
 	readConfig();
 	log_config::config=config.log;
 	master::world.tps=config.tps;
-	
-#ifndef __CYGWIN__
-	short port=config.slaves.start_port;
-	std::string sname="localhost";
-	for(int i=0;i<config.slaves.total;i++){
-		start_slave_fork(port+i);
+
+	for(auto port: ports){
+		listener* l=new listener(port);
+		if (l){
+			listeners::add(l);
+//				printf("Listener %d added\n",l->sockfd);
+		}
 	}
-	sleep(5);
-	for(int i=0;i<config.slaves.total;i++){
-		server *s=server::create(sname, port+i);
-		if (s)
-			server::add(s);
+
+#ifndef __CYGWIN__
+	if (config.slaves.total>0){
+		short port=config.slaves.start_port;
+		for(int i=0;i<config.slaves.total;i++){
+			start_slave_fork(port+i);
+		}
+		sleep(3);
 	}
 #endif
 
@@ -207,6 +208,18 @@ int main(int argc,char* argv[]){
 	startWorkers(listen);
 	startWorkers(socket);
 	startWorkers(server);
+
+#ifndef __CYGWIN__
+	if (config.slaves.total>0){
+		short port=config.slaves.start_port;
+		std::string sname("localhost");
+		for(int i=0;i<config.slaves.total;i++){
+			server *s=server::create(sname, port+i);
+			if (s)
+				server::add(s);
+		}
+	}
+#endif
 	
 	listenworkers::startAll();
 	socketworkers::startAll();
