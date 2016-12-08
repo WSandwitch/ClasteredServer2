@@ -2,8 +2,9 @@ GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline 
 CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
 LDFLAGS= -pthread -lpthread -lm -lstdc++
+HEADERS= -Isrc/share/yaml-cpp/include
 SRC=src
-SHARE_SOURCES:=$(wildcard $(SRC)/share/*.cpp) $(wildcard $(SRC)/share/*/*.cpp) $(wildcard $(SRC)/share/*/*/*.cpp)
+SHARE_SOURCES:=$(wildcard $(SRC)/share/*.cpp) $(wildcard $(SRC)/share/*/*.cpp) $(wildcard $(SRC)/share/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*/*.cpp)
 SHARE_OBJECTS:=$(SHARE_SOURCES:.cpp=.o)
 
 STORAGE?=TEXT
@@ -45,10 +46,10 @@ $(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o
 	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o $(LDFLAGS) -o $@
 
 %.o: %.c
-	$(GCC) -c $(CFLAGS) $(DEFINES) $< -o $@
+	$(GCC) -c $(CFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 
 %.o: %.cpp
-	$(GCC) -c $(CPPFLAGS) $(DEFINES) $< -o $@
+	$(GCC) -c $(CPPFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 	
 generator: 
 	$(GCC) $(SRC)/other/password_generator.c $(SRC)/share/md5.c $(SRC)/share/base64.c -o generator

@@ -405,14 +405,18 @@ namespace share {
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
 		std::list<int> &&ids=world->map.near_cells(x, y, r); //!check this!
+		std::unordered_set<segment*> done;
 		//printf("segments %d \n", world->map.segments.size());
 		for(auto c: ids){//TODO: change to check by map grid
 			share::cell *cell=world->map.cells(c);
 			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
 				segment *s=cell->segments[i];
-				if(s->distanse(p)<=r){
-					//printf("dist \n");
-					return 0;
+				if (done.count(s)==0){ //uniq check
+					if(s->distanse(p)<=r){
+						//printf("dist \n");
+						return 0;
+					}
+					done.insert(s);
 				}
 			}
 		}
