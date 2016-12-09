@@ -83,7 +83,7 @@ namespace share {
 			} weapon;
 				
 			map3b<share::packet> packs;
-			map3b<std::vector<void*>> pack_attrs;
+			map3b<std::vector<char>> pack_attrs;
 			share::mutex m;
 			int slave_id;
 			int cell_id;
@@ -110,6 +110,7 @@ namespace share {
 			void shoot();
 			void set_dir();
 			void set_dir(float x, float y);
+			float vel_angle(float max);
 			bool hurt(short d);
 			void hurt(npc* n);
 			void make_shot(char angle);

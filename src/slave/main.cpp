@@ -154,13 +154,11 @@ int slave_main(int argc, char* argv[]){
 	sleep(1);
 	//cleanup
 	//pthread_join(pid,0);
+	printf("Slave exiting\n");
 	sleep(1);
 	return 1;
 }
 
-
-//start slave as thread of master
-#define main slave_main
 
 void* slave_func(void* a){
 	slave_main(2, (char**)a);

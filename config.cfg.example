@@ -1,4 +1,6 @@
 #log configuration
+slaves 1
+slaves_port 12300
 #log_file log.txt
 log_debug 1
 port 8000

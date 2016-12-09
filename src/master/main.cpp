@@ -169,25 +169,20 @@ int main(int argc,char* argv[]){
 	srand(share::time(0));
 	
 	memset(&config,0,sizeof(config));
+	config.serverworkers.total=1;
+	config.socketworkers.total=1;
+	config.listenworkers.total=1;
 	config.serverworkers.tps=1;
 	config.socketworkers.tps=1;
 	config.listenworkers.tps=3;
 	config.tps=52;
 	config.log.debug=1;
 	config.slaves.total=0;
-	config.slaves.start_port=0;
+	config.slaves.start_port=12300;
 		
 	readConfig();
 	log_config::config=config.log;
 	master::world.tps=config.tps;
-
-	for(auto port: ports){
-		listener* l=new listener(port);
-		if (l){
-			listeners::add(l);
-//				printf("Listener %d added\n",l->sockfd);
-		}
-	}
 
 #ifndef __CYGWIN__
 	if (config.slaves.total>0){
@@ -198,6 +193,14 @@ int main(int argc,char* argv[]){
 		sleep(3);
 	}
 #endif
+
+	for(auto port: ports){
+		listener* l=new listener(port);
+		if (l){
+			listeners::add(l);
+//				printf("Listener %d added\n",l->sockfd);
+		}
+	}
 
 	storageInit(&config.storage);
 	grid=new master::special::grid(master::world.map.map_size, master::world.map.offset);

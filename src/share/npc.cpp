@@ -17,17 +17,17 @@ using namespace share;
 
 #define packAttr(a,call,c,sall,s,ts)\
 	do{\
-		attr.push_back(a);\
+		char $=attr.push_back(a);\
 		if(call)\
-			pack_attrs(0,1).push_back(&a);\
+			pack_attrs(0,1).push_back($);\
 		if(c)\
-			pack_attrs(0,0).push_back(&a);\
+			pack_attrs(0,0).push_back($);\
 		if(sall)\
-			pack_attrs(1,1).push_back(&a);\
+			pack_attrs(1,1).push_back($);\
 		if(s)\
-			pack_attrs(1,0).push_back(&a);\
+			pack_attrs(1,0).push_back($);\
 		if(ts)\
-			pack_attrs(1,0,1).push_back(&a);\
+			pack_attrs(1,0,1).push_back($);\
 	}while(0)
 
 namespace share {
@@ -112,6 +112,7 @@ namespace share {
 			changes to slave
 		*/
 		///(attr, client_all, client, master_slave_all, from_slave, to_slave)
+		attr.set_base(this);
 		packAttr(position.x,1,1,1,1,0); //1cm
 		packAttr(position.y,1,1,1,1,0); //2cm
 		packAttr(direction.x,1,1,1,1,1); //3cms
@@ -193,11 +194,16 @@ namespace share {
 			}
 		}
 	}
+
+	float npc::vel_angle(float max){
+		short $=abs((short)direction.to_angle()-(short)angle);
+		return 1-(1-max)*($>PPI?PPI*2-$:$)/PPI;//decrease vel by max if we go back
+	}
 	
 	void npc::move(){
 		auto $=moves[move_id];
 		if ($){
-			auto v=vel*(1-0.4f*PPI/abs(direction.to_angle()-angle));//decrease vel by 0.6 (1-0.4) if we go back
+			float v=vel*vel_angle(0.43f);
 			(this->*$)(direction.x*v, direction.y*v);//TODO:add angle correction
 		}
 	}
@@ -257,11 +263,13 @@ namespace share {
 		direction.normalize();
 	}
 	
+//hurt for d health
 	bool npc::hurt(short d){
 		set_attr(health, health-d);
 		return health<=0;
 	}
 	
+//hurt by n, tell it to master
 	void npc::hurt(npc* n){
 		packet p;
 		p.setType(MESSAGE_NPC_HURT);
@@ -270,6 +278,7 @@ namespace share {
 		world->sock->send(&p);
 	}
 	
+//tell master want to make shot
 	void npc::make_shot(char angle){
 		packet p;
 		p.setType(MESSAGE_NPC_MAKE_SHOT);
@@ -278,6 +287,7 @@ namespace share {
 		world->sock->send(&p);
 	}
 		
+//tell master want to die
 	bool npc::suicide(){
 		packet p;
 		p.setType(MESSAGE_NPC_SUICIDE);
@@ -286,6 +296,7 @@ namespace share {
 		return 1;
 	}
 	
+//update attrs by income packet
 	void npc::update(packet * p){
 		for(unsigned i=1;i<p->chanks.size();i++){
 			int index=(int)p->chanks[i++].value.c;
@@ -314,6 +325,7 @@ namespace share {
 //		set_dir();
 	}
 	
+//check if any attrs were changed
 	bool npc::updated(){
 		for(unsigned i=0;i<attrs.size();i++){
 			if (attrs[i]){
@@ -332,7 +344,8 @@ namespace share {
 		}\
 	}while(0)
 	
-	//need to choose: <0 - static attrs or slave attrs
+	//create packet with attr that have been changed
+//s - for server, all - pack all attrs for curr type, ts - to slave(only for to server)
 	void npc::pack(bool s, bool all, bool ts){
 		if (!_packs(s,all,ts)){
 			auto as=pack_attrs(s,all,ts);
@@ -341,8 +354,8 @@ namespace share {
 			p.init();
 			p.setType(MESSAGE_NPC_UPDATE);//npc update
 			p.add(id);
-			for(auto a: as){
-				int $=attr(a);
+			for(auto $: as){
+				void *a=attr($);
 				if (all || attrs[$]){
 					p.add((char)$);
 //					printf("added type %d index %d\n", attr.type(a), $);
@@ -377,14 +390,7 @@ namespace share {
 		}
 	}
 #undef packAttr
-	
-//	int npc::gridOwner(){
-//		return world->grid->getOwner(position.x, position.y);
-//	}
-	
-//	std::vector<int>& npc::gridShares(){
-//		return world->grid->getShares(position.x, position.y);		
-//	}
+
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
 		npc* n=new npc(world, id, type);
