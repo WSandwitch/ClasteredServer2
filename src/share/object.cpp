@@ -9,7 +9,7 @@ namespace YAML{
 	template<class T>
 		std::vector<T> vec_of(const YAML::Node &n){
 			std::vector<T> v;
-			for(auto e: n){
+			for(YAML::Node e: n){ //!!need to check for error
 				v.push_back(e.as<T>());
 			}
 			return v;
@@ -76,62 +76,68 @@ namespace share{
 					auto type=attr_type[am.first];
 					if(YAML::Node attr=e[am.second]){
 						switch(type){
-							case 1: if (config.IsScalar()){
-								o->attr_on<char>(am.first)=attr.as<char>();
-//								printf("%s: %d\n", am.second.data(), o->attr_on<char>(am.first));
+							case 1: 
+								if (attr.IsScalar()){
+									o->attr_on<char>(am.first)=attr.as<char>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<char>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 2: if (config.IsScalar()){
-								o->attr_on<short>(am.first)=attr.as<short>();
-//								printf("%s: %d\n", am.second.data(), o->attr_on<short>(am.first));
+							case 2: 
+								if (attr.IsScalar()){
+									o->attr_on<short>(am.first)=attr.as<short>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<short>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 3: if (config.IsScalar()){
-								o->attr_on<int>(am.first)=attr.as<int>();
-//								printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+							case 3: 
+								if (attr.IsScalar()){
+									o->attr_on<int>(am.first)=attr.as<int>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 4: if (config.IsScalar()){
-								o->attr_on<float>(am.first)=attr.as<float>();
-//								printf("%s: %g\n", am.second.data(), o->attr_on<float>(am.first));
+							case 4: 
+								if (attr.IsScalar()){
+									o->attr_on<float>(am.first)=attr.as<float>();
+//										printf("%s: %g\n", am.second.data(), o->attr_on<float>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 5:{
+							case 5:
 								o->attr_on<std::string>(am.first)=attr.as<std::string>();
 //								printf("%s: %s\n", am.second.data(), o->attr_on<std::string>(am.first).data());
 								break;
-							}
-							case 6: if (config.IsSequence()){
-								o->attr_on<std::vector<char>>(am.first)=attr.as<std::vector<char>>();
+							case 6: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<char>>(am.first)=attr.as<std::vector<char>>();
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
 							case 7: if (config.IsSequence()){
 								o->attr_on<std::vector<short>>(am.first)=attr.as<std::vector<short>>();
 								break;
 							}else
 								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 8: if (config.IsSequence()){
-								o->attr_on<std::vector<int>>(am.first)=attr.as<std::vector<int>>();
+							case 8: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<int>>(am.first)=attr.as<std::vector<int>>();
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
-							case 9: if (config.IsSequence()){
-								o->attr_on<std::vector<float>>(am.first)=attr.as<std::vector<float>>();
-//								printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+							case 9: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<float>>(am.first)=attr.as<std::vector<float>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
-							}else
-								printf("object %d attr %s type error\n", o->id, am.second.data());
 						}
 					}
 				}
 //				printf("got id:%d, type:%d\n", o->id, o->type);
 //				printf("got vf:%g,%g\n", o->vf[0], o->vf[1]);
-//				printf("got vf:%hd,%hd\n", o->vs[0], o->vs[1]);
+//				printf("got vs:%hd,%hd\n", o->vs[0], o->vs[1]);
 				if (!all.count(o->id))
 					all[o->id]=o;
 				else
