@@ -1,27 +1,29 @@
+OBJDIR ?= /tmp/CCS2_build
 GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline 
 CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
 LDFLAGS= -pthread -lpthread -lm -lstdc++
 HEADERS= -Isrc/share/yaml-cpp/include
 SRC=src
+
 SHARE_SOURCES:=$(wildcard $(SRC)/share/*.cpp) $(wildcard $(SRC)/share/*/*.cpp) $(wildcard $(SRC)/share/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*/*.cpp)
-SHARE_OBJECTS:=$(SHARE_SOURCES:.cpp=.o)
+SHARE_OBJECTS:=$(addprefix $(OBJDIR)/, $(SHARE_SOURCES:.cpp=.o))
+
+PUBLIC:=master
+PUBLIC_SOURCES=$(wildcard $(SRC)/$(PUBLIC)/*.cpp) $(wildcard $(SRC)/$(PUBLIC)/*/*.cpp) $(wildcard $(SRC)/$(PUBLIC)/*/*/*.cpp)
+PUBLIC_OBJECTS=$(addprefix $(OBJDIR)/, $(PUBLIC_SOURCES:.cpp=.o))
+
+TEST:=test
+TEST_SOURCES=$(wildcard $(SRC)/$(TEST)/*.c) $(wildcard $(SRC)/$(TEST)/*/*.c) $(wildcard $(SRC)/$(TEST)/*/*/*.c)
+TEST_OBJECTS=$(addprefix $(OBJDIR)/, $(TEST_SOURCES:.c=.o))
+
+SLAVE:=slave
+SLAVE_SOURCES=$(wildcard $(SRC)/$(SLAVE)/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*/*.cpp)
+SLAVE_OBJECTS=$(addprefix $(OBJDIR)/, $(SLAVE_SOURCES:.cpp=.o))
 
 STORAGE?=TEXT
 
 DEFINES:= -DSTORAGE_$(STORAGE)
-
-PUBLIC:=master
-PUBLIC_SOURCES=$(wildcard $(SRC)/$(PUBLIC)/*.cpp) $(wildcard $(SRC)/$(PUBLIC)/*/*.cpp) $(wildcard $(SRC)/$(PUBLIC)/*/*/*.cpp)
-PUBLIC_OBJECTS=$(PUBLIC_SOURCES:.cpp=.o)
-
-TEST:=test
-TEST_SOURCES=$(wildcard $(SRC)/$(TEST)/*.c) $(wildcard $(SRC)/$(TEST)/*/*.c) $(wildcard $(SRC)/$(TEST)/*/*/*.c)
-TEST_OBJECTS=$(TEST_SOURCES:.c=.o)
-
-SLAVE:=slave
-SLAVE_SOURCES=$(wildcard $(SRC)/$(SLAVE)/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*/*.cpp)
-SLAVE_OBJECTS=$(SLAVE_SOURCES:.cpp=.o)
 
 ifeq ($(DEBUG),1)
     CFLAGS +=-g -ggdb -rdynamic
@@ -45,10 +47,12 @@ $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS)
 $(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o
 	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o $(LDFLAGS) -o $@
 
-%.o: %.c
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(@D)
 	$(GCC) -c $(CFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 
-%.o: %.cpp
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(@D)
 	$(GCC) -c $(CPPFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 	
 generator: 

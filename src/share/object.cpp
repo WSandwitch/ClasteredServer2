@@ -34,11 +34,11 @@ namespace YAML{
 }
 
 namespace share{
-	
+
+	std::unordered_map<int, object*> object::all;	
 	typeof(object::attr_map) object::attr_map;
 	typeof(object::attr_type) object::attr_type;
 	object_initializer object::initializer;
-	std::unordered_map<int, object*> object::all;
 	
 	int o_type(char &c){return 1;}
 	int o_type(short &c){return 2;}
