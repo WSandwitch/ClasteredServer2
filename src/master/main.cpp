@@ -38,17 +38,12 @@
 #include "../slave/main.h"
 
 #define CONFIG_FILE "config.cfg"
-#ifndef VIEW_AREA_X
-	#define VIEW_AREA_X 200
-#endif
-#ifndef VIEW_AREA_Y
-	#define VIEW_AREA_Y 200
-#endif
 
 
 namespace master{
 	share::world world;
 	master::special::grid *grid;
+	short view_area[2]={300,300};
 }
 
 using namespace share;
@@ -149,6 +144,8 @@ static void segfault_sigaction(int sig){
 #define startWorkers(type)\
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
+share::mutex m1,m2,m3,m4;
+
 int main(int argc,char* argv[]){
 	share::sync tv;
 	struct sigaction sa;
@@ -183,6 +180,13 @@ int main(int argc,char* argv[]){
 	readConfig();
 	log_config::config=config.log;
 	master::world.tps=config.tps;
+
+#ifdef _GLIBCXX_PARALLEL
+	omp_set_dynamic(0);
+	omp_set_num_threads(omp_get_max_threads()*4);
+	omp_set_schedule(omp_sched_dynamic, 4);
+	printf("parallel mode %d\n", omp_get_max_threads());
+#endif	
 
 #ifndef __CYGWIN__
 	if (config.slaves.total>0){
@@ -239,12 +243,18 @@ int main(int argc,char* argv[]){
 	timestamp_t timestamp;
 	timestamps.start=share::time(0);
 	
-	npc *n=new npc(&master::world, 100);
+	npc *n=new npc(&master::world, master::world.getId());
 	n->health=5;
 	n->_health=5;
 	n->bot.used=1;
 	n->move_id=100;
 	master::world.new_npcs.push_back(n);
+	
+	for(int i=0;i<500;i++){
+		npc *n=new npc(&master::world, master::world.getId());
+		n->bot.used=1;
+		master::world.new_npcs.push_back(n);
+	}
 	
 	do{
 		timestamp=share::time(0);
@@ -264,16 +274,25 @@ int main(int argc,char* argv[]){
 //						printf("spawned %d %d\n", n->id, n->health);
 					}						
 				}
-			master::world.npcs_m.unlock();			
+			master::world.npcs_m.unlock();
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
 				if(n){
 					n->m.lock();
 				}
 			}
+#ifdef _GLIBCXX_PARALLEL
+			#pragma omp parallel for shared(m1,m2,m3)
+			for(unsigned ii=0;ii<master::world.npcs.size();ii++){
+				auto i=master::world.npcs.begin();
+				std::advance(i, ii);
+				auto ni=*i;
+#else
 			for(auto ni: master::world.npcs){
+#endif				
 				npc *n=ni.second;
 				if(n){
+//					printf("%d %d\n", omp_get_thread_num(), n);
 					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 //					printf("%d %d\n", slave_id, n->slave_id);
@@ -282,7 +301,9 @@ int main(int argc,char* argv[]){
 						slave_id=n->set_attr(n->slave_id, slave_id);
 					}
 					//move in map
-					n->update_cells();
+					m3.lock();
+						n->update_cells();
+					m3.unlock();
 					//update n->slaves
 					std::unordered_map<int, short> slaves;
 					for(auto slave: n->slaves)//set had to 2
@@ -304,14 +325,18 @@ int main(int argc,char* argv[]){
 									}
 									break;
 								case 1: //new npc
-									n->pack(1,1);
+									m1.lock();
+										n->pack(1,1);
+									m1.unlock();
 									s->sock->send(&n->packs(1,1));
 									n->slaves.insert(slave.first);
-									printf("(slave)send new npc\n");
+//									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
 									if (n->updated()){
-										n->pack(1,0,1);
+										m2.lock();
+											n->pack(1,0,1);
+										m2.unlock();
 										s->sock->send(&n->packs(1,0,1));									
 									}
 									n->slaves.insert(slave.first);
@@ -321,15 +346,15 @@ int main(int argc,char* argv[]){
 					}
 				}
 			}
-			for(auto ci: client::all){
+			for(auto ci:client::all){
 				client *c=ci.second;
 				npc* cnpc=master::world.npcs[c->npc_id];
 				if (c && cnpc){
 					auto cells=master::world.map.cells(
-						cnpc->position.x-VIEW_AREA_X/2, //l
-						cnpc->position.y-VIEW_AREA_Y/2, //t
-						cnpc->position.x+VIEW_AREA_X/2, //r
-						cnpc->position.y+VIEW_AREA_Y/2 //b
+						cnpc->position.x-view_area[0]/2, //l
+						cnpc->position.y-view_area[1]/2, //t
+						cnpc->position.x+view_area[0]/2, //r
+						cnpc->position.y+view_area[1]/2 //b
 					);
 					std::unordered_map<int, short> npcs;
 					for(auto n: c->npcs){
@@ -351,35 +376,51 @@ int main(int argc,char* argv[]){
 					for(auto n: _npcs){
 						npcs[n->id]++;
 					}
-					npc *n;
-					for(auto i: npcs){
+#ifdef _GLIBCXX_PARALLEL
+					#pragma omp parallel for shared(c,m1,m2,m3)
+					for(unsigned ii=0;ii<npcs.size();ii++){
+						auto ni=npcs.begin();
+						std::advance(ni, ii);
+						auto i=*ni;
+#else
+					for(auto ni: npcs){
+#endif				
 						switch(i.second){
-							case 2: //need to remove
-								{
-									printf("need to remove %d \n", i.first);
+							case 2: { //need to remove
+//									printf("need to remove %d \n", i.first);
 									packet p;
 									p.setType(MESSAGE_NPC_REMOVE);
 									p.add(i.first);
 									c->sock->send(&p);
 								}
 								break;
-							case 1: //new npc
+							case 1: {//new npc
+								npc *n;
 								if ((n=master::world.npcs[i.first])!=0){
-									n->pack(0,1); //all attrs
+									m1.lock();
+										n->pack(0,1); //all attrs
+									m1.unlock();
 									c->sock->send(&n->packs(0,1));
 									c->npcs.insert(i.first);
-									printf("(client)send new npc\n");
+//									printf("(client)send new npc\n");
 								}
 								break;
-							case 3: //already had npc
+							}
+							case 3: {//already had npc
+								npc *n;
 								if ((n=master::world.npcs[i.first])!=0){
 									if (n->updated()){
-										n->pack(0); 
+										m2.lock();
+											n->pack(0); 
+										m2.unlock();
 										c->sock->send(&n->packs(0));
 									}
-									c->npcs.insert(i.first);
+									m3.lock();
+										c->npcs.insert(i.first);
+									m3.unlock();
 								}
 								break;
+							}
 						}
 					}
 				}
@@ -407,7 +448,7 @@ int main(int argc,char* argv[]){
 						s.second->sock->send(&p);
 					master::world.old_npcs.clear();
 				}
-			master::world.npcs_m.unlock();			
+			master::world.npcs_m.unlock();
 		master::world.m.unlock();
 		/////
 		/////

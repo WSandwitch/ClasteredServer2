@@ -13,7 +13,7 @@ namespace share {
 		public:
 			sync();
 			int timePassed();
-			void syncTPS(int TPS);
+			void syncTPS(int TPS, bool l=0);
 		private:
 			struct timeval t;
 	};

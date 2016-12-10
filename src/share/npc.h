@@ -120,7 +120,7 @@ namespace share {
 			void make_shot(char angle);
 			bool suicide(); 			
 			void update(share::packet * p);
-			bool updated(); 			
+			bool updated(); 
 			void pack(bool server=0, bool all=0, bool to_slave=0); //pack action attributes, do not pack special atributes
 			bool update_cells();//return 1 if updated
 			

@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstdlib>
 #include "sync.h"
 
@@ -15,8 +16,10 @@ namespace share {
 		return out;
 	}
 	
-	void sync::syncTPS(int TPS){
+	void sync::syncTPS(int TPS, bool l){
 		int diff=timePassed();
+		if (l)
+			printf("spt\t%d\tsleep\t%d\tfull\t%d\n", diff, (1000000/TPS)-diff, (1000000/TPS));
 		if (TPS){
 			if((diff=(1000000/TPS)-diff)>0){
 				usleep(diff);

@@ -74,7 +74,7 @@ namespace share{
 				object *o=new object();
 				for (auto am: attr_map){
 					auto type=attr_type[am.first];
-					if(YAML::Node attr=e[am.second]){
+					if(YAML::Node &&attr=e[am.second]){
 						switch(type){
 							case 1: 
 								if (attr.IsScalar()){

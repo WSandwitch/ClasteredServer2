@@ -1,6 +1,6 @@
 OBJDIR ?= /tmp/CCS2_build
 GCC ?= gcc
-CFLAGS= -Wall -fsigned-char -fgnu89-inline 
+CFLAGS= -Wall -fsigned-char -fgnu89-inline
 CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
 LDFLAGS= -pthread -lpthread -lm -lstdc++
 HEADERS= -Isrc/share/yaml-cpp/include
@@ -31,6 +31,13 @@ ifeq ($(DEBUG),1)
 	DEFINES += -DDEBUG
 endif
 
+ifeq ($(PARALLEL),1)
+	CFLAGS += -fopenmp
+    CPPFLAGS += -fopenmp
+	LDFLAGS += -fopenmp
+    DEFINES += -D_GLIBCXX_PARALLEL
+endif
+
 ifeq ($(OPTIMISATION),1)
     CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
     CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
@@ -39,13 +46,13 @@ endif
 all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
 	
 $(PUBLIC): $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS)
-	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS) $(LDFLAGS) -o $@
+	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(DEFINES) $(SLAVE_OBJECTS) $(LDFLAGS) -o $@
 
 $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS) 
-	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(LDFLAGS) -o $@
+	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(DEFINES) $(LDFLAGS) -o $@
 
-$(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o
-	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) src/slave_main.o $(LDFLAGS) -o $@
+$(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(OBJDIR)/src/slave_main.o
+	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p $(@D)
