@@ -163,9 +163,9 @@ int main(int argc,char* argv[]){
 	//sigaction(SIGSEGV, &sa, NULL);	
 	sigaction(SIGINT, &sa, NULL);	
 	sigaction(SIGTERM, &sa, NULL);	
-#ifndef DEBUG	
+//#ifndef DEBUG	
 	signal(SIGSEGV, segfault_sigaction);
-#endif		
+//#endif		
 	srand(share::time(0));
 	
 	memset(&config,0,sizeof(config));
@@ -323,12 +323,13 @@ int main(int argc,char* argv[]){
 			}
 			for(auto ci: client::all){
 				client *c=ci.second;
-				if (c){
+				npc* cnpc=master::world.npcs[c->npc_id];
+				if (c && cnpc){
 					auto cells=master::world.map.cells(
-						c->npc->position.x-VIEW_AREA_X/2, //l
-						c->npc->position.y-VIEW_AREA_Y/2, //t
-						c->npc->position.x+VIEW_AREA_X/2, //r
-						c->npc->position.y+VIEW_AREA_Y/2 //b
+						cnpc->position.x-VIEW_AREA_X/2, //l
+						cnpc->position.y-VIEW_AREA_Y/2, //t
+						cnpc->position.x+VIEW_AREA_X/2, //r
+						cnpc->position.y+VIEW_AREA_Y/2 //b
 					);
 					std::unordered_map<int, short> npcs;
 					for(auto n: c->npcs){

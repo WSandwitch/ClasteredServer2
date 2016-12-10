@@ -107,11 +107,14 @@ namespace master {
 				//set params
 				nn->angle=p->chanks[1].value.c;
 				nn->direction.by_angle(nn->angle, 1); //right dir and full speed
-				printf("%g %g \n", nn->direction.x, nn->direction.y);
+//				printf("%g %g \n", nn->direction.x, nn->direction.y);
 	//			nn->direction.normalize(); 
 				nn->position=n->position;
+				nn->state=STATE_ATTACK;
+				nn->bot.owner_id=n->id;
 				nn->weapon.damage=n->weapon.damage;
 				nn->weapon.dist=n->weapon.dist; //set max move dist
+				nn->weapon.next_shot=1;//shoot every tick
 				nn->weapon.attacks=n->weapon.attacks; //set max targets
 				nn->attackable=n->weapon.attackable;
 				nn->move_id=1;//TODO: change to choose bullet move id 

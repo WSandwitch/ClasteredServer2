@@ -130,17 +130,21 @@ namespace master {
 							cl->sock->send(&p);
 //							cl->messages_add(new client_message(p.data(), p.size()));
 							///set npc data and add npc to world
-							cl->npc->owner_id=cl->id;
-							master::world.npcs_m.lock();
-								master::world.new_npcs.push_back(cl->npc);
-							master::world.npcs_m.unlock();
-							printf("token OK\n");
-							p.init();
-							p.setType(MESSAGE_CLIENT_UPDATE);
-							p.add((char)1);//index
-							p.add(cl->npc->id);
-							cl->sock->send(&p);
-							break;
+							npc *n=new npc(&master::world, master::world.getId());
+							if (n){
+								cl->npc_id=n->id;
+								n->owner_id=cl->id;
+								master::world.npcs_m.lock();
+									master::world.new_npcs.push_back(n);
+								master::world.npcs_m.unlock();
+								printf("token OK\n");
+								p.init();
+								p.setType(MESSAGE_CLIENT_UPDATE);
+								p.add((char)1);//index
+								p.add(n->id);
+								cl->sock->send(&p);
+								break;
+							}
 						}
 					}
 					printf("token Error\n");
@@ -159,7 +163,8 @@ namespace master {
 
 	static void *message_MESSAGE_SET_DIRECTION(client*cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
-		if (cl->npc){
+		npc *n=master::world.npcs[cl->npc_id];
+		if (n){
 			typeof(point::x) x=0;
 			typeof(point::y) y=0;
 			short dir=0;
@@ -175,18 +180,18 @@ namespace master {
 						dir++;
 						break;
 					case 2://angle
-						cl->npc->set_attr(cl->npc->angle, p->chanks[i].value.c);
+						n->set_attr(n->angle, p->chanks[i].value.c);
 						break;
 					case 3://attack
-						cl->npc->attack(p->chanks[i].value.c);
+						n->attack(p->chanks[i].value.c);
 //						printf("%d attack\n", p->chanks[i].value.c);
 					break;
 				}
 			}
 			if (dir==2){
-				cl->npc->m.lock();
-					cl->npc->set_dir(x, y);
-				cl->npc->m.unlock();
+				n->m.lock();
+					n->set_dir(x, y);
+				n->m.unlock();
 //				printf("set dir (%d %d)\n", x,y);
 			}
 		}

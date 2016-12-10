@@ -70,6 +70,7 @@ namespace share {
 				point goal;
 				int dist; //moved distance
 				npc* target;
+				int owner_id;//owner for bullet 
 			} bot;
 			struct{
 				short temp; 

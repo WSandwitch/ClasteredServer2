@@ -44,7 +44,7 @@ namespace master {
 			short broken;
 			int server_id;
 			share::socket* sock;
-			share::npc* npc;
+			int npc_id;
 			share::mutex mutex;
 			std::list<client_message*> messages;
 			std::set<int> npcs; //TODO: change to ids

@@ -58,7 +58,7 @@ namespace master {
 		name[0]=0;
 		login[0]=0;
 		passwd[0]=0;
-		npc=new share::npc(&master::world, master::world.getId());
+//		npc=new share::npc(&master::world, master::world.getId());
 	}
 	
 	client::~client(){
@@ -68,13 +68,14 @@ namespace master {
 			for (auto mes:messages){
 				delete mes;
 			}
-			if (npc){
-				npc->world->m.lock();
-					npc->world->npcs.erase(npc->id);
-				npc->world->m.unlock();
-				withLock(npc->m, npc->owner_id=0);//set to not respawn
-				delete npc;
-			}
+			master::world.m.lock();
+				npc *n=master::world.npcs[npc_id];
+				if (n){
+					n->world->npcs.erase(n->id);
+					withLock(n->m, n->owner_id=0);//set to not respawn
+					delete n;
+				}
+			master::world.m.unlock();
 		mutex.unlock();
 	}
 
