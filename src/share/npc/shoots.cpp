@@ -81,13 +81,19 @@ namespace share{
 	//spawn bullet npcs
 	void npc_shoots::shoot1(typeof(point::x) x, typeof(point::y) y){
 		//ask master to spawn
-		short ang_diap=60;//weapon.ang_diap//pdegree
-		short ang_shift=10;//weapon.ang_shift//pdegree
+		short ang_diap=60;//weapon.ang_diap //pdegree
+		short ang_shift=10;//weapon.ang_shift //pdegree
 		short attacks=1;//weapon.attacks
 
-		short ang=angle+ang_shift; //move center
-		for (auto i =0;i<attacks;i++){
-			make_shot((char)(ang+ang_diap?(rand()%(ang_diap)-ang_diap/2):0));//calc random angle in diap
+		short ang_=ang_diap?((rand()%ang_diap)-ang_diap/2):0; //calc random angle in diap
+		short ang=((short)angle+ang_shift)+ang_;
+		while(ang<-PPI)
+			ang=PPI*2+ang;
+		while(ang>PPI)
+			ang=PPI*2-ang;
+//		printf("angle %d (%d %d) shot %d\n", angle, (short)angle+ang_shift, ang_, ang);
+		for (auto i=0;i<attacks;i++){
+			make_shot((char)(ang)); //TODO: check 
 		}
 	}
 	

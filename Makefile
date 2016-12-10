@@ -26,8 +26,8 @@ STORAGE?=TEXT
 DEFINES:= -DSTORAGE_$(STORAGE)
 
 ifeq ($(DEBUG),1)
-    CFLAGS +=-g -ggdb -rdynamic
-    CPPFLAGS +=-g -ggdb -rdynamic
+    CFLAGS +=-g -ggdb3 -rdynamic
+    CPPFLAGS +=-g -ggdb3 -rdynamic
 	DEFINES += -DDEBUG
 endif
 

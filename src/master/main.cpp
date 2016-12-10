@@ -163,9 +163,9 @@ int main(int argc,char* argv[]){
 	//sigaction(SIGSEGV, &sa, NULL);	
 	sigaction(SIGINT, &sa, NULL);	
 	sigaction(SIGTERM, &sa, NULL);	
-	
+#ifndef DEBUG	
 	signal(SIGSEGV, segfault_sigaction);
-	
+#endif		
 	srand(share::time(0));
 	
 	memset(&config,0,sizeof(config));
@@ -241,6 +241,9 @@ int main(int argc,char* argv[]){
 	
 	npc *n=new npc(&master::world, 100);
 	n->health=5;
+	n->_health=5;
+	n->bot.used=1;
+	n->move_id=100;
 	master::world.new_npcs.push_back(n);
 	
 	do{
@@ -254,9 +257,11 @@ int main(int argc,char* argv[]){
 					if (n->spawn_wait>0){
 						n->spawn_wait--;
 						++in;
+//						printf("spawn wait %d 5d\n", n->id, n->spawn_wait);
 					}else{
 						master::world.npcs[n->id]=n;
 						in=master::world.new_npcs.erase(in);
+//						printf("spawned %d %d\n", n->id, n->health);
 					}						
 				}
 			master::world.npcs_m.unlock();			
@@ -273,7 +278,7 @@ int main(int argc,char* argv[]){
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 //					printf("%d %d\n", slave_id, n->slave_id);
 					if (slave_id!=n->slave_id){
-						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
+//						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
 						slave_id=n->set_attr(n->slave_id, slave_id);
 					}
 					//move in map

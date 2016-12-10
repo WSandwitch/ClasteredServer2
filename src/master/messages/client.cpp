@@ -178,8 +178,9 @@ namespace master {
 						cl->npc->set_attr(cl->npc->angle, p->chanks[i].value.c);
 						break;
 					case 3://attack
-						cl->npc->set_attr(cl->npc->state, p->chanks[i].value.c ? STATE_WARMUP : STATE_COOLDOWN);
-						break;
+						cl->npc->attack(p->chanks[i].value.c);
+//						printf("%d attack\n", p->chanks[i].value.c);
+					break;
 				}
 			}
 			if (dir==2){

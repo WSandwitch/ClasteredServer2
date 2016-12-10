@@ -36,7 +36,9 @@ namespace share {
 		id(id), 
 		state(0), 
 		health(100),
+		_health(100),
 		type(t), 
+		owner_id(0), 
 //		bot({0}), 
 		angle(0),
 		world(w),
@@ -53,6 +55,10 @@ namespace share {
 		init_attrs();
 		init_position();
 		recalculate_type();
+		
+		//	testing	
+		move_id=type;
+		shoot_id=1;
 	}
 	
 	npc::~npc(){
@@ -61,30 +67,38 @@ namespace share {
 				auto cell=world->map.cells(i);
 				cell->npcs.erase(id);
 			}
-			world->npcs_m.lock();
-				world->old_npcs.insert(id);
-			world->npcs_m.unlock();
-		
-			//respawn with same id
-			//if it is bot, or assigned to player
-			if (bot.used || (owner_id!=0)){//TODO: add respawn mark
+			if (world->id==0){//on master
 				world->npcs_m.lock();
-					world->new_npcs.push_back(clone());
+					world->old_npcs.insert(id);
 				world->npcs_m.unlock();
-			}else{
-				world->putId(id);
+			
+				//respawn with same id
+				//if it is bot, or assigned to player
+				if (bot.used || (owner_id!=0)){//TODO: add respawn mark
+					world->npcs_m.lock();
+						world->new_npcs.push_back(clone());
+					world->npcs_m.unlock();
+					printf("%d respawned\n", id);
+				}else{
+	//				printf("%d died\n", id);
+					world->putId(id);
+				}
 			}
 		}
 	}
 	
 	npc* npc::clone(){
 		npc* n=new npc(*this);
+		//set health and position
+		n->health=n->_health;
+		n->spawn_wait=100;
+		//cleanup and init
 		n->clear();
 		n->init_attrs();
 		n->init_position();
 		n->recalculate_type();
 		n->damagers.clear();
-		//set health and position
+		printf("%d cloned\n", id);
 		return n;
 	}
 
@@ -145,14 +159,12 @@ namespace share {
 	
 	void npc::recalculate_type(){
 		//update dinamic attrs like damage, health from chosen type and other
-		move_id=type;
-		shoot_id=0;
 		timestamp=time(0);
 		///for testing
 		vel=10;
 		r=5;
 		weapon.damage=1;
-		weapon.dist=30;
+		weapon.dist=300;
 	}
 	
 	//example - shoot_type, warmup, cooldown, latency, angle_diap, attacks
@@ -168,24 +180,28 @@ namespace share {
 		short latency=0.5*world->tps; //tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
-//			printf("warmup %hd/%hd\n", weapon.temp,NPC_FULL_TEMP);
+//			printf("%d warmup %hd/%hd\n", id, weapon.temp,NPC_FULL_TEMP);
 			if(weapon.temp<NPC_FULL_TEMP){
 				weapon.temp+=warmup;
 			}else{
 				state=STATE_ATTACK;
 			}
 		}
+		if (state==STATE_SHOOT)//state for show that npc do shot
+			state=STATE_ATTACK;
 		if (state==STATE_ATTACK){//attacking
-//			printf("nextshot %hd\n", weapon.next_shot);
+//			printf("%d nextshot %hd\n", id, weapon.next_shot);
 			if (weapon.next_shot==0){
+//				printf("%d  shoot\n", id);
 				shoot();
+				state=STATE_SHOOT;
 				weapon.next_shot=latency;
 			}else{
 				weapon.next_shot--;
 			}
 		}
 		if (state==STATE_COOLDOWN){//after attack			
-//			printf("cooldown %hd\n", weapon.temp);
+//			printf("%d cooldown %hd\n", id, weapon.temp);
 			if(weapon.temp>0){
 				weapon.temp-=cooldown;
 			}else{
@@ -193,6 +209,10 @@ namespace share {
 				state=STATE_IDLE;
 			}
 		}
+	}
+
+	void npc::attack(bool s){
+		set_attr(state,s?STATE_WARMUP:STATE_COOLDOWN);
 	}
 
 	float npc::vel_angle(float max){
@@ -279,11 +299,11 @@ namespace share {
 	}
 	
 //tell master want to make shot
-	void npc::make_shot(char angle){
+	void npc::make_shot(char a){
 		packet p;
 		p.setType(MESSAGE_NPC_MAKE_SHOT);
 		p.add(id);
-		p.add(angle);
+		p.add(a);
 		world->sock->send(&p);
 	}
 		

@@ -36,6 +36,14 @@ namespace share {
 				y=roundf(l*sinf(rad));
 			}
 		
+	template<>
+		template<class T1>
+			void point_<float>::by_angle(char angle, T1 l){
+				float rad=from_pdegrees(angle);
+				x=l*cosf(rad);//TODO:check
+				y=l*sinf(rad);
+			}
+		
 	template<class T>
 		template<class T1, class T2>		
 			float point_<T>::length(T1 x, T2 y){

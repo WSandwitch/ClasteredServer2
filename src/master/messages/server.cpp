@@ -35,7 +35,7 @@ namespace master {
 
 	///[nid, enemyid]
 	static void* message_NPC_HURT(server *sv, packet *p){
-		if (p->chanks.size()<1)
+		if (p->chanks.size()<2)
 			return p;//strange
 		//find npc and hurt it
 		master::world.m.lock();
@@ -47,7 +47,7 @@ namespace master {
 					n->hurt(d);
 					n->damagers[e->id]+=d;
 				n->m.unlock();
-				printf("%d hurts by %d for %d\n", n->id, e->id, d);
+				printf("%d hurted by %d for %d (%d)\n", n->id, e->id, d, n->health);
 			}
 		master::world.m.unlock();
 		return 0;
@@ -62,7 +62,7 @@ namespace master {
 			npc *n=master::world.npcs[p->chanks[0].value.i];
 			withLock(n->m, n->set_attr(n->health, 0));
 		master::world.m.unlock();
-		printf("npc %d suiside\n", n->id);
+//		printf("npc %d suiside\n", n->id);
 		return 0;
 	}
 
@@ -76,6 +76,8 @@ namespace master {
 	}
 
 	static void* message_NPC_UPDATE(server *sv, packet* p){
+		if (p->chanks.size()<1)
+			return p;//strange
 		int id=p->chanks[0].value.i;
 		npc* n=0;
 		master::world.m.lock();
@@ -95,27 +97,32 @@ namespace master {
 	
 	///[id, angle]
 	static void* message_NPC_MAKE_SHOT(server *sv, packet *p){
+		if (p->chanks.size()<2)
+			return p;//strange
 		master::world.m.lock();
 			npc *n=master::world.npcs[p->chanks[0].value.i];
-			if (n)
+			if (n){
 				n->m.lock();
+				npc *nn = new npc(n->world, n->world->getId());
+				//set params
+				nn->angle=p->chanks[1].value.c;
+				nn->direction.by_angle(nn->angle, 1); //right dir and full speed
+				printf("%g %g \n", nn->direction.x, nn->direction.y);
+	//			nn->direction.normalize(); 
+				nn->position=n->position;
+				nn->weapon.damage=n->weapon.damage;
+				nn->weapon.dist=n->weapon.dist; //set max move dist
+				nn->weapon.attacks=n->weapon.attacks; //set max targets
+				nn->attackable=n->weapon.attackable;
+				nn->move_id=1;//TODO: change to choose bullet move id 
+				nn->shoot_id=2;//TODO: change to choose bullet shoot id 
+				
+				n->m.unlock();
+				master::world.npcs_m.lock();
+					master::world.new_npcs.push_back(nn);
+				master::world.npcs_m.unlock();
+			}
 		master::world.m.unlock();
-		if (n){
-			npc *nn = new npc(n->world, n->world->getId());
-			//set params
-			nn->angle=p->chanks[1].value.c;
-			nn->direction.by_angle(nn->angle, 1); //right dir and full speed
-			nn->weapon.damage=n->weapon.damage;
-			nn->weapon.dist=n->weapon.dist; //set max move dist
-			nn->weapon.attacks=n->weapon.attacks; //set max targets
-			nn->attackable=n->weapon.attackable;
-			nn->shoot_id=1;//TODO: change to choose bullet move id 
-			
-			n->m.unlock();
-			master::world.npcs_m.lock();
-				master::world.new_npcs.push_back(nn);
-			master::world.npcs_m.unlock();
-		}
 		return 0;
 	}
 

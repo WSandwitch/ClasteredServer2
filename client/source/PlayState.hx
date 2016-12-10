@@ -66,6 +66,7 @@ class PlayState extends FlxState
 	private static inline var MSG_SET_DIRECTION:Int = 2;
 	//in messages
 	private static inline var MSG_NPC_UPDATE:Int=3;
+	private static inline var MESSAGE_NPC_REMOVE:Int=5;
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
 	private var map:TiledLevel;
@@ -323,12 +324,27 @@ class PlayState extends FlxState
 					case MSG_NPC_UPDATE:
 						var n:Null<Npc> = npcs[p.chanks[0].i];
 						if (n == null){
-							n = new Npc(0, 0, 0);
+							n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of creen
 							n.id = p.chanks[0].i;
 							npcs[p.chanks[0].i] = n;
 							add(n);
 						}
 						n.update_attributes(p);
+					case MESSAGE_NPC_REMOVE:
+						for (chank in p.chanks){
+							var nid = chank.i;
+							if (npc_id==nid){
+								//player npc add screen you are died
+							}else{
+								var n:Null<Npc> = npcs[nid];
+								if (n != null){
+									npcs.remove(nid);
+									remove(n);
+									n.destroy();
+									n = null;
+								}
+							}
+						}
 					case MSG_CLIENT_UPDATE:
 						var i:Int=0;
 						while(i<p.chanks.length-1){

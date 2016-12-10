@@ -16,7 +16,8 @@
 #define STATE_IDLE 0
 #define STATE_WARMUP 1
 #define STATE_ATTACK 2
-#define STATE_COOLDOWN 3
+#define STATE_SHOOT 3
+#define STATE_COOLDOWN 4
 
 extern "C"{
 #include <time.h>
@@ -56,6 +57,7 @@ namespace share {
 			point position;
 			pointf direction;
 			short health; //curent health
+			short _health; //max health
 			short type; //
 			short move_id;
 			short shoot_id; 
@@ -106,6 +108,7 @@ namespace share {
 			void init_position();
 			void recalculate_type();
 			void attack();
+			void attack(bool s);
 			void move();
 			void shoot();
 			void set_dir();
