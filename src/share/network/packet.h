@@ -10,7 +10,7 @@ extern "C"{
 }
 
 namespace share {
-	
+
 	class packet_chank{
 		public:
 			char type;

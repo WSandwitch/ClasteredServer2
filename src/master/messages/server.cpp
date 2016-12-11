@@ -60,7 +60,10 @@ namespace master {
 		//find npc kill it
 		master::world.m.lock();
 			npc *n=master::world.npcs[p->chanks[0].value.i];
-			withLock(n->m, n->set_attr(n->health, 0));
+			if (n){
+//				printf("inited? -> %d\n", n->inited);
+				withLock(n->m, n->set_attr(n->health, 0));
+			}
 		master::world.m.unlock();
 //		printf("npc %d suiside\n", n->id);
 		return 0;

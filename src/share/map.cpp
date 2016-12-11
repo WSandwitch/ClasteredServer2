@@ -29,7 +29,7 @@ namespace share{
 		return buffer;
 	}
 	
-	map::map(int x, int y): offset(10){
+	map::map(int x, int y): offset(50){
 		cell.x=x;
 		cell.y=y;
 //		grid=0;

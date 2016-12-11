@@ -50,6 +50,11 @@ namespace share {
 			typeof(p.size()) size(){return p.size();};
 		};
 	
+	struct pack_p{
+		bool done;
+		mutex m;
+	};
+		
 	class npc {
 		public:
 			int id;
@@ -65,6 +70,7 @@ namespace share {
 			int owner_id; //id of player
 			char angle; //angle of view in pdegrees
 			share::world *world;
+			share::mutex m;
 			struct{
 				char used;
 				point goal;
@@ -87,7 +93,6 @@ namespace share {
 				
 			map3b<share::packet> packs;
 			map3b<std::vector<char>> pack_attrs;
-			share::mutex m;
 			int slave_id;
 			int cell_id;
 			int r; //radius of collision
@@ -121,8 +126,8 @@ namespace share {
 			bool suicide(); 			
 			void update(share::packet * p);
 			bool updated(); 
-			void pack(bool server=0, bool all=0, bool to_slave=0); //pack action attributes, do not pack special atributes
-			bool update_cells();//return 1 if updated
+			void pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe
+			bool update_cells();//threadsafe
 			
 			template<class T1, class T2>
 			T1 set_attr(T1 &a, T2 v){
@@ -142,7 +147,7 @@ namespace share {
 		protected:
 			float vel;
 			timestamp_t timestamp;
-			map3b<bool> _packs;
+			map3b<pack_p> _packs;
 			
 			bool check_point(typeof(point::x) x, typeof(point::y) y);
 		

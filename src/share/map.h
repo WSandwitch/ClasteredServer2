@@ -19,10 +19,9 @@ namespace share {
 	
 	struct cell{
 		int id;
+		mutex m;
 		std::map<int, npc*> npcs;
 		std::vector<segment*> segments;
-		npc* get_npc(int id);
-		void add_npc(npc *n);
 	};
 
 	class map {

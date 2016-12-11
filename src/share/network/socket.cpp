@@ -72,20 +72,26 @@ namespace share {
 		short size=p->size();
 		int flag=1;
 		int result=1;
-		char* data=(char*)malloc(size+sizeof(size));
+//		char* data=(char*)malloc(size+sizeof(size));
 		size=byteSwap(size);
-		if (data==0){
-			perror("malloc");
+//		if (data==0){
+//			perror("malloc");
 			//check result set to 0
-		}else{
-			int shift=0;
-			memcpy(data, &size, sizeof(size));
-			shift+=sizeof(size);
-			memcpy(data+shift, p->data(), p->size());
-			shift+=p->size();
+//		}else{
+//			int shift=0;
+//			memcpy(data, &size, sizeof(size));
+//			shift+=sizeof(size);
+//			memcpy(data+shift, p->data(), p->size());
+//			shift+=p->size();
 			lockWrite();
-				setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));//maybe try TCP_CORK
-					result=send(data, shift);
+			setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+#ifndef __CYGWIN__
+				setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, (char *) &flag, sizeof(int));
+#endif
+
+//					result=send(data, shift);
+					result=send(&size, sizeof(size));
+					result=send(p->data(), p->size());
 /*					printf("send ");
 					for(int i=0;i<shift;i++){
 						printf("%d,", data[i]);
@@ -93,10 +99,13 @@ namespace share {
 					printf("\n");
 */					
 					flag=0; 
-				setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+#ifndef __CYGWIN__
+				setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, (char *) &flag, sizeof(int));
+#endif
+			setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
 			unlockWrite();
-			free(data);
-		}
+//			free(data);
+//		}
 		return result;
 	}
 

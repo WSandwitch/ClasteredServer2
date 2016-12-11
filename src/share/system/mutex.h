@@ -12,6 +12,7 @@ namespace share {
 			pthread_mutex_t m;
 		public:
 			mutex();
+			mutex(const share::mutex &_);
 			~mutex();
 			void lock();
 			void unlock();

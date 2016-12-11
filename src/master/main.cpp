@@ -144,8 +144,6 @@ static void segfault_sigaction(int sig){
 #define startWorkers(type)\
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
-share::mutex m1,m2,m3,m4;
-
 int main(int argc,char* argv[]){
 	share::sync tv;
 	struct sigaction sa;
@@ -249,13 +247,13 @@ int main(int argc,char* argv[]){
 	n->bot.used=1;
 	n->move_id=100;
 	master::world.new_npcs.push_back(n);
-	
+/*	
 	for(int i=0;i<500;i++){
 		npc *n=new npc(&master::world, master::world.getId());
 		n->bot.used=1;
 		master::world.new_npcs.push_back(n);
 	}
-	
+*/	
 	do{
 		timestamp=share::time(0);
 		tv.timePassed(); //start timer
@@ -282,7 +280,7 @@ int main(int argc,char* argv[]){
 				}
 			}
 #ifdef _GLIBCXX_PARALLEL
-			#pragma omp parallel for shared(m1,m2,m3)
+			#pragma omp parallel for
 			for(unsigned ii=0;ii<master::world.npcs.size();ii++){
 				auto i=master::world.npcs.begin();
 				std::advance(i, ii);
@@ -301,9 +299,7 @@ int main(int argc,char* argv[]){
 						slave_id=n->set_attr(n->slave_id, slave_id);
 					}
 					//move in map
-					m3.lock();
-						n->update_cells();
-					m3.unlock();
+					n->update_cells(); //threadsafe
 					//update n->slaves
 					std::unordered_map<int, short> slaves;
 					for(auto slave: n->slaves)//set had to 2
@@ -325,18 +321,14 @@ int main(int argc,char* argv[]){
 									}
 									break;
 								case 1: //new npc
-									m1.lock();
-										n->pack(1,1);
-									m1.unlock();
+									n->pack(1,1);
 									s->sock->send(&n->packs(1,1));
 									n->slaves.insert(slave.first);
 //									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
 									if (n->updated()){
-										m2.lock();
-											n->pack(1,0,1);
-										m2.unlock();
+										n->pack(1,0,1);
 										s->sock->send(&n->packs(1,0,1));									
 									}
 									n->slaves.insert(slave.first);
@@ -377,13 +369,13 @@ int main(int argc,char* argv[]){
 						npcs[n->id]++;
 					}
 #ifdef _GLIBCXX_PARALLEL
-					#pragma omp parallel for shared(c,m1,m2,m3)
+					#pragma omp parallel for shared(c)
 					for(unsigned ii=0;ii<npcs.size();ii++){
 						auto ni=npcs.begin();
 						std::advance(ni, ii);
 						auto i=*ni;
 #else
-					for(auto ni: npcs){
+					for(auto i: npcs){
 #endif				
 						switch(i.second){
 							case 2: { //need to remove
@@ -397,9 +389,7 @@ int main(int argc,char* argv[]){
 							case 1: {//new npc
 								npc *n;
 								if ((n=master::world.npcs[i.first])!=0){
-									m1.lock();
-										n->pack(0,1); //all attrs
-									m1.unlock();
+									n->pack(0,1); //all attrs
 									c->sock->send(&n->packs(0,1));
 									c->npcs.insert(i.first);
 //									printf("(client)send new npc\n");
@@ -410,14 +400,10 @@ int main(int argc,char* argv[]){
 								npc *n;
 								if ((n=master::world.npcs[i.first])!=0){
 									if (n->updated()){
-										m2.lock();
-											n->pack(0); 
-										m2.unlock();
+										n->pack(0); 
 										c->sock->send(&n->packs(0));
 									}
-									m3.lock();
-										c->npcs.insert(i.first);
-									m3.unlock();
+									withLock(c->mutex, c->npcs.insert(i.first));
 								}
 								break;
 							}

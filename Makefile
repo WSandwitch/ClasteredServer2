@@ -1,4 +1,5 @@
 OBJDIR ?= /tmp/CCS2_build
+ARCH ?= $(uname -m)
 GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline
 CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
@@ -25,7 +26,7 @@ STORAGE?=TEXT
 
 DEFINES:= -DSTORAGE_$(STORAGE)
 
-ifeq ($(DEBUG),1)
+ifneq ($(DEBUG),0)
     CFLAGS +=-g -ggdb3 -rdynamic
     CPPFLAGS +=-g -ggdb3 -rdynamic
 	DEFINES += -DDEBUG
@@ -41,6 +42,11 @@ endif
 ifeq ($(OPTIMISATION),1)
     CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
     CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
+	ifeq ($(filter $(ARCH),ppc ppc64),)
+		CFLAGS += -march=native
+		CPPFLAGS += -march=native
+		LDFLAGS += -march=native
+	endif
 endif
 
 all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
@@ -54,7 +60,7 @@ $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS)
 $(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(OBJDIR)/src/slave_main.o
 	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o $@
 
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)/%.o: %.c 
 	@mkdir -p $(@D)
 	$(GCC) -c $(CFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 

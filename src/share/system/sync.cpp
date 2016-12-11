@@ -18,8 +18,10 @@ namespace share {
 	
 	void sync::syncTPS(int TPS, bool l){
 		int diff=timePassed();
+#ifdef DEBUG
 		if (l)
 			printf("spt\t%d\tsleep\t%d\tfull\t%d\n", diff, (1000000/TPS)-diff, (1000000/TPS));
+#endif
 		if (TPS){
 			if((diff=(1000000/TPS)-diff)>0){
 				usleep(diff);

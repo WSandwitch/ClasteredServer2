@@ -65,7 +65,7 @@ namespace share {
 		if (world){
 			for(auto i: cells){
 				auto cell=world->map.cells(i);
-				cell->npcs.erase(id);
+				withLock(cell->m, cell->npcs.erase(id));
 			}
 			if (world->id==0){//on master
 				world->npcs_m.lock();
@@ -107,7 +107,7 @@ namespace share {
 			attrs[i.first]=0;
 		}
 		for(auto i: _packs){
-			_packs.p[i.first]=0;
+			i.second.done=0;
 		}
 		if (health<=0){
 			return 1;
@@ -142,6 +142,10 @@ namespace share {
 		packAttr(move_id,0,0,1,0,1); //13s
 		packAttr(shoot_id,0,0,1,0,1); //14s 
 		packAttr(attackable,0,0,1,1,1); //15s //TODO: check can be got from info
+		packAttr(bot.owner_id,0,0,1,0,1); //16s 
+		packAttr(weapon.dist,0,0,1,0,1); //17s
+		packAttr(weapon.next_shot,0,0,1,0,1); //18s
+		packAttr(weapon.attacks,0,0,1,0,1); //19s
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -177,7 +181,7 @@ namespace share {
 		//TODO: check	
 		short warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
 		short cooldown=NPC_FULL_TEMP/world->tps/1; //set
-		short latency=0.5*world->tps; //tiks
+		short latency=0.3*world->tps; //tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
 //			printf("%d warmup %hd/%hd\n", id, weapon.temp,NPC_FULL_TEMP);
@@ -234,12 +238,11 @@ namespace share {
 			(this->*$)(0, 0);//add useful coordinates
 	}
 	
-#define m world->map
 	bool npc::update_cells(){//TODO:improve performance
-		int _cell_id=m.to_grid(position.x, position.y);
+		int _cell_id=world->map.to_grid(position.x, position.y);
 		if (cell_id!=_cell_id){//if npc move to another cell
 			std::unordered_map<int, short> e;
-			std::list<int> &&v=m.near_cells(_cell_id, r);
+			std::list<int> &&v=world->map.near_cells(_cell_id, r);
 			//set old cells to 2
 			for(auto i: cells){
 				e[i]=2;
@@ -249,12 +252,13 @@ namespace share {
 				e[i]++;
 			}
 			for(auto i: e){
+				auto $=world->map.cells(i.first);
 				switch(i.second){
 					case 1: //new
-						m.cells(i.first)->npcs[id]=this;
+						withLock($->m, $->npcs[id]=this);
 						break;
 					case 2: //remove
-						m.cells(i.first)->npcs.erase(id);
+						withLock($->m, $->npcs.erase(id));
 						break;
 					case 3: //already has
 						break;
@@ -267,7 +271,6 @@ namespace share {
 		}
 		return 0;
 	}
-#undef m
 	
 	void npc::set_dir(){//TODO:remove
 		if (bot.used)
@@ -367,47 +370,50 @@ namespace share {
 	//create packet with attr that have been changed
 //s - for server, all - pack all attrs for curr type, ts - to slave(only for to server)
 	void npc::pack(bool s, bool all, bool ts){
-		if (!_packs(s,all,ts)){
-			auto as=pack_attrs(s,all,ts);
-//			printf("pack %d %d %d, %d \n", s,all,ts, as.size());
-			packet &p=packs(s,all,ts);
-			p.init();
-			p.setType(MESSAGE_NPC_UPDATE);//npc update
-			p.add(id);
-			for(auto $: as){
-				void *a=attr($);
-				if (all || attrs[$]){
-					p.add((char)$);
-//					printf("added type %d index %d\n", attr.type(a), $);
-					switch(attr.type(a)){
-						case 1:
-							p.add(*(char*)a);
-//							printf("added type value %d\n", *(char*)a);
-							break;
-						case 2:
-							p.add(*(short*)a);
-//							printf("added type value %d\n", *(short*)a);
-							break;
-						case 3:
-							p.add(*(int*)a);
-//							printf("added type value %d\n", *(int*)a);
-							break;
-						case 4:
-							p.add(*(float*)a);
-//							printf("added type value %g\n", *(float*)a);
-							break;
-						case 5:
-							p.add(*(double*)a);
-//							printf("added type value %lg\n", *(double*)a);
-							break;
-						default:
-							p.add((char)0);
-							break;
+		auto _pack=_packs(s,all,ts);
+		_pack.m.lock();//TODO: move mutex to packet
+			if (!_pack.done){
+				auto as=pack_attrs(s,all,ts);
+	//			printf("pack %d %d %d, %d \n", s,all,ts, as.size());
+				packet &p=packs(s,all,ts);
+				p.init();
+				p.setType(MESSAGE_NPC_UPDATE);//npc update
+				p.add(id);
+				for(auto $: as){
+					void *a=attr($);
+					if (all || attrs[$]){
+						p.add((char)$);
+	//					printf("added type %d index %d\n", attr.type(a), $);
+						switch(attr.type(a)){
+							case 1:
+								p.add(*(char*)a);
+	//							printf("added type value %d\n", *(char*)a);
+								break;
+							case 2:
+								p.add(*(short*)a);
+	//							printf("added type value %d\n", *(short*)a);
+								break;
+							case 3:
+								p.add(*(int*)a);
+	//							printf("added type value %d\n", *(int*)a);
+								break;
+							case 4:
+								p.add(*(float*)a);
+	//							printf("added type value %g\n", *(float*)a);
+								break;
+							case 5:
+								p.add(*(double*)a);
+	//							printf("added type value %lg\n", *(double*)a);
+								break;
+							default:
+								p.add((char)0);
+								break;
+						}
 					}
 				}
+				_pack.done=1;
 			}
-			_packs(s,all,ts)=1;
-		}
+		_pack.m.unlock();
 	}
 #undef packAttr
 

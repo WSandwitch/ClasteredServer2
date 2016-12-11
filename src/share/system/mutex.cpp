@@ -15,6 +15,10 @@ namespace share {
 		pthread_mutex_init(&m, 0);
 	}
 
+	mutex::mutex(const share::mutex &_){
+		pthread_mutex_init(&m, 0);
+	}
+
 	mutex::~mutex(){
 		pthread_mutex_destroy(&m);
 	}
