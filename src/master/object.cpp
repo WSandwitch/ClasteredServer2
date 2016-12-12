@@ -33,7 +33,7 @@ namespace YAML{
 		}
 }
 
-namespace share{
+namespace master{
 
 	std::unordered_map<int, object*> object::all;	
 	typeof(object::attr_map) object::attr_map;

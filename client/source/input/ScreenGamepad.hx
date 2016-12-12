@@ -75,7 +75,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	private var _random:FlxRandom = new FlxRandom();
 	private var _ids:Array<Int> = [];
 	/**
-	 * Create a gamepad which contains 4 directional buttons and 4 action buttons.
+	 * Create a gamepad which contains 4 directional buttons and 4 action buttons, and 2 analog sticks.
 	 * 
 	 * @param 	FlxMode			The mode. XBOX for default.
 	 * @param 	useStartBack	Show StartBack group.

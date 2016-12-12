@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace share{
+namespace master{
 
 	int o_type(char &c);
 	int o_type(short &c);

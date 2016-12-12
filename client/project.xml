@@ -51,6 +51,7 @@
 	<haxelib name="polygonal-ds" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->
+	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 	
 	<!--Enable the Flixel core recording system-->
 	<!--<haxedef name="FLX_RECORD" />-->

@@ -1,5 +1,6 @@
 package;
 
+import states.LoginState;
 import clasteredServerClient.Connection;
 import clasteredServerClient.Receiver;
 import clasteredServerClient.Packet;
@@ -17,6 +18,7 @@ class Main extends Sprite
 		super();
 		addChild(new CSGame(640, 480, LoginState));
 		
+		FlxG.autoPause = false;
 		//FlxG.fixedTimestep = false;
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1024,768);
 		//read config and setup

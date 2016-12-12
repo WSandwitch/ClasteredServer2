@@ -1,4 +1,4 @@
-package;
+package states;
 
 import clasteredServerClient.Packet;
 import flash.Lib;
@@ -388,6 +388,15 @@ class PlayState extends FlxState
 		cam.followLerp = Math.round(10 * cam.followLerp) / 10; // adding or subtracting .1 causes roundoff errors
 		hud.updateCamLerp(cam.followLerp);
 	}
+	
+	//for using custom actions, use with FlxG.autoPause = true;
+	override public function onFocus():Void{
+		
+	} 
+	
+	override public function onFocusLost():Void{
+		
+	} 
 	
 }
 

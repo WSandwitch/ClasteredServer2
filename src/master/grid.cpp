@@ -3,6 +3,7 @@
 #include <new>
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <cmath>
 #include <iostream>
 
@@ -119,7 +120,7 @@ namespace master {
 				for(int n=0;n<1000000;n++){
 					float a=l/n;
 					int m=ceil(d/a);
-					if (d<=m*a && 1.1f*d>=m*a){
+					if (d<=m*a && 1.5f*d>=m*a){
 						cell[i]=a;
 						break;
 					}
@@ -142,7 +143,7 @@ namespace master {
 	#define pushShares(o, x1,y1) \
 		if (x1>=0 && x1<counts[0] && y1>=0 && y1<counts[1])\
 			o.shares.push_back(server_ids[(y1)*counts[0]+x1])
-	//		printf("grid_size %d %d total %d\n",grid_size[0],grid_size[1],grid_size[0]*grid_size[1]);
+			printf("grid_size %d %d total %d\n",grid_size[0],grid_size[1],grid_size[0]*grid_size[1]);
 			data=new data_cell*[grid_size[0]*grid_size[1]+1];
 			int _offset[2]={(int)ceil(offset/cell[0]),(int)ceil(offset/cell[1])};
 			grid_server fake_gs;//for none servers

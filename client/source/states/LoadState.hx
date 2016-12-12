@@ -1,4 +1,4 @@
-package;
+package states;
 
 import clasteredServerClient.Packet;
 import flash.Lib;
@@ -21,7 +21,7 @@ import haxe.Timer.delay;
 using flixel.util.FlxSpriteUtil;
 
 /**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
+ * 
  */
 class LoadState extends FlxState
 {
@@ -39,6 +39,7 @@ class LoadState extends FlxState
 		game.pass = "qwer";
 		
 		try{
+//			var conn = new Connection("192.168.1.245", 8000);
 			var conn = new Connection("172.16.1.40", 8000);
 			game.connection = conn;
 			delay(function(){

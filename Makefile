@@ -39,6 +39,12 @@ ifeq ($(PARALLEL),1)
     DEFINES += -D_GLIBCXX_PARALLEL
 endif
 
+ifeq ($(GPROF),1)
+	CFLAGS += -pg
+    CPPFLAGS += -pg
+	LDFLAGS += -pg
+endif
+
 ifeq ($(OPTIMISATION),1)
     CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
     CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops

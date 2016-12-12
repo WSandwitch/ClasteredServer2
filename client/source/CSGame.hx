@@ -1,5 +1,6 @@
 import flixel.*;
 import clasteredServerClient.*;
+import states.*;
 
 class CSGame extends FlxGame
 {

@@ -1,5 +1,6 @@
 package clasteredServerClient;
 
+import states.PlayState;
 import haxe.CallStack;
 
 import flixel.FlxG;
