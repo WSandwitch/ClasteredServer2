@@ -161,6 +161,7 @@ class AbstractInputManager{
 		any_gamepad:Bool=true,
 		treshhold:Float = 0.1
 	):Null<AbstractInputID>{
+	#if !FLX_NO_KEYBOARD
 		if (keys_ignore != null){
 			var key:FlxKey = FlxG.keys.firstJustPressed();
 			if (keys_cancel != null && keys_cancel.indexOf(key)!=-1)
@@ -168,6 +169,8 @@ class AbstractInputManager{
 			if (key != -1 && keys_ignore.indexOf(key)==-1)
 				return new AbstractInputKeyboardID(null, key);
 		}
+	#end
+	#if !FLX_NO_MOUSE
 		if (mouse_ignore != null){
 			if (FlxG.mouse.justPressed){
 				if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_LEFT) !=-1)
@@ -201,6 +204,8 @@ class AbstractInputManager{
 				}
 			}
 		}
+	#end
+	#if !FLX_NO_GAMEPAD
 		var gamepads:Array<FlxGamepad> = FlxG.gamepads.getActiveGamepads();
 		for(gamepad in gamepads)
 			if (gamepad != null){
@@ -262,7 +267,8 @@ class AbstractInputManager{
 						}
 					}
 				}
-			}		
+			}
+	#end
 		return null;
 	}
 }
@@ -459,6 +465,7 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 		
 	override
 	public function update(){
+	#if !FLX_NO_GAMEPAD
 		for (name in actions){
 			var action = manager.actions[name];
 			if (gamepad_id==null){
@@ -473,6 +480,7 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 				}
 			}
 		}
+	#end
 	}	
 
 	private function proceedGamepad(gamepad:FlxGamepad, action:AbstractInputAction){
@@ -608,6 +616,7 @@ class AbstractInputGamepadKeyID extends AbstractInputID{
 	
 	override
 	public function update(){
+	#if !FLX_NO_GAMEPAD
 		for (name in actions){
 			var action = manager.actions[name];
 			if (gamepad_id==null){
@@ -627,6 +636,7 @@ class AbstractInputGamepadKeyID extends AbstractInputID{
 			if (action.justReleased)//TODO:check
 				action.value = 0;
 		}
+	#end
 	}
 	
 	override
@@ -648,6 +658,7 @@ class AbstractInputMouseID extends AbstractInputID{
 	
 	override
 	public function update(){
+	#if !FLX_NO_MOUSE
 		for (name in actions){
 			var action = manager.actions[name];
 			switch(key){
@@ -680,6 +691,7 @@ class AbstractInputMouseID extends AbstractInputID{
 			if (action.justReleased)//TODO:check
 				action.value = 0;
 		}
+	#end
 	} 
 
 	override
@@ -701,6 +713,7 @@ class AbstractInputKeyboardID extends AbstractInputID{
 	
 	override
 	public function update(){
+	#if !FLX_NO_KEYBOARD
 		for (name in actions){
 			var action = manager.actions[name];
 			action.justPressed = action.justPressed || FlxG.keys.anyJustPressed([key]);
@@ -711,6 +724,7 @@ class AbstractInputKeyboardID extends AbstractInputID{
 			if (action.justReleased)
 				action.value = 0;
 		}
+	#end
 	}
 	
 	override

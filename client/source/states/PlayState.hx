@@ -8,11 +8,9 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.system.scaleModes.*;
-import flixel.addons.nape.FlxNapeSpace;
 import flixel.math.FlxMath;
 import flixel.math.FlxRect;
 import flixel.util.FlxColor;
-import nape.geom.Vec2;
 import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
@@ -27,7 +25,7 @@ import flixel.system.macros.FlxMacroUtil;
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class PlayState extends FlxState
+class PlayState extends BaseState
 {
 	// Demo arena boundaries
 	static var LEVEL_MIN_X;
@@ -71,10 +69,22 @@ class PlayState extends FlxState
 	///
 	private var map:TiledLevel;
 	
+	private function checkKeyBack(e:openfl.events.KeyboardEvent):Void
+	{
+		switch (e.keyCode)
+		{
+			case FlxKey.ESCAPE:
+				trace("back button");
+//				e.stopImmediatePropagation();
+//				restartLevel();
+		}
+	}
+
 	override public function create():Void 
 	{	
-		FlxNapeSpace.init();
-		
+	
+		FlxG.stage.addEventListener(openfl.events.KeyboardEvent.KEY_UP, checkKeyBack);
+
 		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
 		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
 		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
@@ -90,8 +100,8 @@ class PlayState extends FlxState
 		
 //		FlxG.mouse.visible = false;
 		
-		FlxNapeSpace.velocityIterations = 5;
-		FlxNapeSpace.positionIterations = 5;
+//		FlxNapeSpace.velocityIterations = 5;
+//		FlxNapeSpace.positionIterations = 5;
 
 		map = new TiledLevel();
 		add(map);
@@ -292,7 +302,7 @@ class PlayState extends FlxState
 			connection.sendPacket(p);
 //			trace("sended");
 		}
-		
+	#if !FLX_NO_KEYBOARD	
 		if (FlxG.keys.justPressed.U)
 			setLerp(.1);
 		if (FlxG.keys.justPressed.J)
@@ -310,7 +320,7 @@ class PlayState extends FlxState
 			
 		if (FlxG.keys.justPressed.M)
 			FlxG.camera.shake();
-		
+	#end	
 	}
 	
 	private function checkPackets(elapsed:Float) {

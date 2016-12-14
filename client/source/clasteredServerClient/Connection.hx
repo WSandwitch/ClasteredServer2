@@ -15,29 +15,93 @@ import haxe.crypto.Md5;
 import haxe.crypto.Base64;
 import haxe.Timer.delay;
 
+#if cpp
+import cpp.vm.Thread;
+#elseif neko
+import neko.vm.Thread;
+#elseif java
+import java.vm.Thread;
+#elseif flash
+#end
+
+
 class Connection{
-	private var sock:Null<Socket>;
+	private var sock:Null<Socket> = null;
 	public var write:Lock = new Lock();
 	public var read:Lock = new Lock();
 	
-	public function new(host:String, port:Int){
-		var p:Packet = new Packet();
-//		sock.setBlocking(true);
-//		sock.setTimeout(100000);
-	#if flash
-		sock = new Socket(host, port);
-		//sock.connect(host, port);
-		sock.endian = LITTLE_ENDIAN;
-	#else
+	public function new(){
 		sock = new Socket();
-		sock.connect(new Host(host), port);
-		sock.input.bigEndian=false;
-		sock.output.bigEndian = false;
-		sock.setFastSend(true);
-	#end
-		p.type = 0;
-		p.addString("Haxe hello");
-		sendPacket(p);
+	}
+	
+#if flash	
+	private function _connect(host:String, port:Int, ?success:Connection->Void, ?fail:Void->Void){
+		var p:Packet = new Packet();
+		try{
+			sock.connect(host, port);
+			sock.endian = LITTLE_ENDIAN;
+			p.type = 0;
+			p.addString("Haxe Flash hello");
+			sendPacket(p);
+			if (success != null)
+				success(this);
+		}catch(e:Dynamic){
+			if (fail != null)
+				fail();
+		}
+	}
+#else	
+	private function _connect(){
+		var p:Packet = new Packet();
+		var host:String = Thread.readMessage(true);
+		var port:Int = Thread.readMessage(true);
+		var success:Null<Connection->Void> = Thread.readMessage(true);
+		var fail:Null<Void->Void> = Thread.readMessage(true);
+		try{
+			sock.connect(new Host(host), port);
+			sock.input.bigEndian=false;
+			sock.output.bigEndian = false;
+			sock.setFastSend(true);
+			p.type = 0;
+			p.addString("Haxe Native hello");
+			sendPacket(p);
+			if (success != null)
+				success(this);
+		}catch(e:Dynamic){
+			if (fail != null)
+				fail();
+		}
+	}
+#end
+
+	public function connect(host:String, port:Int, sync:Bool = true,  ?success:Connection->Void, ?fail:Void->Void){
+		if (sync){
+			var p:Packet = new Packet();
+	//		sock.setBlocking(true);
+	//		sock.setTimeout(100000);
+		#if flash
+			sock.connect(host, port);
+			sock.endian = LITTLE_ENDIAN;
+		#else
+			sock.connect(new Host(host), port);
+			sock.input.bigEndian=false;
+			sock.output.bigEndian = false;
+			sock.setFastSend(true);
+		#end
+			p.type = 0;
+			p.addString("Haxe hello");
+			sendPacket(p);
+		}else{
+		#if flash
+			haxe.Timer.delay(_connect.bind(host, port, success, fail), 33);
+		#else
+			var t = Thread.create(_connect);
+			t.sendMessage(host);
+			t.sendMessage(port);
+			t.sendMessage(success);
+			t.sendMessage(fail);
+		#end
+		}
 	}
 	
 	public function bytesAvailable(size:UInt):Bool{

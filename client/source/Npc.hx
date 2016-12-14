@@ -5,7 +5,6 @@ import clasteredServerClient.Packet;
 import flash.geom.Point;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.nape.FlxNapeSprite;
 import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 

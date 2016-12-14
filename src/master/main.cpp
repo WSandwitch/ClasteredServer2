@@ -182,7 +182,7 @@ int main(int argc,char* argv[]){
 #ifdef _GLIBCXX_PARALLEL
 	omp_set_dynamic(0);
 	omp_set_num_threads(omp_get_max_threads()*4);
-	omp_set_schedule(omp_sched_dynamic, 4);
+//	omp_set_schedule(omp_sched_dynamic, 4);
 	printf("parallel mode %d\n", omp_get_max_threads());
 #endif	
 

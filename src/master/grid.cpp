@@ -143,7 +143,7 @@ namespace master {
 	#define pushShares(o, x1,y1) \
 		if (x1>=0 && x1<counts[0] && y1>=0 && y1<counts[1])\
 			o.shares.push_back(server_ids[(y1)*counts[0]+x1])
-			printf("grid_size %d %d total %d\n",grid_size[0],grid_size[1],grid_size[0]*grid_size[1]);
+//			printf("grid_size %d %d total %d\n",grid_size[0],grid_size[1],grid_size[0]*grid_size[1]);
 			data=new data_cell*[grid_size[0]*grid_size[1]+1];
 			int _offset[2]={(int)ceil(offset/cell[0]),(int)ceil(offset/cell[1])};
 			grid_server fake_gs;//for none servers
