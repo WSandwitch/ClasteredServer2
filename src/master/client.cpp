@@ -69,12 +69,12 @@ namespace master {
 				delete mes;
 			}
 			master::world.m.lock();
-				npc *n=master::world.npcs[npc_id];
-				if (n){
+				try{
+					npc *n=master::world.npcs.at(npc_id);
 					n->world->npcs.erase(n->id);
 					withLock(n->m, n->owner_id=0);//set to not respawn
 					delete n;
-				}
+				}catch(...){}
 			master::world.m.unlock();
 		mutex.unlock();
 	}

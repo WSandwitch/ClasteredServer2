@@ -33,9 +33,11 @@
 	<set name="BUILD_DIR" value="export" />
 	<classpath name="source" />
 	<assets path="assets" />
-	<assets path="tilesets" rename="assets/tilesets" unless="android" />
-	<assets path="map.tmx" rename="assets/map.tmx" if="debug" />
-	<assets path="map.tmx" rename="assets/map.tmx"  embed="true" unless="debug" />
+	<assets path="assets_ext/tilesets" rename="assets/tilesets" if="flash" /> 
+	<assets path="assets_ext/tilesets" rename="assets/tilesets" if="debug" /> <!--in realise copy to assets!-->
+	
+	<assets path="assets_ext/map.tmx" rename="assets/map.tmx" if="debug" />
+	<assets path="assets_ext/map.tmx" rename="assets/map.tmx" embed="true" unless="debug" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
 

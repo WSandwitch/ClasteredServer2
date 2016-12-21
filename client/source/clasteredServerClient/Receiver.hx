@@ -1,6 +1,7 @@
 package clasteredServerClient;
 
 import states.PlayState;
+import states.CSState;
 import haxe.CallStack;
 
 import flixel.FlxG;
@@ -93,7 +94,7 @@ class Receiver{
 				trace(CallStack.toString(CallStack.exceptionStack()));
 			}
 		}
-		state.connection_lost();
+		CSState.connection_lost();
 		trace("receiver exited");
 	}
 	

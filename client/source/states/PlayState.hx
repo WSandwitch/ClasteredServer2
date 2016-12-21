@@ -25,7 +25,7 @@ import flixel.system.macros.FlxMacroUtil;
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class PlayState extends BaseState
+class PlayState extends CSState
 {
 	// Demo arena boundaries
 	static var LEVEL_MIN_X;
@@ -57,9 +57,9 @@ class PlayState extends BaseState
 	public var receiver:Null<Receiver> = null;
 	public var packets:Array<Packet> = new Array<Packet>();
 	
-	public function connection_lost(){
-		game.connection_lost();
-	}
+//	public function connection_lost(){
+//		game.connection_lost();
+//	}
 	///out messages
 	private static inline var MSG_SET_DIRECTION:Int = 2;
 	//in messages

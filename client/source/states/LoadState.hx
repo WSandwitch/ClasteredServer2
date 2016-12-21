@@ -21,7 +21,7 @@ using flixel.util.FlxSpriteUtil;
 /**
  * 
  */
-class LoadState extends BaseState
+class LoadState extends CSState
 {
 
 	override public function create():Void 

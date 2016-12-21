@@ -48,6 +48,7 @@ endif
 ifeq ($(OPTIMISATION),1)
     CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
     CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
+    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
 	ifeq ($(filter $(ARCH),ppc ppc64),)
 		CFLAGS += -march=native
 		CPPFLAGS += -march=native

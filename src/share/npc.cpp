@@ -225,17 +225,16 @@ namespace share {
 	}
 	
 	void npc::move(){
-		auto $=moves[move_id];
-		if ($){
+		try{
 			float v=vel*vel_angle(0.43f);
-			(this->*$)(direction.x*v, direction.y*v);//TODO:add angle correction
-		}
+			(this->*(moves.at(move_id)))(direction.x*v, direction.y*v);//TODO:add angle correction
+		}catch(...){}
 	}
 	
 	void npc::shoot(){
-		auto $=shoots[shoot_id];
-		if ($)
-			(this->*$)(0, 0);//add useful coordinates
+		try{
+			(this->*(shoots.at(shoot_id)))(0, 0);//add useful coordinates
+		}catch(...){}
 	}
 	
 	bool npc::update_cells(){//TODO:improve performance

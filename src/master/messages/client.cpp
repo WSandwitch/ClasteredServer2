@@ -163,8 +163,8 @@ namespace master {
 
 	static void *message_MESSAGE_SET_DIRECTION(client*cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
-		npc *n=master::world.npcs[cl->npc_id];
-		if (n){
+		try{
+			npc *n=master::world.npcs.at(cl->npc_id);
 			typeof(point::x) x=0;
 			typeof(point::y) y=0;
 			short dir=0;
@@ -194,7 +194,7 @@ namespace master {
 				n->m.unlock();
 //				printf("set dir (%d %d)\n", x,y);
 			}
-		}
+		}catch(...){}
 		return 0;
 	}
 

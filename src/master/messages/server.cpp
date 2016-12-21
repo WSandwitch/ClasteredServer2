@@ -40,16 +40,16 @@ namespace master {
 			return p;//strange
 		//find npc and hurt it
 		master::world.m.lock();
-			npc *n=master::world.npcs[p->chanks[0].value.i];
-			npc *e=master::world.npcs[p->chanks[1].value.i];
-			if (n && e){
+			try{
+				npc *n=master::world.npcs.at(p->chanks[0].value.i);
+				npc *e=master::world.npcs.at(p->chanks[1].value.i);
 				n->m.lock();
 					auto d=withLock(e->m, e->weapon.damage);
 					n->hurt(d);
 					n->damagers[e->id]+=d;
 				n->m.unlock();
 				printf("%d hurted by %d for %d (%d)\n", n->id, e->id, d, n->health);
-			}
+			}catch(...){}
 		master::world.m.unlock();
 		return 0;
 	}
@@ -60,11 +60,11 @@ namespace master {
 			return p;//strange
 		//find npc kill it
 		master::world.m.lock();
-			npc *n=master::world.npcs[p->chanks[0].value.i];
-			if (n){
+			try{
+				npc *n=master::world.npcs.at(p->chanks[0].value.i);
 //				printf("inited? -> %d\n", n->inited);
 				withLock(n->m, n->set_attr(n->health, 0));
-			}
+			}catch(...){}
 		master::world.m.unlock();
 //		printf("npc %d suiside\n", n->id);
 		return 0;
@@ -85,17 +85,18 @@ namespace master {
 		int id=p->chanks[0].value.i;
 		npc* n=0;
 		master::world.m.lock();
-			n=master::world.npcs[id];
-			if(!n){
+			try{
+				n=master::world.npcs.at(id);
+			}catch(...){
 				n=new npc(&master::world, id);
 				master::world.npcs_m.lock();
 					master::world.new_npcs.push_back(n);
 				master::world.npcs_m.unlock();
 			}
 			n->m.lock();
+				n->update(p);
+			n->m.unlock();
 		master::world.m.unlock();
-			n->update(p);
-		n->m.unlock();
 		return 0;
 	}
 	
@@ -104,8 +105,8 @@ namespace master {
 		if (p->chanks.size()<2)
 			return p;//strange
 		master::world.m.lock();
-			npc *n=master::world.npcs[p->chanks[0].value.i];
-			if (n){
+			try{
+				npc *n=master::world.npcs.at(p->chanks[0].value.i);
 				n->m.lock();
 				npc *nn = new npc(n->world, n->world->getId());
 				//set params
@@ -128,7 +129,7 @@ namespace master {
 				master::world.npcs_m.lock();
 					master::world.new_npcs.push_back(nn);
 				master::world.npcs_m.unlock();
-			}
+			}catch(...){}
 		master::world.m.unlock();
 		return 0;
 	}

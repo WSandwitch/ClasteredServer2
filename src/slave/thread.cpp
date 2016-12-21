@@ -30,15 +30,15 @@ static void* threadFunc(void *arg){
 	withLock(world.m, world.main_loop=1);
 
 	while(withLock(world.m, world.main_loop)){
-		processor f;
 		if (world.sock->recv(&p)<=0)
 			break;
 //		printf("packet %d\n", p.type());
 		//some work
-		if((f=processors::messages[p.type()])!=0)
-			f(&p);
-		else
+		try{
+			processors::messages.at(p.type())(&p);
+		}catch(...){
 			printf("unknown message\n");
+		}
 	}
 	withLock(world.m, world.main_loop=0);
 	return 0;

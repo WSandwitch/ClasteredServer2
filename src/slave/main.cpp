@@ -92,41 +92,35 @@ int slave_main(int argc, char* argv[]){
 		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n){
-					n->m.lock();
-				}
+				n->m.lock();
 			}
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n){
-//					n->m.lock();
-//					printf("%d %d, %g %g\n", world.id, n->slave_id, n->position.x, n->position.y);
-					if (world.id==n->slave_id){
-						n->move();
-					}
-					n->update_cells();
-//					n->m.unlock();
+//				n->m.lock();
+//				printf("%d %d, %g %g\n", world.id, n->slave_id, n->position.x, n->position.y);
+				if (world.id==n->slave_id){
+					n->move();
 				}
+				n->update_cells();
+//				n->m.unlock();
 			}
 //		world.m.unlock();
 		//attack
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n){
-//					n->m.lock();
-					if (world.id==n->slave_id){
-						n->attack();
-					}
-//					n->m.unlock();
+//				n->m.lock();
+				if (world.id==n->slave_id){
+					n->attack();
 				}
+//				n->m.unlock();
 			}
 //		world.m.unlock();
 		//send data
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n && n->updated()){
+				if (n->updated()){
 					n->pack(1,0);
 					world.sock->send(&n->packs(1,0));
 				}
@@ -136,10 +130,8 @@ int slave_main(int argc, char* argv[]){
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n){
-					n->clear();
-					n->m.unlock();
-				}
+				n->clear();
+				n->m.unlock();
 			}
 			world.npcs_m.lock();
 				for(auto n: world.new_npcs){

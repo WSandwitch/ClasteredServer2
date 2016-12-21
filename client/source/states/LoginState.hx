@@ -22,12 +22,13 @@ import flixel.input.keyboard.FlxKey;
 import input.AbstractInputManager;
 import input.AbstractInputManager.*;
 
+import util.CSAssets;
 
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
  
-class LoginState extends BaseState
+class LoginState extends CSState
 {
 	var g:ScreenGamepad;
 	override public function create():Void 
