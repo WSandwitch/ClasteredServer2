@@ -6,6 +6,7 @@ import flash.display.BlendMode;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.group.FlxSpriteGroup;
 import flixel.FlxState;
 import flixel.system.scaleModes.*;
 import flixel.math.FlxMath;
@@ -23,8 +24,21 @@ using flixel.util.FlxSpriteUtil;
 import flixel.system.macros.FlxMacroUtil;
 
 /**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
+ * 
  */
+
+ class MapObjects extends FlxSpriteGroup{
+	 
+	 public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
+	 public var map:Null<TiledLevel> = null;
+	 
+	 public function new(map:String){
+		 super();
+		 add(map=new TiledLevel(map));
+	 }
+	 
+ }
+ 
 class PlayState extends CSState
 {
 	// Demo arena boundaries
@@ -48,7 +62,7 @@ class PlayState extends CSState
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
 	private var _angle:Float = 0;
-	private static inline var _d_angle:Float = 2*3.14/180; //2 degree
+	private static inline var _d_angle:Float = 2 * 3.14 / 180; //2 degree
 	
 	
 	public var l:Lock = new Lock();
@@ -69,7 +83,7 @@ class PlayState extends CSState
 	///
 	private var map:TiledLevel;
 	
-	private function checkKeyBack(e:openfl.events.KeyboardEvent):Void
+	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
 	{
 		switch (e.keyCode)
 		{

@@ -15,6 +15,15 @@ namespace YAML{
 			return v;
 		}
 	
+	template<class T>
+		std::vector<std::vector<T>> vec_vec_of(const YAML::Node &n){
+			std::vector<std::vector<T>> v;
+			for(YAML::Node e: n){ //!!need to check for error
+				v.push_back(e.as<std::vector<T>>());
+			}
+			return v;
+		}
+	
 	template <>
 		std::vector<char> Node::as() const{
 			return vec_of<char>(*this);
@@ -31,7 +40,27 @@ namespace YAML{
 		std::vector<float> Node::as() const{
 			return vec_of<float>(*this);
 		}
+
+	template <>
+		std::vector<std::vector<char>> Node::as() const{
+			return vec_vec_of<char>(*this);
+		}
+	template <>
+		std::vector<std::vector<short>> Node::as() const{
+			return vec_vec_of<short>(*this);
+		}
+	template <>
+		std::vector<std::vector<int>> Node::as() const{
+			return vec_vec_of<int>(*this);
+		}
+	template <>
+		std::vector<std::vector<float>> Node::as() const{
+			return vec_vec_of<float>(*this);
+		}
+
 }
+
+using namespace share;
 
 namespace master{
 
@@ -49,6 +78,10 @@ namespace master{
 	int o_type(std::vector<short> &c){return 7;}
 	int o_type(std::vector<int> &c){return 8;}
 	int o_type(std::vector<float> &c){return 9;}
+	int o_type(std::vector<std::vector<char>> &c){return 10;}
+	int o_type(std::vector<std::vector<short>> &c){return 11;}
+	int o_type(std::vector<std::vector<int>> &c){return 12;}
+	int o_type(std::vector<std::vector<float>> &c){return 13;}
 	
 	object::object(){
 	}
@@ -61,14 +94,32 @@ namespace master{
 	
 	void object::init_attrs(){
 		add_attr(id);
+		add_attr(kind); 
 		add_attr(type);
+		add_attr(cost); 
+		add_attr(deps); 
+		add_attr(weapon.dist); 
+		add_attr(weapon.ang_diap); 
+		add_attr(weapon.ang_shift); 
+		add_attr(weapon.attacks); 
+		add_attr(weapon.warmup); 
+		add_attr(weapon.cooldown); 
+		add_attr(weapon.latency); 
+		add_attr(weapon.shoot_id); 
+		add_attr(weapon.move_id); 
+		add_attr(weapon.attackable); 
 	}
 #undef add_attr
 	
+	void object::apply_to(npc *n){
+		
+	}
+
 	object_initializer::object_initializer(){
 		object $;
 		$.init_attrs();
 		YAML::Node config = YAML::LoadFile("data/objects.yml");
+		//get original attrs
 		if (config.IsSequence()){
 			for (auto e: config){
 				object *o=new object();
@@ -132,6 +183,34 @@ namespace master{
 								}else
 									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
+							case 10: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<std::vector<char>>>(am.first)=attr.as<std::vector<std::vector<char>>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
+								break;
+							case 11: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<std::vector<short>>>(am.first)=attr.as<std::vector<std::vector<short>>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
+								break;
+							case 12: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<std::vector<int>>>(am.first)=attr.as<std::vector<std::vector<int>>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
+								break;
+							case 13: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<std::vector<float>>>(am.first)=attr.as<std::vector<std::vector<float>>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
+								break;
 						}
 					}
 				}
@@ -143,6 +222,17 @@ namespace master{
 				else
 					delete o;
 			}
+		}
+		//convert attrs
+		for(auto ei: all){
+			auto e=ei.second;
+			//convert to pdegrees
+			e->weapon.ang_diap=to_pdegrees(e->weapon.ang_diap);
+			e->weapon.ang_shift=to_pdegrees(e->weapon.ang_shift);
+			//convert to tikc
+			e->weapon.warmup=NPC_FULL_TEMP/(master::world.tps*e->weapon.warmup);
+			e->weapon.cooldown=NPC_FULL_TEMP/(master::world.tps*e->weapon.cooldown);
+			e->weapon.latency=NPC_FULL_TEMP/(master::world.tps*e->weapon.latency);
 		}
 //		exit(0);
 	}

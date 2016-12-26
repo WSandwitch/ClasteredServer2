@@ -22,14 +22,16 @@ import haxe.io.Path;
 import openfl.Assets;
 
 /**
- * @author Samuel Batista
+ * 
  */
 class TiledLevel extends FlxTilemap{
 		
-	public function new()
+	public function new(?map:String)
 	{
 		super();
-		var tiledmap:TiledMap = new TiledMap("assets/map.tmx");
+		if (map == null)
+			map = "assets/map.tmx";
+		var tiledmap:TiledMap = new TiledMap(map);
 
 		FlxG.camera.setScrollBoundsRect(0, 0, tiledmap.fullWidth, tiledmap.fullHeight, true);
 		
