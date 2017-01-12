@@ -7,10 +7,11 @@ import haxe.zip.Entry;
 import openfl.Assets;
 import flixel.FlxG;
 import openfl.display.BitmapData;
-import sys.io.File;
-import sys.io.FileInput;
 import openfl.utils.ByteArray;
-
+#if !flash
+	import sys.io.File;
+	import sys.io.FileInput;
+#end
 
 class CSAssets
 {

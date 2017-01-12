@@ -43,6 +43,7 @@
 namespace master{
 	share::world world;
 	master::special::grid *grid;
+	config_t config;
 	short view_area[2]={300,300};
 }
 
@@ -225,6 +226,7 @@ int main(int argc,char* argv[]){
 		}
 	}
 #endif
+	config.rsa=new rsa();
 	
 	listenworkers::startAll();
 	socketworkers::startAll();
@@ -254,6 +256,7 @@ int main(int argc,char* argv[]){
 		master::world.new_npcs.push_back(n);
 	}
 */	
+	
 	do{
 		timestamp=share::time(0);
 		tv.timePassed(); //start timer
@@ -496,7 +499,8 @@ int main(int argc,char* argv[]){
 	printf("Listeners cleared\n");
 //	printf("Ask to stop server workers\n");
 	listenworkers::stopAll();
-
+	
+	delete config.rsa;
 	chatsClear();
 	printf("Chats cleared\n");
 	for (auto i:server::all)

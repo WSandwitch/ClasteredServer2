@@ -3,6 +3,7 @@
 
 #include "yaml-cpp/yaml.h"
 #include "object.h"
+#include "world.h"
 
 namespace YAML{
 	

@@ -358,7 +358,8 @@ class Connection{
 										if (!bytesAvailable(p.size))
 											return false;
 										recvPacketData(p);
-									
+//										trace(p);
+										
 										var buf:Bytes = Bytes.ofString("aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbb"); //create Bytes 32 long 
 										buf.blit(0, Base64.decode(p.chanks[0].s), 0, 16); //set first 16 
 										buf.blit(16, Md5.make(Bytes.ofString(pass)), 0, 16); //set second 16

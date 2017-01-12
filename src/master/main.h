@@ -3,9 +3,10 @@
 
 #include "../share/system/log.h"
 #include "storage.h"
+#include "crypto/rsa.h"
 
 namespace master {
-	struct config{
+	struct config_t{
 		log_config log;
 		storage_config storage;
 		short run;
@@ -20,6 +21,9 @@ namespace master {
 			short start_port;
 			short total;
 		}slaves;
-	} config;
+		master::rsa *rsa;
+	};
+	
+	extern config_t config;
 }
 #endif

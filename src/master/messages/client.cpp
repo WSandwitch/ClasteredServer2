@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "../main.h"
 #include "client.h"
 #include "server.h"
 #include "../client.h"
@@ -97,6 +98,8 @@ namespace master {
 							p.setType(MSG_C_AUTH_TOKEN);
 		//					packetAddNumber(p,s);
 							p.add((char*)token, s);
+							
+							p.add(config.rsa->public_key());
 //							std::string ts(token);
 //							p.add(ts); 
 							cl->sock->send(&p);

@@ -3,10 +3,13 @@ package states;
 import clasteredServerClient.Packet;
 import flash.Lib;
 import flash.display.BlendMode;
+import flash.media.ID3Info;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxObject;
 import flixel.group.FlxSpriteGroup;
+import flixel.group.FlxGroup;
 import flixel.FlxState;
 import flixel.system.scaleModes.*;
 import flixel.math.FlxMath;
@@ -19,6 +22,7 @@ import haxe.CallStack;
 import flixel.input.keyboard.FlxKey;
 import input.AbstractInputManager;
 import input.AbstractInputManager.*;
+import input.ScreenGamepad;
 
 using flixel.util.FlxSpriteUtil;
 import flixel.system.macros.FlxMacroUtil;
@@ -27,16 +31,30 @@ import flixel.system.macros.FlxMacroUtil;
  * 
  */
 
- class MapObjects extends FlxSpriteGroup{
+ class MapObjects extends FlxGroup{
 	 
 	 public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	 public var map:Null<TiledLevel> = null;
 	 
-	 public function new(map:String){
+	 public function new(?m:String){
 		 super();
-		 add(map=new TiledLevel(map));
+		 add(map=new TiledLevel(m));
 	 }
 	 
+	 public function set_npc(id:Int, n:Npc){
+		 npcs.set(id, n);
+		 add(n);
+	 }
+	 
+	 public function get_npc(id:Int):Npc{
+		 return npcs.get(id);
+	 }
+	 
+	 public function remove_npc(id:Int){
+		 var n:Null<Npc> = get_npc(id);
+		 remove(n);
+		 npcs.remove(id);
+	 }
  }
  
 class PlayState extends CSState
@@ -58,7 +76,7 @@ class PlayState extends CSState
 
 	///network attrs
 	public var id:Int;
-	public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
+//	public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
 	private var _angle:Float = 0;
@@ -81,7 +99,8 @@ class PlayState extends CSState
 	private static inline var MESSAGE_NPC_REMOVE:Int=5;
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
-	private var map:TiledLevel;
+	private var _map:MapObjects;
+	private var _gamepad:ScreenGamepad;
 	
 	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
 	{
@@ -93,7 +112,11 @@ class PlayState extends CSState
 //				restartLevel();
 		}
 	}
-
+	
+	public function connection_lost(){
+		CSState.connection_lost();
+	}
+	
 	override public function create():Void 
 	{	
 	
@@ -117,8 +140,8 @@ class PlayState extends CSState
 //		FlxNapeSpace.velocityIterations = 5;
 //		FlxNapeSpace.positionIterations = 5;
 
-		map = new TiledLevel();
-		add(map);
+		_map = new MapObjects();
+		add(_map);
 
 //		createFloorTiles();
 //		FlxNapeSpace.createWalls(LEVEL_MIN_X, LEVEL_MIN_Y, LEVEL_MAX_X, LEVEL_MAX_Y);
@@ -163,20 +186,27 @@ class PlayState extends CSState
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
 */
-		
+	#if mobile
+		_gamepad = new ScreenGamepad();
+		add(_gamepad);
+	#end
 		//change to normal mapping
 		var a = actions.addAction(GO_UP);
 		a.addKey(FlxKey.W);
 		a.addKey(FlxKey.UP);
+		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_MINUS);
 		a=actions.addAction(GO_DOWN);
 		a.addKey(FlxKey.S);
 		a.addKey(FlxKey.DOWN);
+		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_PLUS);
 		a=actions.addAction(GO_LEFT);
 		a.addKey(FlxKey.A);
 		a.addKey(FlxKey.LEFT);
+		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_MINUS);
 		a=actions.addAction(GO_RIGHT);
 		a.addKey(FlxKey.D);
 		a.addKey(FlxKey.RIGHT);
+		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_PLUS);
 		a=actions.addAction(ATTACK);
 		a.addMouseKey(MouseID.MOUSE_LEFT);
 	}
@@ -299,8 +329,12 @@ class PlayState extends CSState
 			p.addChar(3);
 			p.addChar(Math.round(actions.value(ATTACK)));
 		}
-		if(npc != null){
-			var angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);
+		if (npc != null){
+			var angle:Float = 0;
+		#if !FLX_NO_MOUSE
+			angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);		
+		#end
+			//add gamepad sngle control
 //			trace(Math.abs(_angle-angle));
 			if (Math.abs(_angle-angle) >= _d_angle){
 				_angle = angle;
@@ -346,12 +380,11 @@ class PlayState extends CSState
 			if (p!=null){
 				switch p.type {
 					case MSG_NPC_UPDATE:
-						var n:Null<Npc> = npcs[p.chanks[0].i];
+						var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 						if (n == null){
 							n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of creen
 							n.id = p.chanks[0].i;
-							npcs[p.chanks[0].i] = n;
-							add(n);
+							_map.set_npc(p.chanks[0].i, n);
 						}
 						n.update_attributes(p);
 					case MESSAGE_NPC_REMOVE:
@@ -360,10 +393,9 @@ class PlayState extends CSState
 							if (npc_id==nid){
 								//player npc add screen you are died
 							}else{
-								var n:Null<Npc> = npcs[nid];
+								var n:Null<Npc> = _map.get_npc(nid);
 								if (n != null){
-									npcs.remove(nid);
-									remove(n);
+									_map.remove_npc(nid);
 									n.destroy();
 									n = null;
 								}
@@ -375,12 +407,11 @@ class PlayState extends CSState
 							switch p.chanks[i].i {
 								case 1:
 									npc_id=p.chanks[++i].i;
-									if (npcs[npc_id] == null){
-										npcs[npc_id] = new Npc(0, 0, 0);
-										npcs[npc_id].id = npc_id;
-										add(npcs[npc_id]);
+									if (_map.get_npc(npc_id) == null){
+										_map.set_npc(npc_id, new Npc(0, 0, 0));
+										_map.get_npc(npc_id).id = npc_id;
 									}
-									npc = npcs[npc_id];
+									npc = _map.get_npc(npc_id);
 									FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
 									i++;
 							}
