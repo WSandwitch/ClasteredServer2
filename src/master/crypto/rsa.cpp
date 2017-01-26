@@ -6,15 +6,16 @@
 
 namespace master{
 
-	int rsa::padding=RSA_PKCS1_OAEP_PADDING;
+	int rsa::padding=RSA_PKCS1_PADDING;//RSA_NO_PADDING;//RSA_PKCS1_OAEP_PADDING;
 	
 	rsa::rsa(int kBits, int kExp){
 		struct {
 			int $1;
 			timestamp_t $2;
-		} tokenbase={rand(), time(0)};
+		} tokenbase={rand(), share::time(0)};
 		RAND_seed(&tokenbase, sizeof(tokenbase));
-		_rsa = RSA_generate_key(kBits, kExp, 0, 0);
+		
+		_rsa = RSA_generate_key(kBits, kExp?:7, 0, 0); 
 	}
 	
 	rsa::~rsa(){
@@ -23,7 +24,8 @@ namespace master{
 	
 	std::string rsa::public_key(){
 		BIO *bio = BIO_new(BIO_s_mem());
-		PEM_write_bio_RSAPublicKey(bio, _rsa);
+		PEM_write_bio_RSA_PUBKEY(bio, _rsa);
+		//PEM_write_bio_RSAPublicKey(bio, _rsa);
 
 		int keylen = BIO_pending(bio);
 		char *pem_key = (char*)calloc(keylen+1, 1); /* Null-terminate */
@@ -55,6 +57,20 @@ namespace master{
 		return RSA_size(_rsa);
 	}
 	
+	std::string rsa::get_e(){
+		char *str = BN_bn2hex(_rsa->e);
+		std::string s(str);
+		OPENSSL_free(str);
+		return s;
+	}
+	
+	std::string rsa::get_n(){
+		char *str = BN_bn2hex(_rsa->n);
+		std::string s(str);
+		OPENSSL_free(str);
+		return s;
+	}
+	
 	int rsa::encrypt(int size, const void* input, void* output){
 		return RSA_public_encrypt(
 			size, 
@@ -66,13 +82,21 @@ namespace master{
 	}
 	
 	int rsa::decrypt(int size, const void* input, void* output){
-		return RSA_private_decrypt(			
+		int o=RSA_private_decrypt(			
 			size, 
 			(const unsigned char*)input, 
 			(unsigned char*)output, 
 			_rsa, 
 			padding
 		);
+		if(o<0){
+			char* err=(char*)malloc(130);
+			ERR_load_crypto_strings();
+			ERR_error_string(ERR_get_error(), err);
+			printf("%s\n", err);
+			free(err);
+		}
+		return o;
 	}
 	
 }

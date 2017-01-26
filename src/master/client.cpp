@@ -94,11 +94,11 @@ namespace master {
 	client* client::get(int id){
 		client *c=0;
 		m.lock();
-			auto i=all.find(id);
-			if (i!=all.end())
-				c=i->second;
-			if (c!=0 && c->broken)
-				c=0;
+			try{
+				c=all.at(id);
+				if (c->broken)
+					c=0;
+			}catch(...){}
 		m.unlock();
 		return c;
 	}
@@ -230,7 +230,8 @@ namespace master {
 		id=u->id;
 		sprintf(name,"%s",u->name);
 		sprintf(login,"%s",u->login);
-		share::base64::decode((unsigned char*)u->passwd, (unsigned char*)passwd, strlen(u->passwd));
+		sprintf(passwd,"%s",u->passwd);
+//		share::base64::decode((unsigned char*)u->passwd, (unsigned char*)passwd, strlen(u->passwd));
 		//add other
 		return 0;
 	}

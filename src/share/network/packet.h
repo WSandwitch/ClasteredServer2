@@ -50,6 +50,8 @@ namespace share {
 			bool add(std::string);
 			bool add(char*, short);
 			bool add(void*, short size);
+			template<class T>
+				bool operator<<(T o){return add(o);}
 		private: 
 			std::vector<char> buf;
 			

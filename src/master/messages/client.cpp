@@ -47,40 +47,34 @@ namespace master {
 	//AUTH
 	static void *message_MESSAGE_AUTH(client*cl, packet* _p){
 		FILE* f=_p->stream();
-		char c;
-		int size;
 		short s;
-		char buf[100];
 		printf("client auth\n");
-		if (f){	
-			size=fread(&c,1,sizeof(c),f);//
+		if (_p->chanks.size()>=2){	
+//			size=fread(&c,1,sizeof(c),f);//
 //			printf("%d\n",c);
-			size=fread(&c,1,sizeof(c),f);
+//			size=fread(&c,1,sizeof(c),f);
 //			printf("%d\n",c);
-			size=fread(&c,1,sizeof(c),f);
-			size=fread(&c,1,sizeof(c),f);
+//			size=fread(&c,1,sizeof(c),f);
+//			size=fread(&c,1,sizeof(c),f);
 //			printf("%d\n",c);
 			do{
-				if (c==1){
+				if (_p->chanks[0].value.c==1){
 					user_info u;
-					size=fread(&c,1,sizeof(c),f);
-					if (c==6){
-						size=fread(&s,1,sizeof(s),f);//size
-						for(size=s;size>0;){//must read full string
-							size-=fread(buf+(s-size),1,size,f);//name, s elements of 1 byte
-						}
-						buf[s]=0;
+//					size=fread(&c,1,sizeof(c),f);
+					if (_p->chanks[1].type==6){
+//						size=fread(&s,1,sizeof(s),f);//size
+//						for(size=s;size>0;){//must read full string
+//							size-=fread(buf+(s-size),1,size,f);//name, s elements of 1 byte
+//						}
+//						buf[s]=0;
+						auto &login=_p->chanks[1].str;
+						printf("login got %s\n", login.data());
 						//find client by login
-						if(storageUserByLogin(buf, &u)==0){//if we found user
+						if(storageUserByLogin((char*)login.c_str(), &u)==0){//if we found user
 							client* _cl=0;
-							struct {
-								int $1;
-								timestamp_t $2;
-							} tokenbase={rand(), share::time(0)};//uniq token
-							char token[100];
 							cl->set_info(&u);
 							cl->conn_type=CLIENT_CONN_SOCKET;
-							fclose(f);
+//							fclose(f);
 							if((_cl=client::get(cl->id))!=0){//already signed in
 								if (withLock(_cl->mutex, _cl->broken)){
 									client::remove(_cl);
@@ -92,14 +86,12 @@ namespace master {
 								}
 							}
 							client::add(cl);
-							share::MD5::create((char*)&tokenbase, sizeof(tokenbase), cl->token); //add normal token
-							s=share::base64::encode((unsigned char*)cl->token, (unsigned char*)token,16, 0);
 							packet p;
 							p.setType(MSG_C_AUTH_TOKEN);
 		//					packetAddNumber(p,s);
-							p.add((char*)token, s);
 							
-							p.add(config.rsa->public_key());
+							p.add(config.rsa->get_n());
+							p.add(config.rsa->get_e());
 //							std::string ts(token);
 //							p.add(ts); 
 							cl->sock->send(&p);
@@ -108,33 +100,39 @@ namespace master {
 						}
 					}
 					printf("Not correct message\n");
-				}else if(c==2){
-					size=fread(&c,sizeof(c),1,f);
+				}else if(_p->chanks[0].value.c==2){
+//					size=fread(&c,sizeof(c),1,f);
 	//				printf("%d\n",c);
-					if (c==6){
-						size=fread(&s,sizeof(s),1,f);//size
-						size=fread(buf,1,s,f);//hash
-						buf[s]=0;
-						char token[100];
-						char md5[20];
-						memcpy(token, cl->token, 16);
-						memcpy(token+16, cl->passwd, 16);
-						share::MD5::create((char*)token, 32, md5); 
-						s=share::base64::encode((unsigned char*)md5, (unsigned char*)token, 16, 0);
-						printf("token must be %s got %s\n", token, buf);
-						if (strcmp(buf,token)==0){//add normal token check
-							//auth ok
-							fclose(f);
-							packet p;
-							p.setType(MSG_C_USER_INFO);
-							p.add(cl->id);
-							//packetAddString(p, cl->name);
-							//add other params
-							cl->sock->send(&p);
-//							cl->messages_add(new client_message(p.data(), p.size()));
-							///set npc data and add npc to world
-							npc *n=new npc(&master::world, master::world.getId());
-							if (n){
+					if (_p->chanks[1].type==6){
+//						size=fread(&s,sizeof(s),1,f);//size
+//						size=fread(buf,1,s,f);//hash
+//						buf[s]=0;
+						try{
+							std::string pass("");
+							auto &&str=_p->chanks[1].str;
+							char *pbuf=new char[str.size()*2];
+							memset(pbuf, 0, sizeof(char)*str.size()*2);
+							s=share::base64::decode((unsigned char*)str.c_str(), (unsigned char*)pbuf, str.size());
+							char *pout=new char[s+1];
+							memset(pout, 0, sizeof(char)*(s+1));
+							s=config.rsa->decrypt(s-1, pbuf, pout);
+							pass+=pout;
+//							printf("passwd len %d %s %s\n", s, pout, pass.data());
+							delete[] pout;
+							delete[] pbuf;
+							if (pass==std::string(cl->passwd)){//add normal token check
+								//auth ok
+	//							fclose(f);
+								packet p;
+								p.setType(MSG_C_USER_INFO);
+								p.add(cl->id);
+								//packetAddString(p, cl->name);
+								//add other params
+								cl->sock->send(&p);
+	//							cl->messages_add(new client_message(p.data(), p.size()));
+								///set npc data and add npc to world
+							
+								npc *n=new npc(&master::world, master::world.getId());
 								cl->npc_id=n->id;
 								n->owner_id=cl->id;
 								master::world.npcs_m.lock();
@@ -148,7 +146,7 @@ namespace master {
 								cl->sock->send(&p);
 								break;
 							}
-						}
+						}catch(...){}
 					}
 					printf("token Error\n");
 				}

@@ -183,7 +183,7 @@ namespace share {
 	}
 	
 	bool packet::add(std::string a){
-		add((char*)a.data(), a.size());
+		add((char*)a.c_str(), a.size());
 		return 0;
 	}
 	
@@ -239,7 +239,7 @@ namespace share {
 					memcpy(&$, &buf[++i], sizeof($));
 					$=byteSwap($);
 					i+=sizeof($);
-					chank.str.assign(buf[i], $);
+					chank.str.assign(&buf[i], $);
 					i+=$;
 					chanks.push_back(chank);
 					break;

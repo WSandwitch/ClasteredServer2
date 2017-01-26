@@ -10,6 +10,7 @@ class CSGame extends FlxGame
 	public var pass:Null<String> = null;
 	
 	public function connection_lost(){
+		connection.close();
 		FlxG.switchState(new LoginState());
 	}
 	

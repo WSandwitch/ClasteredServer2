@@ -2,6 +2,8 @@ package clasteredServerClient;
 
 
 import clasteredServerClient.Packet.Chank;
+import com.hurlant.util.ByteArray;
+import haxe.CallStack;
 import haxe.io.Bytes;
 import haxe.io.BytesBuffer;
 import haxe.io.BytesOutput;
@@ -24,6 +26,9 @@ import java.vm.Thread;
 #elseif flash
 #end
 
+import com.hurlant.crypto.rsa.RSAKey;
+import com.hurlant.util.Hex;
+import com.hurlant.util.der.PEM;
 
 class Connection{
 	private var sock:Null<Socket> = null;
@@ -102,6 +107,10 @@ class Connection{
 			t.sendMessage(fail);
 		#end
 		}
+	}
+	
+	public function close(){
+		sock.close();
 	}
 	
 	public function bytesAvailable(size:UInt):Bool{
@@ -345,7 +354,7 @@ class Connection{
 						p.addChar(1);//first stage
 						p.addString(login);
 						sendPacket(p);
-						
+//						trace(p);
 						p.init();
 						repeater(function(){
 							try{
@@ -359,21 +368,27 @@ class Connection{
 											return false;
 										recvPacketData(p);
 //										trace(p);
+
 										
-										var buf:Bytes = Bytes.ofString("aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbb"); //create Bytes 32 long 
-										buf.blit(0, Base64.decode(p.chanks[0].s), 0, 16); //set first 16 
-										buf.blit(16, Md5.make(Bytes.ofString(pass)), 0, 16); //set second 16
-										var password:String = Base64.encode(Md5.make(buf));//md5(salt+pass)
+										var rsa:RSAKey = RSAKey.parsePublicKey(p.chanks[0].s, p.chanks[1].s);//exit on rsa error
+//										trace(rsa.dump());
+										var src:ByteArray=Hex.toArray(Hex.fromString(pass));
+										var out:ByteArray=new ByteArray();
+										rsa.encrypt(src, out, src.length);
+//										trace(out);
+										
 										p.init();
 										p.type = 1;
 										p.addChar(2);
-										p.addString(password);
+										p.addString(Base64.encode(out.getBytes()));
 										sendPacket(p);
+										
+//										trace(p);
 										
 										p.init();
 										p.type = 50;
 										p.addChar(2);
-										p.addString(password);
+										p.addString("rdffygtf");
 										sendPacket(p);
 										
 										p.init();
@@ -390,22 +405,34 @@ class Connection{
 														recvPacketData(p);
 													
 														f(p.chanks[0].i);
-													}catch(e:Dynamic){}
+													}catch (e:Dynamic){
+														trace(e);
+													}
 													return true;
 												});
-											}catch(e:Dynamic){}
+											}catch (e:Dynamic){
+												trace(e);
+											}
 											return true;
 										});
-									}catch(e:Dynamic){}
+									}catch (e:Dynamic){
+										trace(e, CallStack.exceptionStack());
+									}
 									return true;
 								});
-							}catch(e:Dynamic){}
+							}catch (e:Dynamic){
+								trace(e);
+							}
 							return true;
 						});
-					}catch(e:Dynamic){}
+					}catch (e:Dynamic){
+						trace(e);
+					}
 					return true;
 				});
-			}catch(e:Dynamic){}
+			}catch (e:Dynamic){
+				trace(e);
+			}
 			return true;
 		});
 	}

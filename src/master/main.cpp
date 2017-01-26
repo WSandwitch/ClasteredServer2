@@ -226,7 +226,13 @@ int main(int argc,char* argv[]){
 		}
 	}
 #endif
+	printf("generating rsa key\n");
 	config.rsa=new rsa();
+	printf("rsa key created\n");
+	
+//	printf("%s\n",config.rsa->get_e().data());
+//	printf("%s\n",config.rsa->get_n().data());
+//	return 0;
 	
 	listenworkers::startAll();
 	socketworkers::startAll();
