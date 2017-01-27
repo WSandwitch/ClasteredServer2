@@ -37,7 +37,8 @@
 #include "../share/messages.h"
 #include "../slave/main.h"
 
-#define CONFIG_FILE "config.cfg"
+#define CONFIG_FILE "../config/config.cfg"
+#define CONFIG_FOLDER "../config/"
 
 
 namespace master{
@@ -57,7 +58,7 @@ static int readConfig(){
 	FILE* f;
 	if ((f=fopen(CONFIG_FILE,"rt"))==0){
 		printf("cant open %s, using defaults\n",CONFIG_FILE);
-		sprintf(config.storage.file, "%s", "storage.txt");//set default
+		sprintf(config.storage.file, "%s%s",CONFIG_FOLDER, "storage.txt");//set default
 		config.log.debug=1;
 		return 1;
 	}
@@ -101,7 +102,9 @@ static int readConfig(){
 			fscanf(f, "%hd", &config.listenworkers.total);
 		}else
 		if (strcmp(buf, "storage_config")==0){
-			fscanf(f, "%s", config.storage.file);
+			char $[100];
+			fscanf(f,"%s", $);
+			sprintf(config.storage.file, "%s%s", CONFIG_FOLDER, $);
 		}else
 		if (strcmp(buf, "log_file")==0){
 			fscanf(f, "%s", config.log.file);

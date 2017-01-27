@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "map.h"
+#include "system/log.h"
 #include "NLTmxMap/NLTmxMap.h"
 
 namespace share{
@@ -29,14 +30,14 @@ namespace share{
 		return buffer;
 	}
 	
-	map::map(int x, int y): offset(50){
+	map::map(int x, int y, char* path): offset(50){
 		cell.x=x;
 		cell.y=y;
 //		grid=0;
 		map_size[0]=200;
 		map_size[1]=200;
 		clean_segments();
-		reconfigure();
+		reconfigure(path);
 	}
 	
 	map::~map(){
@@ -53,8 +54,8 @@ namespace share{
 		segments.clear();
 	}
 	
-	void map::reconfigure(){
-		char * xml = (char*) loadFile( "data/map.tmx", true );
+	void map::reconfigure(char* path){
+		char * xml = (char*) loadFile( path, true );
 		if (xml){
 			NLTmxMap* map = NLLoadTmxMap( xml );
 			//fill data
@@ -74,6 +75,8 @@ namespace share{
 			}
 			delete map;
 			free(xml);
+		}else{
+			printf("Can't loadFile map %s\n", path);
 		}
 //		if (grid)
 //			delete[] grid;

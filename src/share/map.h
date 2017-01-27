@@ -35,7 +35,7 @@ namespace share {
 			int map_size[2];
 			int offset;
 		
-			map(int x=10, int y=10);
+			map(int x=10, int y=10, char *path="../maps/map.tmx");
 			~map();
 			share::cell* cells(int id);
 			share::cell* cells(point &p);
@@ -48,7 +48,7 @@ namespace share {
 			int to_grid_y(typeof(point::y) y);
 			int id_to_x(int id);
 			int id_to_y(int id);
-			void reconfigure();
+			void reconfigure(char* path);
 			std::vector<segment> cell_borders(int id);
 			std::list<int> near_cells(int id, typeof(npc::r) r);
 			std::list<int> near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r);

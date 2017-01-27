@@ -17,8 +17,8 @@
 ╚══════════════════════════════════════════════════════════════╝
 */
 
-#define SLAVES_FILE_DEFAULT "storage/slaves.txt"
-#define USERS_FILE_DEFAULT "storage/users.txt"
+#define SLAVES_FILE_DEFAULT "../storage/slaves.txt"
+#define USERS_FILE_DEFAULT "../storage/users.txt"
 	namespace master {
 	struct files_config {
 		char users[100];
@@ -46,16 +46,19 @@
 		FILE* f;
 		if (conf->file[0]!=0 && ((f=fopen(conf->file, "rt"))!=0)){
 			while(feof(f)==0){
-				char buf[100];
+				char buf[100], $[100];
 				fscanf(f,"%s",buf);
 				if (strcmp(buf,"users_file")==0){
-					fscanf(f, "%s", files.users);
+					fscanf(f, "%s", $);
+					sprintf(files.users, "../%s", $);
 				}else
 				if (strcmp(buf,"slaves_file")==0){
-					fscanf(f, "%s", files.slaves);
+					fscanf(f, "%s", $);
+					sprintf(files.slaves, "../%s", $);
 				}
 				if (strcmp(buf,"attributes_path")==0){
-					fscanf(f, "%s", files.attributes);
+					fscanf(f, "%s", $);
+					sprintf(files.attributes, "../%s", $);
 				}
 			}
 			fclose(f);

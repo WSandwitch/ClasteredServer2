@@ -19,7 +19,7 @@ import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxSpriteUtil;
 import haxe.io.Path;
-import openfl.Assets;
+import util.CSAssets;
 
 /**
  * 
@@ -30,7 +30,7 @@ class TiledLevel extends FlxTilemap{
 	{
 		super();
 		if (map == null)
-			map = "assets/map.tmx";
+			map = "assets/maps/map.tmx";
 		var tiledmap:TiledMap = new TiledMap(map);
 
 		FlxG.camera.setScrollBoundsRect(0, 0, tiledmap.fullWidth, tiledmap.fullHeight, true);
@@ -48,7 +48,7 @@ class TiledLevel extends FlxTilemap{
 						fr.push(bm_blank); //fill missed tile images
 				}
 				if (ts.tileImagesSources == null){
-					var bitmap:Null<BitmapData> = Assets.getBitmapData(ts.imageSource);
+					var bitmap:Null<BitmapData> = CSAssets.getBitmapData((~/^(..\/)+/).replace(ts.imageSource,""));
 					if (bitmap == null){
 						bitmap = bm_blank;
 						for (i in 1...ts.numTiles)
@@ -68,7 +68,7 @@ class TiledLevel extends FlxTilemap{
 				}else{
 					for (t in ts.tileImagesSources){
 						if (t != null){
-							var bitmap:Null<BitmapData> = Assets.getBitmapData(t.source);
+							var bitmap:Null<BitmapData> = CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""));
 							if (bitmap == null)
 								bitmap = bm_blank;
 							fr.push(bitmap);

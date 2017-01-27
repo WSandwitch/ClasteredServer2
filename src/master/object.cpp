@@ -119,7 +119,7 @@ namespace master{
 	object_initializer::object_initializer(){
 		object $;
 		$.init_attrs();
-		YAML::Node config = YAML::LoadFile("data/objects.yml");
+		YAML::Node config = YAML::LoadFile("../data/objects.yml");
 		//get original attrs
 		if (config.IsSequence()){
 			for (auto e: config){

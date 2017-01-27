@@ -59,13 +59,13 @@ endif
 all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
 	
 $(PUBLIC): $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS)
-	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(DEFINES) $(SLAVE_OBJECTS) $(LDFLAGS) -lcrypto -o $@
+	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(DEFINES) $(SLAVE_OBJECTS) $(LDFLAGS) -lcrypto -o bin/$@
 
 $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS) 
-	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(DEFINES) $(LDFLAGS) -o $@
+	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(DEFINES) $(LDFLAGS) -o bin/$@
 
 $(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(OBJDIR)/src/slave_main.o
-	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o $@
+	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o bin/$@
 
 $(OBJDIR)/%.o: %.c 
 	@mkdir -p $(@D)
@@ -84,4 +84,4 @@ $(PUBLIC)_fast:
 	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) -o $(PUBLIC)
 
 clean:
-	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(PUBLIC) $(TEST) $(PUBLIC).exe $(SLAVE) $(SLAVE).exe $(TEST).exe generator.exe generator src/slave_main.o
+	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) bin/* src/slave_main.o
