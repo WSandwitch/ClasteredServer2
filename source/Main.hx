@@ -1,10 +1,6 @@
 package;
 
 import states.LoginState;
-import clasteredServerClient.Connection;
-import clasteredServerClient.Receiver;
-import clasteredServerClient.Packet;
-import flixel.FlxGame;
 import openfl.display.Sprite;
 
 import flixel.FlxG;
@@ -16,18 +12,28 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
-		addChild(new CSGame(640, 480, LoginState));
-		
+	#if mobile
+		addChild(new CSGame(0, 0, LoginState));
+	#else
+		//add load saved screen size
+		addChild(new CSGame(720, 560, LoginState));
+		FlxG.resizeWindow(FlxG.width, FlxG.height);
+	#end
 		FlxG.autoPause = false;
 		//FlxG.fixedTimestep = false;
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(1024,768);
+		FlxG.scaleMode = new BorderedStageSizeScaleMode();//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
 		//read config and setup
 	#if desktop
-		FlxG.resizeGame(800, 600);
-		FlxG.resizeWindow(800, 600);
-//		FlxG.camera.setSize(800, 600);
+		//you can resize window on fly
+//		FlxG.resizeGame(1024, 800);
+//		FlxG.resizeWindow(1024, 800);
+//		FlxG.camera.setSize(1024, 800);
 	#end
 		//FlxG.fullscreen = true;
 		//FlxG.switchState(new PlayState());
+	#if (mobile && debug)
+		FlxG.log.redirectTraces = true;
+		FlxG.debugger.visible = true;
+	#end
 	}
 }

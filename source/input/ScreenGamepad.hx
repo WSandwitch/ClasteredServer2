@@ -14,6 +14,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxAnalog;
 
+import openfl.system.Capabilities;
 import openfl.events.JoystickEvent;
 import flixel.input.gamepad.FlxGamepad.FlxGamepadModel;
 import flixel.input.gamepad.id.XInputID;
@@ -74,6 +75,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	private var _offset:FlxPoint = new FlxPoint();
 	private var _random:FlxRandom = new FlxRandom();
 	private var _ids:Array<Int> = [];
+	private var _scale_dpi:Float = 1;
 	/**
 	 * Create a gamepad which contains 4 directional buttons and 4 action buttons, and 2 analog sticks.
 	 * 
@@ -88,9 +90,13 @@ class ScreenGamepad extends FlxSpriteGroup{
 		_ids.push(id);
 		if (buttonSize==null)
 			buttonSize = new FlxPoint(32, 32);
+	#if mobile
+		_scale_dpi = Capabilities.screenDPI / 125; //125 - default dpi
+	#end
+
+		_buttonSize = new FlxPoint(Math.round(buttonSize.x*_scale_dpi), Math.round(buttonSize.y*_scale_dpi));
 		if (offset==null)
-			offset = new FlxPoint(buttonSize.x*0.7, buttonSize.y*0.7);
-		_buttonSize = buttonSize;
+			offset = new FlxPoint(_buttonSize.x*0.7, _buttonSize.y*0.7);
 		_offset = offset;
 		if (M == null)
 			M = XBOX;		
@@ -107,7 +113,8 @@ class ScreenGamepad extends FlxSpriteGroup{
 		var button_sprites = ["up","down","left","right","a","b","x","y","back","start"];	
 		var names = ["normal", "highlight", "pressed"];	
 		for (sprite_f in button_sprites){
-			_frames[sprite_f]=FlxTileFrames.fromGraphic(FlxG.bitmap.add('assets/gamepad/${sprite_f}.png'), _buttonSize);
+			var bmd = FlxG.bitmap.add('assets/gamepad/${sprite_f}.png');
+			_frames[sprite_f]=FlxTileFrames.fromGraphic(bmd, new FlxPoint(bmd.height/3,bmd.height/3));
 			for( i in 0...3){
 				_frames[sprite_f].frames[i].name = names[i];
 			}
@@ -149,12 +156,16 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogLeft.base.y += analogLeft.base.height / 2;
 		analogLeft.base.frames = base_sprite.frames;
 		analogLeft.base.resetSizeFromFrame();
+		analogLeft.base.scale.set(_scale_dpi, _scale_dpi);
+		analogLeft.base.updateHitbox();
 		analogLeft.base.x -= analogLeft.base.width / 2;
 		analogLeft.base.y -= analogLeft.base.height / 2;
 		analogLeft.thumb.x += analogLeft.thumb.width / 2;
 		analogLeft.thumb.y += analogLeft.thumb.height / 2;
 		analogLeft.thumb.frames = thumb_sprite.frames;
 		analogLeft.thumb.resetSizeFromFrame();
+		analogLeft.thumb.scale.set(_scale_dpi, _scale_dpi);
+		analogLeft.thumb.updateHitbox();
 		analogLeft.thumb.x -= analogLeft.thumb.width / 2;
 		analogLeft.thumb.y -= analogLeft.thumb.height / 2;
 		analogLeft.exists = false;
@@ -168,12 +179,16 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogRight.base.y += analogRight.base.height / 2;
 		analogRight.base.frames = base_sprite.frames;
 		analogRight.base.resetSizeFromFrame();
+		analogRight.base.scale.set(_scale_dpi, _scale_dpi);
+		analogRight.base.updateHitbox();
 		analogRight.base.x -= analogRight.base.width / 2;
 		analogRight.base.y -= analogRight.base.height / 2;
 		analogRight.thumb.x += analogRight.thumb.width / 2;
 		analogRight.thumb.y += analogRight.thumb.height / 2;
 		analogRight.thumb.frames = thumb_sprite.frames;
 		analogRight.thumb.resetSizeFromFrame();
+		analogRight.thumb.scale.set(_scale_dpi, _scale_dpi);
+		analogRight.thumb.updateHitbox();
 		analogRight.thumb.x -= analogRight.thumb.width / 2;
 		analogRight.thumb.y -= analogRight.thumb.height / 2;
 		analogRight.onPressed = drag_handler;
@@ -181,9 +196,10 @@ class ScreenGamepad extends FlxSpriteGroup{
 		add(analogRight);
 		
 		if (_radius == 0)
-			_radius = (analogLeft.base.width)/2;
+			_radius = _scale_dpi*(analogLeft.base.width)/2;
 		
 		setMode(M);
+		setAlpha(0.5);
 	}
 
 	override public function destroy():Void{
@@ -204,60 +220,67 @@ class ScreenGamepad extends FlxSpriteGroup{
 	
 	public function setMode(M:FlxMode){
 //		trace(M);
+	#if mobile
+		var w = FlxG.width;
+		var h = FlxG.height;
+	#else
+		var w = FlxG.camera.width;
+		var h = FlxG.camera.height;
+	#end
 		var buttons_shift:FlxPoint = new FlxPoint(_distanse.x / 2 + _buttonSize.x, _distanse.y / 2 + _buttonSize.y);
 		switch (M){
 			//TODO: add inverse modes (as it has angle=180)
 			case XBOX:
 				dPad.exists = true;
 				dPad.x = (buttons_shift.x + _offset.x); 
-				dPad.y = FlxG.height - (buttons_shift.y + _offset.y);
+				dPad.y = h - (buttons_shift.y + _offset.y);
 				actions.exists = true;
-				actions.x = FlxG.width - (buttons_shift.x + _offset.x);
-				actions.y = FlxG.height - (_radius + _offset.y)*2 - buttons_shift.y;
+				actions.x = w - (buttons_shift.x + _offset.x);
+				actions.y = h - (_radius + _offset.y)*2 - buttons_shift.y;
 				analogLeft.exists = true;
 				analogLeft.x = (buttons_shift.x + _offset.x);
-				analogLeft.y = FlxG.height - (buttons_shift.y + _offset.y) * 2 - _radius;
+				analogLeft.y = h - (buttons_shift.y + _offset.y) * 2 - _radius;
 				analogRight.exists = true;
-				analogRight.x = FlxG.width - (buttons_shift.x + _offset.x);
-				analogRight.y = FlxG.height - (_radius + _offset.y);
+				analogRight.x = w - (buttons_shift.x + _offset.x);
+				analogRight.y = h - (_radius + _offset.y);
 			case PS:
 				dPad.exists = true;
 				dPad.x = (buttons_shift.x + _offset.x); 
-				dPad.y = FlxG.height - (_radius + _offset.y)*2 - buttons_shift.y;
+				dPad.y = h - (_radius + _offset.y)*2 - buttons_shift.y;
 				actions.exists = true;
-				actions.x = FlxG.width - (buttons_shift.x + _offset.x);
-				actions.y = FlxG.height - (_radius + _offset.y)*2 - (buttons_shift.y);
+				actions.x = w - (buttons_shift.x + _offset.x);
+				actions.y = h - (_radius + _offset.y)*2 - (buttons_shift.y);
 				analogLeft.exists = true;
 				analogLeft.x = (buttons_shift.x + _offset.x);
-				analogLeft.y = FlxG.height - (_radius + _offset.y);
+				analogLeft.y = h - (_radius + _offset.y);
 				analogRight.exists = true;
-				analogRight.x = FlxG.width - (buttons_shift.x + _offset.x);
-				analogRight.y = FlxG.height - (_radius + _offset.y);
+				analogRight.x = w - (buttons_shift.x + _offset.x);
+				analogRight.y = h - (_radius + _offset.y);
 			case SIMPLE:
 				dPad.exists = false;
 				actions.exists = true;
-				actions.x = FlxG.width - (buttons_shift.x + _offset.x);
-				actions.y = FlxG.height - (buttons_shift.y + _offset.y);
+				actions.x = w - (buttons_shift.x + _offset.x);
+				actions.y = h - (buttons_shift.y + _offset.y);
 				analogLeft.exists = true;
 				analogLeft.x = (buttons_shift.x + _offset.x);
-				analogLeft.y = FlxG.height - (buttons_shift.y + _offset.y);
+				analogLeft.y = h - (buttons_shift.y + _offset.y);
 				analogRight.exists = false;
 			case ANALOG:
 				dPad.exists = false;
 				actions.exists = false;
 				analogLeft.exists = true;
 				analogLeft.x = (buttons_shift.x + _offset.x);
-				analogLeft.y = FlxG.height - (buttons_shift.y + _offset.y);
+				analogLeft.y = h - (buttons_shift.y + _offset.y);
 				analogRight.exists = true;
-				analogRight.x = FlxG.width - (buttons_shift.x + _offset.x);
-				analogRight.y = FlxG.height - (buttons_shift.y + _offset.y);
+				analogRight.x = w - (buttons_shift.x + _offset.x);
+				analogRight.y = h - (buttons_shift.y + _offset.y);
 			case SNES:
 				dPad.exists = true;
 				dPad.x = (buttons_shift.x + _offset.x); 
-				dPad.y = FlxG.height - (buttons_shift.y + _offset.y);
+				dPad.y = h - (buttons_shift.y + _offset.y);
 				actions.exists = true;
-				actions.x = FlxG.width - (buttons_shift.x + _offset.x);
-				actions.y = FlxG.height - (buttons_shift.y + _offset.y);
+				actions.x = w - (buttons_shift.x + _offset.x);
+				actions.y = h - (buttons_shift.y + _offset.y);
 				analogLeft.exists = false;
 				analogRight.exists = false;
 			case _:
@@ -282,6 +305,8 @@ class ScreenGamepad extends FlxSpriteGroup{
 		var button = new FlxButton(X, Y);
 		button.frames = _frames[Graphic];
 		button.resetSizeFromFrame();
+		button.scale.set(_scale_dpi, _scale_dpi);
+		button.updateHitbox();
 		button.solid = false;
 		button.immovable = true;
 		button.scrollFactor.set();

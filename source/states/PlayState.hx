@@ -108,7 +108,8 @@ class PlayState extends CSState
 		{
 			case FlxKey.ESCAPE:
 				trace("back button");
-//				e.stopImmediatePropagation();
+				e.stopImmediatePropagation();
+				//TODO: add show menu
 //				restartLevel();
 		}
 	}
@@ -122,10 +123,10 @@ class PlayState extends CSState
 	
 		FlxG.stage.addEventListener(openfl.events.KeyboardEvent.KEY_UP, checkKeyBack);
 
-		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
-		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
-		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
-		LEVEL_MAX_Y = FlxG.stage.stageHeight * 1.5;
+//		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
+//		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
+//		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
+//		LEVEL_MAX_Y = FlxG.stage.stageHeight * 1.5;
 		
 		super.create();
 		game = cast FlxG.game;
@@ -143,22 +144,6 @@ class PlayState extends CSState
 		_map = new MapObjects();
 		add(_map);
 
-//		createFloorTiles();
-//		FlxNapeSpace.createWalls(LEVEL_MIN_X, LEVEL_MIN_Y, LEVEL_MAX_X, LEVEL_MAX_Y);
-		// Walls border.
-//		add(new FlxSprite(-FlxG.width / 2, -FlxG.height / 2, "assets/Border.png"));
-		
-		// Player orb
-		//orbShadow = new FlxSprite(FlxG.width / 2, FlxG.height / 2, "assets/OrbShadow.png");
-		//orbShadow.centerOffsets();
-		//orbShadow.blend = BlendMode.MULTIPLY;
-		
-		//orb = new Npc(FlxG.width / 2, FlxG.height / 2, 1);
-		
-		//add(orbShadow);
-		//add(orb);
-		
-		//orb.shadow = orbShadow;
 
 		hud = new HUD();
 		add(hud);
@@ -171,9 +156,11 @@ class PlayState extends CSState
 		overlayCamera = new FlxCamera(0, 0, 640, 720);
 		overlayCamera.bgColor = FlxColor.TRANSPARENT;
 		overlayCamera.follow(deadzoneOverlay);
+		overlayCamera.antialiasing=true;
 		FlxG.cameras.add(overlayCamera);
 		add(deadzoneOverlay);
 		
+		FlxG.camera.antialiasing=true;
 		
 //		FlxG.camera.setScrollBoundsRect(LEVEL_MIN_X, LEVEL_MIN_Y,
 //			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X), LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y), true);

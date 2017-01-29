@@ -171,10 +171,10 @@ int main(int argc,char* argv[]){
 	config.serverworkers.total=1;
 	config.socketworkers.total=1;
 	config.listenworkers.total=1;
-	config.serverworkers.tps=1;
-	config.socketworkers.tps=1;
-	config.listenworkers.tps=3;
-	config.tps=24;
+	config.serverworkers.tps=10;
+	config.socketworkers.tps=10;
+	config.listenworkers.tps=10;
+	config.tps=28;
 	config.log.debug=1;
 	config.slaves.total=0;
 	config.slaves.start_port=12300;

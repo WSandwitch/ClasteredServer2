@@ -9,6 +9,7 @@
 #include "npc.h"
 #include "math/segment.h"
 
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 extern "C"{
 
