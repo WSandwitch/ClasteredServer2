@@ -55,7 +55,16 @@ namespace share {
 //		printf("%g %g | %g %g\n",(p.x-this->a.x),(p.y-this->a.y),(this->b.x-this->a.x),(this->b.y-this->a.y));
 		return (this->b.x-this->a.x)*(p.y-this->a.y)-(this->b.y-this->a.y)*(p.x-this->a.x);
 	}
-		
+	
+	typeof(segment::a) segment::to_vector(){
+		typeof(segment::a) out(b.x+-a.x, b.y-a.y);
+		return out;
+	}
+	
+	typeof(segment::a) segment::rand_point_in(){
+		typeof(segment::a) out(a.x+((rand()%((int)(b.x*10000)+1))/10000.0), a.y+((rand()%((int)(b.y*10000)+1))/10000.0));
+		return out;
+	}
 }
 
 namespace std {

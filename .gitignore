@@ -3,6 +3,7 @@
 /master
 /slave
 /client/export
+/assets/*.png
 
 # Compiled Object files
 *.slo

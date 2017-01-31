@@ -75,13 +75,10 @@ $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	$(GCC) -c $(CPPFLAGS) $(DEFINES) $(HEADERS) $< -o $@
 	
-generator: 
-	$(GCC) $(SRC)/other/password_generator.c $(SRC)/share/md5.c $(SRC)/share/base64.c -o generator
-
 fast: $(PUBLIC)_fast
 	
 $(PUBLIC)_fast:
-	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) -o $(PUBLIC)
+	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) $(DEFINES) $(HEADERS) -o bin/$(PUBLIC)
 
 clean:
 	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o

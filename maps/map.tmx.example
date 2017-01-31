@@ -29,4 +29,7 @@
  <objectgroup name="areas" visible="0">
   <object id="5" x="0" y="0" width="640" height="640"/>
  </objectgroup>
+ <objectgroup color="#ccff33" name="safezones">
+  <object id="12" x="33" y="29" width="188" height="100"/>
+ </objectgroup>
 </map>

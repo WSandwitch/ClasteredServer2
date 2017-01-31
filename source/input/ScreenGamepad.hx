@@ -344,7 +344,10 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogRight.base.alpha = a;	
 		return this;
 	}
-
+	
+	public function resize(w:Int, h:Int){
+		//fill body
+	}
 }
 
 class FlxButtons{

@@ -17,11 +17,14 @@ namespace share {
 			float signed_area2(point &p);
 			float length();
 			bool cross(segment *b);
-			typeof(point::x) vector(point &p);
+			typeof(point::x) vector(point &p); //vector mul
+			typeof(segment::a) to_vector(); 
+			typeof(segment::a) rand_point_in();
 		
 			friend std::ostream& operator<<(std::ostream &stream, const segment &s);
 	};
 	
+	typedef segment quad;
 }
 
 #endif

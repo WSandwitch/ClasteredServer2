@@ -21,8 +21,12 @@ class Main extends Sprite
 	#end
 		FlxG.autoPause = false;
 		//FlxG.fixedTimestep = false;
-		FlxG.scaleMode = new BorderedStageSizeScaleMode();//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
-		//read config and setup
+	#if flash
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
+	#else
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
+	#end
+	//read config and setup
 	#if desktop
 		//you can resize window on fly
 //		FlxG.resizeGame(1024, 800);

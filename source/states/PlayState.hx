@@ -31,31 +31,6 @@ import flixel.system.macros.FlxMacroUtil;
  * 
  */
 
- class MapObjects extends FlxGroup{
-	 
-	 public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
-	 public var map:Null<TiledLevel> = null;
-	 
-	 public function new(?m:String){
-		 super();
-		 add(map=new TiledLevel(m));
-	 }
-	 
-	 public function set_npc(id:Int, n:Npc){
-		 npcs.set(id, n);
-		 add(n);
-	 }
-	 
-	 public function get_npc(id:Int):Npc{
-		 return npcs.get(id);
-	 }
-	 
-	 public function remove_npc(id:Int){
-		 var n:Null<Npc> = get_npc(id);
-		 remove(n);
-		 npcs.remove(id);
-	 }
- }
  
 class PlayState extends CSState
 {
@@ -99,7 +74,7 @@ class PlayState extends CSState
 	private static inline var MESSAGE_NPC_REMOVE:Int=5;
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
-	private var _map:MapObjects;
+	private var _map:CSMap;
 	private var _gamepad:ScreenGamepad;
 	
 	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
@@ -122,7 +97,7 @@ class PlayState extends CSState
 	{	
 	
 		FlxG.stage.addEventListener(openfl.events.KeyboardEvent.KEY_UP, checkKeyBack);
-
+		
 //		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
 //		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
 //		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
@@ -141,9 +116,9 @@ class PlayState extends CSState
 //		FlxNapeSpace.velocityIterations = 5;
 //		FlxNapeSpace.positionIterations = 5;
 
-		_map = new MapObjects();
+		_map = new CSMap();
 		add(_map);
-
+		
 
 		hud = new HUD();
 		add(hud);
@@ -156,11 +131,13 @@ class PlayState extends CSState
 		overlayCamera = new FlxCamera(0, 0, 640, 720);
 		overlayCamera.bgColor = FlxColor.TRANSPARENT;
 		overlayCamera.follow(deadzoneOverlay);
+	#if !flash
 		overlayCamera.antialiasing=true;
+		FlxG.camera.antialiasing=true;
+	#end
 		FlxG.cameras.add(overlayCamera);
 		add(deadzoneOverlay);
 		
-		FlxG.camera.antialiasing=true;
 		
 //		FlxG.camera.setScrollBoundsRect(LEVEL_MIN_X, LEVEL_MIN_Y,
 //			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X), LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y), true);
@@ -290,15 +267,22 @@ class PlayState extends CSState
 		}
 	}
 	
-	override public function update(elapsed:Float):Void 
+	override 
+	public function update(elapsed:Float):Void 
 	{	
-		super.update(elapsed);
-		
 //		trace(elapsed);
 //		trace(Sys.time());
 //		trace(orb.x,orb.y);
 		checkInput(elapsed);
 		checkPackets(elapsed);
+
+		super.update(elapsed);
+	}
+	
+	override
+	public function onResize(w:Int, h:Int){
+		trace(w);
+		_map.resize(w,h);
 	}
 	
 	private function checkInput(elapsed:Float) {
@@ -400,6 +384,7 @@ class PlayState extends CSState
 									}
 									npc = _map.get_npc(npc_id);
 									FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
+									_map.fov.follow = npc;
 									i++;
 							}
 						}

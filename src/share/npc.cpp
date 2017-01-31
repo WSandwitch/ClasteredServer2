@@ -156,9 +156,14 @@ namespace share {
 		//if bot rand in square
 		//else nearest safe zone
 		
-		///for testing
-		position.x=20;
-		position.y=20;
+		if (world){
+			position=world->map.nearest_safezone(position).rand_point_in();
+			printf("found position (%g %g)\n", position.x, position.y);
+		}else{
+			///for testing
+			position.x=40;
+			position.y=40;
+		}
 	}
 	
 	void npc::recalculate_type(){

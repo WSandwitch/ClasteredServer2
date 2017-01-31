@@ -62,16 +62,25 @@ namespace share{
 			map_size[0]=map->tileWidth*map->width;
 			map_size[1]=map->tileHeight*map->height;
 			for(auto group: map->groups){
-				if (group->name==std::string("collision"))
-					for(auto obj: group->objects)
+				if (group->name==std::string("collision")){
+					for(auto obj: group->objects){
 						if (obj->type==OBJECT_QUAD){
 							segments.push_back(new segment(obj->x, obj->y, obj->x+obj->width, obj->y));
 							segments.push_back(new segment(obj->x+obj->width, obj->y, obj->x+obj->width, obj->y+obj->height));
 							segments.push_back(new segment(obj->x+obj->width, obj->y+obj->height, obj->x, obj->y+obj->height));
 							segments.push_back(new segment(obj->x, obj->y+obj->height, obj->x, obj->y));
-						}else
+						}else{
 							for(int i=1, end=obj->points.size();i<end;i++)
 								segments.push_back(new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y));
+						}
+					}
+				}else if (group->name==std::string("safezones")){
+					for(auto obj: group->objects){
+						if (obj->type==OBJECT_QUAD){
+							safezones[obj->gid]=quad(obj->x, obj->y, obj->width, obj->height);
+						}
+					}
+				}
 			}
 			delete map;
 			free(xml);
@@ -199,5 +208,36 @@ namespace share{
 	std::list<int> map::near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r){
 		//TODO: check returned data
 		return cells(x-r, y-r, x+r, y+r);
+	}
+	
+	quad& map::nearest_safezone(typeof(point::x) x, typeof(point::y) y){
+		point p(x, y);
+		return nearest_safezone(p);
+	}
+	
+	quad& map::nearest_safezone(point& p){
+		quad *out=0;
+		float d;
+		for (auto i: safezones){
+			float $=i.second.distanse(p);
+			if (out==0 || $<d){
+				d=$;
+				out=&i.second;
+			}
+		}
+		return *out;
+	}
+	
+	int map::nearest_safezone_id(point& p){
+		int out=-1;
+		float d;
+		for (auto i: safezones){
+			float $=i.second.distanse(p);
+			if (out<0 || $<d){
+				d=$;
+				out=i.first;
+			}
+		}
+		return out;
 	}
 }

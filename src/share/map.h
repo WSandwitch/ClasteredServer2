@@ -1,7 +1,7 @@
 #ifndef CLASTERED_SERVER_SLAVE_MAP_HEADER
 #define CLASTERED_SERVER_SLAVE_MAP_HEADER
 
-#include <map>
+#include <unordered_map>
 #include <list>
 #include <queue>
 #include <vector>
@@ -21,7 +21,7 @@ namespace share {
 	struct cell{
 		int id;
 		mutex m;
-		std::map<int, npc*> npcs;
+		std::unordered_map<int, npc*> npcs;
 		std::vector<segment*> segments;
 	};
 
@@ -33,6 +33,7 @@ namespace share {
 //			share::cell *grid;
 			std::vector<share::cell> grid;
 			std::vector<segment*> segments;
+			std::unordered_map<int, quad> safezones;
 			int map_size[2];
 			int offset;
 		
@@ -53,6 +54,9 @@ namespace share {
 			std::vector<segment> cell_borders(int id);
 			std::list<int> near_cells(int id, typeof(npc::r) r);
 			std::list<int> near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r);
+			quad& nearest_safezone(typeof(point::x) x, typeof(point::y) y);
+			quad& nearest_safezone(point& p);
+			int nearest_safezone_id(point& p);
 			
 			friend std::ostream& operator<<(std::ostream &stream, const map &m);
 		private:

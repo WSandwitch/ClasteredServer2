@@ -50,7 +50,7 @@
 	
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape" />-->
-	<!--<haxelib name="polygonal-ds" />-->
+	<haxelib name="polygonal-ds" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
