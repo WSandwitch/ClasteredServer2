@@ -19,8 +19,8 @@ class FOV extends FlxSprite{
 	public var _shadow:FlxSprite = new FlxSprite();
 	private var _vis:Visibility;
 	
-	private static inline var BASE_COLOR:Int = 0xDD000000;
-	private static inline var FILL_COLOR:Int = 0xDDDDDDDD;
+	public static inline var BASE_COLOR:Int = 0xEE000000;
+	public static inline var FILL_COLOR:Int = 0xEEEEEEEE;
 	
 	public function new(width:Int, height:Int, vis:Visibility, ?f:FlxObject){
 		super();// "assets/images/lamp.png");
@@ -33,8 +33,9 @@ class FOV extends FlxSprite{
 	}
 	
 	override
-	public function update(elapsed){
+	public function draw(){//update(elapsed){
 		if (follow != null) {
+			reset(FlxG.camera.scroll.x, FlxG.camera.scroll.y);
 			_vis.setLightLocation(follow.x, follow.y);
 			_vis.sweep();
 			
@@ -53,6 +54,7 @@ class FOV extends FlxSprite{
 //			blend = openfl.display.BlendMode.MULTIPLY;
 			FlxSpriteUtil.alphaMaskFlxSprite(_shadow, this, this);
 		}
+		super.draw();
 	}
 	
 	public function resize(width:Int, height:Int){

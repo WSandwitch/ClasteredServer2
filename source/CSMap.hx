@@ -35,7 +35,6 @@ class CSMap extends FlxGroup{
 	public var vis:Visibility = new Visibility();
 	public var fov:FOV;
 	
-	private var _fovCamera:FlxCamera; 
 	private var _npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	private var _npcs_group:FlxGroup = new FlxGroup();
 	
@@ -46,11 +45,6 @@ class CSMap extends FlxGroup{
 		add(tilemap);
 		add(_npcs_group);
 		fov = new FOV(FlxG.width, FlxG.height, vis);
-		_fovCamera = new FlxCamera(0, 0, Std.int(fov.width), Std.int(fov.height));
-		_fovCamera.bgColor = FlxColor.TRANSPARENT;
-		_fovCamera.follow(fov, FlxCameraFollowStyle.NO_DEAD_ZONE);
-		FlxG.cameras.add(_fovCamera);
-		fov.x =-100000; //move outside of screen
 		add(fov);
 		if (map == null)
 			map = "assets/maps/map.tmx";
@@ -137,7 +131,6 @@ class CSMap extends FlxGroup{
 	
 	public function resize(w:Int, h:Int){
 		fov.resize(w, h);
-		_fovCamera.setSize(w, h);
 	}
 	
 	public function set_npc(id:Int, n:Npc){

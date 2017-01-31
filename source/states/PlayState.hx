@@ -77,6 +77,9 @@ class PlayState extends CSState
 	private var _map:CSMap;
 	private var _gamepad:ScreenGamepad;
 	
+	private var _map_group:FlxGroup = new FlxGroup();
+	private var _hud_group:FlxGroup = new FlxGroup();
+	
 	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
 	{
 		switch (e.keyCode)
@@ -117,11 +120,13 @@ class PlayState extends CSState
 //		FlxNapeSpace.positionIterations = 5;
 
 		_map = new CSMap();
-		add(_map);
+		add(_map_group);
+		_map_group.add(_map);
 		
 
 		hud = new HUD();
-		add(hud);
+		add(_hud_group);
+		_hud_group.add(hud);
 
 		// Camera Overlay
 		deadzoneOverlay = new FlxSprite(-10000, -10000);

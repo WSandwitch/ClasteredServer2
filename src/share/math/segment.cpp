@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>
 #include <math.h>
 
 #include "point.h"
