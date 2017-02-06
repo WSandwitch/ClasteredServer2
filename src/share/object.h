@@ -6,11 +6,12 @@
 #include <unordered_map>
 
 #include "../share/npc.h"
+#include "../share/world.h"
 
 #define OBJECT_BASE 1
 #define OBJECT_WEAPON 2
 
-namespace master{
+namespace share{
 
 	struct object_initializer;
 	
@@ -46,15 +47,15 @@ namespace master{
 			
 		static std::unordered_map<int, std::string> attr_map;
 		static std::unordered_map<int, int> attr_type;
-		static object_initializer initializer;
+//		static object_initializer initializer;
 		static std::unordered_map<int, object*> all;
 	};
 	
 	struct object_initializer : object {
-		object_initializer();
+		object_initializer(world &w);
 		~object_initializer();
 	};
 
-};
+}
 
 #endif

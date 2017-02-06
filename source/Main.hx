@@ -7,6 +7,8 @@ import flixel.FlxG;
 import flixel.system.scaleModes.*;
 import clasteredServerClient.*;
 
+import openfl.system.Capabilities;
+
 class Main extends Sprite
 {
 	public function new()
@@ -24,6 +26,7 @@ class Main extends Sprite
 	#if flash
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
 	#else
+		trace('screen dpi '+Capabilities.screenDPI);
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
 	#end
 	//read config and setup

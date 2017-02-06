@@ -66,7 +66,7 @@ namespace share {
 			short type; //
 			short move_id;
 			short shoot_id; 
-			short weapon_id; 
+			int weapon_id; //object_id
 			int owner_id; //id of player
 			char angle; //angle of view in pdegrees
 			share::world *world;
@@ -89,6 +89,10 @@ namespace share {
 				short ang_shift;//pdegree
 				short attacks;
 				int dist;
+				
+				short warmup; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+				short cooldown; //set
+				short latency; //tiks
 			} weapon;
 				
 			map3b<share::packet> packs;

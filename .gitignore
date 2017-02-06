@@ -100,3 +100,4 @@ src/other/connection_tester.unknown
 data/objects.yml
 client/assets_ext/map.tmx
 maps/map.tmx
+*.png

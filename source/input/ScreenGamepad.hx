@@ -66,6 +66,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	 */
 	public var analogLeft:Null<FlxAnalog> = null;
 	public var analogRight:Null<FlxAnalog> = null;
+	public var mode:FlxMode = XBOX;
 	
 	private var _acc:Array<Float> = [0, 0, 0, 0, 0, 0];
 	private var _radius:Float=0;
@@ -93,13 +94,13 @@ class ScreenGamepad extends FlxSpriteGroup{
 	#if mobile
 		_scale_dpi = Capabilities.screenDPI / 125; //125 - default dpi
 	#end
-
+	
 		_buttonSize = new FlxPoint(Math.round(buttonSize.x*_scale_dpi), Math.round(buttonSize.y*_scale_dpi));
 		if (offset==null)
 			offset = new FlxPoint(_buttonSize.x*0.7, _buttonSize.y*0.7);
 		_offset = offset;
 		if (M == null)
-			M = XBOX;		
+			M = mode;		
 		_distanse.x = 1.1 * _buttonSize.x;
 		_distanse.y = 1.1 * _buttonSize.y;
 		
@@ -218,15 +219,21 @@ class ScreenGamepad extends FlxSpriteGroup{
 
 	}
 	
-	public function setMode(M:FlxMode){
+	public function setMode(M:FlxMode, ?w:Int, ?h:Int){
 //		trace(M);
+		mode = M;
 	#if mobile
-		var w = FlxG.width;
-		var h = FlxG.height;
+		if (w == null)
+			w = FlxG.width;
+		if (h == null)
+			h = FlxG.height;
 	#else
-		var w = FlxG.camera.width;
-		var h = FlxG.camera.height;
+		if (w == null)
+			w = FlxG.camera.width;
+		if (h == null)
+			h = FlxG.camera.height;
 	#end
+		//TODO: add scale correction
 		var buttons_shift:FlxPoint = new FlxPoint(_distanse.x / 2 + _buttonSize.x, _distanse.y / 2 + _buttonSize.y);
 		switch (M){
 			//TODO: add inverse modes (as it has angle=180)
@@ -314,9 +321,9 @@ class ScreenGamepad extends FlxSpriteGroup{
 		button.onDown.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_DOWN, true, false, id, I));};
 		button.onOut.callback = button.onUp.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_UP, true, false, id, I));};
 	#end	
-		#if FLX_DEBUG
+	#if FLX_DEBUG
 		button.ignoreDrawDebug = true;
-		#end
+	#end
 		buttons[I] = button;
 		return button;
 	}
@@ -347,6 +354,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	
 	public function resize(w:Int, h:Int){
 		//fill body
+		setMode(mode);
 	}
 }
 
@@ -366,7 +374,6 @@ class FlxButtons{
 }
 
 enum FlxMode{
-	
 	XBOX;
 	PS;
 	SNES;

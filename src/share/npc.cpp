@@ -12,6 +12,7 @@ extern "C"{
 #include "npc/moves.h"
 #include "world.h"
 #include "messages.h"
+#include "../share/object.h"
 
 using namespace share;
 
@@ -144,8 +145,13 @@ namespace share {
 		packAttr(attackable,0,0,1,1,1); //15s //TODO: check can be got from info
 		packAttr(bot.owner_id,0,0,1,0,1); //16s 
 		packAttr(weapon.dist,0,0,1,0,1); //17s
-		packAttr(weapon.next_shot,0,0,1,0,1); //18s
+		packAttr(weapon.ang_shift,0,0,1,0,1); //18s
 		packAttr(weapon.attacks,0,0,1,0,1); //19s
+		packAttr(weapon.ang_diap,0,0,1,0,1); //20s
+		packAttr(weapon.warmup,0,0,1,0,1); //21s
+		packAttr(weapon.cooldown,0,0,1,0,1); //22s
+		packAttr(weapon.latency,0,0,1,0,1); //23s
+		packAttr(weapon.next_shot,0,0,1,0,1); //24s //??
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -158,7 +164,6 @@ namespace share {
 		
 		if (world){
 			position=world->map.nearest_safezone(position).rand_point_in();
-			printf("found position (%g %g)\n", position.x, position.y);
 		}else{
 			///for testing
 			position.x=40;
@@ -169,11 +174,31 @@ namespace share {
 	void npc::recalculate_type(){
 		//update dinamic attrs like damage, health from chosen type and other
 		timestamp=time(0);
+		try{
+			object *o=object::all.at(weapon_id);
+//			weapon.damage=o->weapon.damage;
+			weapon.dist=o->weapon.dist;
+			weapon.ang_diap=o->weapon.ang_diap;//pdegree
+			weapon.ang_shift=o->weapon.ang_shift;//pdegree
+			weapon.attacks=o->weapon.attacks;
+			weapon.warmup=o->weapon.warmup;
+			weapon.cooldown=o->weapon.cooldown;
+			weapon.latency=o->weapon.latency;
+		}catch(...){}
+		
 		///for testing
-		vel=10;
-		r=5;
+		vel=5;
+		r=13;
 		weapon.damage=1;
 		weapon.dist=300;
+		weapon.ang_diap=60;//pdegree
+		weapon.ang_shift=10;//pdegree
+		weapon.attacks=2;
+		if (world){
+			weapon.warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+			weapon.cooldown=NPC_FULL_TEMP/world->tps/1; //set
+			weapon.latency=0.3*world->tps; //tiks
+		}
 	}
 	
 	//example - shoot_type, warmup, cooldown, latency, angle_diap, attacks
@@ -184,9 +209,9 @@ namespace share {
 	//minigun - 1, 2, 2, 0.2, 4, 1
 	void npc::attack(){
 		//TODO: check	
-		short warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-		short cooldown=NPC_FULL_TEMP/world->tps/1; //set
-		short latency=0.3*world->tps; //tiks
+		short warmup=weapon.warmup;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+		short cooldown=weapon.cooldown;//NPC_FULL_TEMP/world->tps/1; //set
+		short latency=weapon.latency;//0.3*world->tps; //tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
 //			printf("%d warmup %hd/%hd\n", id, weapon.temp,NPC_FULL_TEMP);

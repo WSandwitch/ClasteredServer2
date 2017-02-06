@@ -27,7 +27,7 @@ class Npc extends FlxSpriteGroup
 	public function new (x:Float, y:Float, type:Int)
 	{
 		super(x, y);
-		sprite = new FlxSprite(0, 0, "assets/Orb.png");
+		sprite = new FlxSprite(0, 0, "assets/npc/solder_gun128.png");
 		sprite.x =-sprite.width / 2;
 		sprite.y =-sprite.height / 2;
 		add(sprite);

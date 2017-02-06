@@ -61,14 +61,12 @@ namespace YAML{
 
 }
 
-using namespace share;
-
-namespace master{
+namespace share{
 
 	std::unordered_map<int, object*> object::all;	
 	typeof(object::attr_map) object::attr_map;
 	typeof(object::attr_type) object::attr_type;
-	object_initializer object::initializer;
+//	object_initializer object::initializer;
 	
 	int o_type(char &c){return 1;}
 	int o_type(short &c){return 2;}
@@ -116,7 +114,7 @@ namespace master{
 		
 	}
 
-	object_initializer::object_initializer(){
+	object_initializer::object_initializer(world &w){
 		object $;
 		$.init_attrs();
 		YAML::Node config = YAML::LoadFile("../data/objects.yml");
@@ -231,9 +229,9 @@ namespace master{
 			e->weapon.ang_diap=to_pdegrees(e->weapon.ang_diap);
 			e->weapon.ang_shift=to_pdegrees(e->weapon.ang_shift);
 			//convert to tikc
-			e->weapon.warmup=NPC_FULL_TEMP/(master::world.tps*e->weapon.warmup);
-			e->weapon.cooldown=NPC_FULL_TEMP/(master::world.tps*e->weapon.cooldown);
-			e->weapon.latency=NPC_FULL_TEMP/(master::world.tps*e->weapon.latency);
+			e->weapon.warmup=NPC_FULL_TEMP/(w.tps*e->weapon.warmup);
+			e->weapon.cooldown=NPC_FULL_TEMP/(w.tps*e->weapon.cooldown);
+			e->weapon.latency=NPC_FULL_TEMP/(w.tps*e->weapon.latency);
 		}
 //		exit(0);
 	}

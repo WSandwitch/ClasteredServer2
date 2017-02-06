@@ -35,17 +35,21 @@
 #include "../share/system/log.h"
 #include "../share/world.h"
 #include "../share/messages.h"
+#include "../share/object.h"
 #include "../slave/main.h"
 
 #define CONFIG_FILE "../config/config.cfg"
 #define CONFIG_FOLDER "../config/"
-
 
 namespace master{
 	share::world world;
 	master::special::grid *grid;
 	config_t config;
 	short view_area[2]={300,300};
+}
+
+namespace share{
+	
 }
 
 using namespace share;
@@ -149,6 +153,7 @@ static void segfault_sigaction(int sig){
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
 int main(int argc,char* argv[]){
+	object_initializer initializer(master::world);
 	share::sync tv;
 	struct sigaction sa;
 	struct {

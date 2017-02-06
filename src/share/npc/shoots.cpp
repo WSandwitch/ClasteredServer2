@@ -32,10 +32,10 @@ namespace share{
 	//melee shot
 	void npc_shoots::shoot0(typeof(point::x) x, typeof(point::y) y){
 		//init vars
-		short ang_diap=60;//weapon.ang_diap//pdegree
-		short ang_shift=10;//weapon.ang_shift//pdegree
-		short attacks=1;//weapon.attacks
-		int dist=20;//weapon.dist
+		short ang_diap=weapon.ang_diap;//pdegree
+		short ang_shift=weapon.ang_shift;//pdegree
+		short attacks=weapon.attacks;
+		int dist=weapon.dist;
 
 		short ang=angle+ang_shift;
 
@@ -81,9 +81,9 @@ namespace share{
 	//spawn bullet npcs
 	void npc_shoots::shoot1(typeof(point::x) x, typeof(point::y) y){
 		//ask master to spawn
-		short ang_diap=60;//weapon.ang_diap //pdegree
-		short ang_shift=10;//weapon.ang_shift //pdegree
-		short attacks=1;//weapon.attacks
+		short ang_diap=weapon.ang_diap; //pdegree
+		short ang_shift=weapon.ang_shift; //pdegree
+		short attacks=weapon.attacks;
 
 		short ang_=ang_diap?((rand()%ang_diap)-ang_diap/2):0; //calc random angle in diap
 		short ang=((short)angle+ang_shift)+ang_;
@@ -102,7 +102,7 @@ namespace share{
 	//bullet r is attack dist
 	//bullet weapon.dist is  move dist
 	void npc_shoots::shoot2(typeof(point::x) x, typeof(point::y) y){
-		short attacks=2;//weapon.attacks;
+		short attacks=weapon.attacks;
 		
 		std::unordered_set<npc*> npcs;
 		auto cells=world->map.cells(position, r);
