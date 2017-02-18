@@ -7,6 +7,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
+import util.CSAssets;
 
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -14,12 +15,14 @@ import openfl.Assets;
 class Npc extends FlxSpriteGroup
 {
 	public var id:Int;
+	public var type:Int = 0;
 //	public var m:Lock=new Lock();
 	public var dest_x:Null<Int> = 0;
 	public var dest_y:Null<Int> = 0;
 	public var dir_x:Null<Int> = 0;
 	public var dir_y:Null<Int> = 0;
 	public var updater:Map<Int, Null<Dynamic->Void>>=new Map<Int, Null<Dynamic->Void>>();
+	public var sprite_updated:Bool = false;
 	
 	public var sprite:Null<FlxSprite> = null;
 	public var shadow:Null<FlxSprite> = null;
@@ -27,11 +30,10 @@ class Npc extends FlxSpriteGroup
 	public function new (x:Float, y:Float, type:Int)
 	{
 		super(x, y);
-		sprite = new FlxSprite(0, 0, "assets/npc/solder_gun128.png");
-		sprite.x =-sprite.width / 2;
-		sprite.y =-sprite.height / 2;
+		sprite = new FlxSprite(0, 0);// , "assets/npc/solder_gun128.png"); //base sprite
+//		sprite.x =-sprite.width / 2;
+//		sprite.y =-sprite.height / 2;
 		add(sprite);
-		
 		var that = this;
 		//moves = false;
 		//this.field("aaa")();
@@ -41,6 +43,10 @@ class Npc extends FlxSpriteGroup
 		};
 		updater[2] = function(a:Dynamic){
 			that.dest_y = a;
+		};
+		updater[6] = function(a:Dynamic){
+			that.type = a;
+			sprite_updated = true;
 		};
 		updater[9] = function(a:Dynamic){
 			that.setAngle(Math.round(a / 120.0 * 180)); 
@@ -88,6 +94,28 @@ class Npc extends FlxSpriteGroup
 			}
 			i++;
 		}
+		if (sprite_updated){
+			update_sprite();
+			sprite_updated = false;
+		}
+	}
+	
+	public function update_sprite(){
+		//TODO: add loading animation sheets
+		try{
+			sprite.loadGraphic(CSAssets.getGraphic(CSObjects.get(type).sprite));
+		}catch(e:Dynamic){
+			sprite.loadGraphic(CSAssets.getGraphic("assets/npc/solder_base.png"));
+		}
+		sprite.resetSize();
+//		sprite.resetSizeFromFrame();
+		sprite.updateHitbox();
+//		sprite.x = -sprite.width / 2;
+//		sprite.y = -sprite.height / 2;
+		sprite.x -= sprite.width / 2;
+		sprite.y -= sprite.height / 2;
+		trace(sprite.width);
+		trace(sprite.height);
 	}
 	
 	public function setAngle(a:Int){

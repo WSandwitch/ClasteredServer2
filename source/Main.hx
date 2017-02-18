@@ -23,11 +23,12 @@ class Main extends Sprite
 	#end
 		FlxG.autoPause = false;
 		//FlxG.fixedTimestep = false;
-	#if flash
+		trace('screen dpi '+Capabilities.screenDPI);
+	#if flash //72 dpi
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
 	#else
-		trace('screen dpi '+Capabilities.screenDPI);
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(Capabilities.screenDPI/96.0);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
+//		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 	#end
 	//read config and setup
 	#if desktop

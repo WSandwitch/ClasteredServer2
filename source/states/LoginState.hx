@@ -24,6 +24,7 @@ import input.AbstractInputManager.*;
 
 import util.CSAssets;
 
+
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
@@ -37,8 +38,11 @@ class LoginState extends CSState
 		super.create();
 		
 		trace("login state");
-				
+		
+		
 		//add show cursor
+		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
+		////end
 		if (game.login == null && game.pass == null)
 			FlxG.switchState(new LoadState());
 		else

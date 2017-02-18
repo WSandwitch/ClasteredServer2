@@ -10,6 +10,7 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 	public function new(scale:Float = 1){
 		super();
 		_scale_val = scale;
+		onMeasure(FlxG.width, FlxG.height); 
 	}
 	
 	override public function onMeasure(Width:Int, Height:Int):Void

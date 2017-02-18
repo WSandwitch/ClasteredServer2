@@ -63,7 +63,7 @@ namespace share {
 			pointf direction;
 			short health; //curent health
 			short _health; //max health
-			short type; //
+			int type; //base id
 			short move_id;
 			short shoot_id; 
 			int weapon_id; //object_id

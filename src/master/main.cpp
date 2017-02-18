@@ -315,53 +315,52 @@ int main(int argc,char* argv[]){
 				for(auto ni: master::world.npcs){
 #endif				
 					npc *n=ni.second;
-					if(n){
-	//					printf("%d %d\n", omp_get_thread_num(), n);
-						int slave_id=master::grid->get_owner(n->position.x, n->position.y);
-						auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
-	//					printf("%d %d\n", slave_id, n->slave_id);
-						if (slave_id!=n->slave_id){
-	//						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
-							slave_id=n->set_attr(n->slave_id, slave_id);
-						}
-						//move in map
-						n->update_cells(); //threadsafe
-						//update n->slaves
-						std::unordered_map<int, short> slaves;
-						for(auto slave: n->slaves)//set had to 2
-							slaves[slave]=2;
-						n->slaves.clear();
-						for(auto slave: share_ids)
-							slaves[slave]++; //inc real
-						slaves[n->slave_id]++;
-						for(auto slave: slaves){
-							server *s=server::get(slave.first);
-							if (s){
-								switch(slave.second){
-									case 2: //need to remove
-										{
-											packet p;
-											p.setType(MESSAGE_NPC_REMOVE);
-											p.add(n->id);
-											s->sock->send(&p);
-										}
-										break;
-									case 1: //new npc
-										n->pack(1,1);
-										s->sock->send(&n->packs(1,1));
-										n->slaves.insert(slave.first);
-	//									printf("(slave)send new npc\n");
-										break;
-									case 3: //already had npc
-										if (n->updated()){
-											n->pack(1,0,1);
-											s->sock->send(&n->packs(1,0,1));									
-										}
-										n->slaves.insert(slave.first);
-										break;
-								}
-							}	
-						}
+//					printf("%d %d\n", n->id, n->health);
+//					printf("%d %d\n", omp_get_thread_num(), n);
+					int slave_id=master::grid->get_owner(n->position.x, n->position.y);
+					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
+//					printf("%d %d\n", slave_id, n->slave_id);
+					if (slave_id!=n->slave_id){
+//						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
+						slave_id=n->set_attr(n->slave_id, slave_id);
+					}
+					//move in map
+					n->update_cells(); //threadsafe
+					//update n->slaves
+					std::unordered_map<int, short> slaves;
+					for(auto slave: n->slaves)//set had to 2
+						slaves[slave]=2;
+					n->slaves.clear();
+					for(auto slave: share_ids)
+						slaves[slave]++; //inc real
+					slaves[n->slave_id]++;
+					for(auto slave: slaves){
+						server *s=server::get(slave.first);
+						if (s){
+							switch(slave.second){
+								case 2: //need to remove
+									{
+										packet p;
+										p.setType(MESSAGE_NPC_REMOVE);
+										p.add(n->id);
+										s->sock->send(&p);
+									}
+									break;
+								case 1: //new npc
+									n->pack(1,1);
+									s->sock->send(&n->packs(1,1));
+									n->slaves.insert(slave.first);
+//									printf("(slave)send new npc\n");
+									break;
+								case 3: //already had npc
+									if (n->updated()){
+										n->pack(1,0,1);
+										s->sock->send(&n->packs(1,0,1));									
+									}
+									n->slaves.insert(slave.first);
+									break;
+							}
+						}	
 					}
 				}	
 			}
@@ -448,11 +447,9 @@ int main(int argc,char* argv[]){
 			std::list<npc*> l;
 			for(auto ni: master::world.npcs){
 				npc *n=ni.second;
-				if(n){
-					if(n->clear())
-						l.push_back(n);
-					n->m.unlock();
-				}
+				if(n->clear())
+					l.push_back(n);
+				n->m.unlock();
 			}
 			for(auto n: l){
 				master::world.npcs.erase(n->id);

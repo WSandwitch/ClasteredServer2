@@ -122,6 +122,7 @@ namespace master {
 				nn->weapon.next_shot=1;//shoot every tick
 				nn->weapon.attacks=n->weapon.attacks; //set max targets
 				nn->attackable=n->weapon.attackable;
+				nn->type=2;//TODO: get base type from weapon object
 				nn->move_id=1;//TODO: change to choose bullet move id 
 				nn->shoot_id=2;//TODO: change to choose bullet shoot id 
 				

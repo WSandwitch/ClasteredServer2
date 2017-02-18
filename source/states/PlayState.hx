@@ -106,6 +106,8 @@ class PlayState extends CSState
 //		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
 //		LEVEL_MAX_Y = FlxG.stage.stageHeight * 1.5;
 		
+		CSObjects.init();
+		
 		super.create();
 		game = cast FlxG.game;
 		
@@ -178,6 +180,10 @@ class PlayState extends CSState
 		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_PLUS);
 		a=actions.addAction(ATTACK);
 		a.addMouseKey(MouseID.MOUSE_LEFT);
+		
+		//TODO: change to send event
+		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
+		onResize(FlxG.width, FlxG.height); 
 	}
 	
 	function drawDeadzone() 
@@ -286,8 +292,10 @@ class PlayState extends CSState
 	
 	override
 	public function onResize(w:Int, h:Int){
-		trace(w);
-		_map.resize(w,h);
+//		trace(w);
+		var _w:Int = Std.int(w / FlxG.scaleMode.scale.x);
+		var _h:Int = Std.int(h / FlxG.scaleMode.scale.y);
+		_map.resize(_w, _h);
 	}
 	
 	private function checkInput(elapsed:Float) {
@@ -328,15 +336,21 @@ class PlayState extends CSState
 		}
 	#if !FLX_NO_KEYBOARD	
 		if (FlxG.keys.justPressed.U)
-			setLerp(.1);
+			npc.sprite.y+=3;
 		if (FlxG.keys.justPressed.J)
-			setLerp( -.1);
+			npc.sprite.y-=3;
 			
-		if (FlxG.keys.justPressed.I)
-			setLead(.5);
+		if (FlxG.keys.justPressed.H)
+			npc.sprite.x-=3;
 		if (FlxG.keys.justPressed.K)
-			setLead( -.5);
+			npc.sprite.x+=3;
 			
+		if (FlxG.keys.justPressed.Y){
+			trace(npc.x);
+			trace(npc.y);
+			trace(npc.sprite.x);
+			trace(npc.sprite.y);
+		}
 		if (FlxG.keys.justPressed.O)
 			setZoom(FlxG.camera.zoom + .1);
 		if (FlxG.keys.justPressed.L)

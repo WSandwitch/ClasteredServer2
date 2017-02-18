@@ -38,7 +38,7 @@ namespace share {
 		state(0), 
 		health(100),
 		_health(100),
-		type(t), 
+		type(1), //player/bot npc by default 
 		owner_id(0), 
 //		bot({0}), 
 		angle(0),
@@ -58,7 +58,7 @@ namespace share {
 		recalculate_type();
 		
 		//	testing	
-		move_id=type;
+		move_id=t;
 		shoot_id=1;
 	}
 	
@@ -100,6 +100,7 @@ namespace share {
 		n->recalculate_type();
 		n->damagers.clear();
 		printf("%d cloned\n", id);
+//	*((int*)(0))=5;
 		return n;
 	}
 
@@ -165,9 +166,10 @@ namespace share {
 		if (world){
 			position=world->map.nearest_safezone(position).rand_point_in();
 		}else{
+			printf("npc without world\n");
 			///for testing
-			position.x=40;
-			position.y=40;
+			position.x=100;
+			position.y=100;
 		}
 	}
 	
@@ -188,7 +190,7 @@ namespace share {
 		
 		///for testing
 		vel=5;
-		r=13;
+		r=23;
 		weapon.damage=1;
 		weapon.dist=300;
 		weapon.ang_diap=60;//pdegree

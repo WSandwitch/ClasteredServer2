@@ -37,7 +37,8 @@ class LoadState extends CSState
 		game.pass = "qwer";
 		
 		try{
-			(new Connection()).connect("192.168.1.51", 8000, false, function(conn:Connection){				
+//			(new Connection()).connect("172.16.1.40", 8000, false, function(conn:Connection){				
+			(new Connection()).connect("localhost", 8000, false, function(conn:Connection){				
 	//			conn.connect("localhost", 8000);
 				game.connection = conn;
 				delay(function(){
@@ -59,7 +60,7 @@ class LoadState extends CSState
 			trace(CallStack.toString(CallStack.exceptionStack()));
 			//Add move to AuthState
 		}
-		
+		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 	}
 	
 }
