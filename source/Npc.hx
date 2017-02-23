@@ -107,15 +107,13 @@ class Npc extends FlxSpriteGroup
 		}catch(e:Dynamic){
 			sprite.loadGraphic(CSAssets.getGraphic("assets/npc/solder_base.png"));
 		}
-		sprite.resetSize();
-//		sprite.resetSizeFromFrame();
+//		sprite.resetSize();
+		sprite.resetSizeFromFrame();
 		sprite.updateHitbox();
 //		sprite.x = -sprite.width / 2;
 //		sprite.y = -sprite.height / 2;
 		sprite.x -= sprite.width / 2;
 		sprite.y -= sprite.height / 2;
-		trace(sprite.width);
-		trace(sprite.height);
 	}
 	
 	public function setAngle(a:Int){

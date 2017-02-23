@@ -111,7 +111,8 @@ namespace share {
 			
 			npc(){};
 			npc(share::world *w, int id, short type=0);
-			~npc();
+			void remove();
+//			void operator delete(void *n);
 			npc* clone();
 			bool clear();
 			void init_attrs();

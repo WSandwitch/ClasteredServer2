@@ -453,7 +453,7 @@ int main(int argc,char* argv[]){
 			}
 			for(auto n: l){
 				master::world.npcs.erase(n->id);
-				delete n; //auto added to old_npcs
+				n->remove(); //auto added to old_npcs
 			}
 			master::world.npcs_m.lock();
 				if (master::world.old_npcs.size()>0){

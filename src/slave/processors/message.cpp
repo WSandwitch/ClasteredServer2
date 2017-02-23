@@ -45,9 +45,11 @@ namespace slave {
 				n->m.lock();
 					slave::world.npcs.erase(id);
 				n->m.unlock();
-				delete n;
-			}catch(...){}
-			printf("npc %d removed\n", id);
+				n->remove();
+				printf("npc %d removed\n", id);
+			}catch(...){
+				printf("npc %d not found\n", id);
+			}
 		slave::world.m.unlock();
 		return 0;
 	}

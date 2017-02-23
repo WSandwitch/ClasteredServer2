@@ -62,34 +62,45 @@ namespace share {
 		shoot_id=1;
 	}
 	
-	npc::~npc(){
-		if (world){
-			for(auto i: cells){
-				auto cell=world->map.cells(i);
-				withLock(cell->m, cell->npcs.erase(id));
-			}
-			if (world->id==0){//on master
-				world->npcs_m.lock();
-					world->old_npcs.insert(id);
-				world->npcs_m.unlock();
-			
-				//respawn with same id
-				//if it is bot, or assigned to player
-				if (bot.used || (owner_id!=0)){//TODO: add respawn mark
+	void npc::remove(){
+		do{
+			if (world){
+				for(auto i: cells){
+					auto cell=world->map.cells(i);
+					withLock(cell->m, cell->npcs.erase(id));
+				}
+				if (world->id==0){//on master
 					world->npcs_m.lock();
-						world->new_npcs.push_back(clone());
+						world->old_npcs.insert(id);
 					world->npcs_m.unlock();
-					printf("%d respawned\n", id);
-				}else{
-	//				printf("%d died\n", id);
-					world->putId(id);
+				
+					//respawn with same id
+					//if it is bot, or assigned to player
+					if (bot.used || (owner_id!=0)){//TODO: add respawn mark
+						world->npcs_m.lock();
+							world->new_npcs.push_back(clone());
+						world->npcs_m.unlock();
+						printf("%d respawned\n", id);
+						break;//no delete
+					}else{
+		//				printf("%d died\n", id);
+						world->putId(id);
+					}
 				}
 			}
-		}
+			delete this;
+		}while(0);
 	}
 	
-	npc* npc::clone(){
-		npc* n=new npc(*this);
+/*	void npc::operator delete(void *n_){
+		npc *n=(npc*)n_;
+		printf("delete overloaded\n");
+		//TODO: move here destructor body
+		::delete n;
+	}
+*/	
+	npc* npc::clone(){//TODO: change to update this attrs and return tjis
+/*		npc* n=new npc(*this);
 		//set health and position
 		n->health=n->_health;
 		n->spawn_wait=100;
@@ -99,7 +110,24 @@ namespace share {
 		n->init_position();
 		n->recalculate_type();
 		n->damagers.clear();
+		n->bot.dist=0;
 		printf("%d cloned\n", id);
+		return n;
+*/		npc* n=this;
+		//set health and position
+		n->health=n->_health;
+		n->spawn_wait=100;
+		//cleanup and init
+		n->clear();
+		for(auto i:n->attr){
+			n->attrs[i.first]=1;
+		}
+		n->init_position();
+		n->recalculate_type();
+		n->damagers.clear();
+		n->bot.dist=0;
+		//TODO:check for other attributes need to be cleared
+		printf("%d reused\n", id);
 //	*((int*)(0))=5;
 		return n;
 	}

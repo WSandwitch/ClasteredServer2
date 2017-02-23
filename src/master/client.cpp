@@ -73,7 +73,7 @@ namespace master {
 					npc *n=master::world.npcs.at(npc_id);
 					n->world->npcs.erase(n->id);
 					withLock(n->m, n->owner_id=0);//set to not respawn
-					delete n;
+					n->remove();
 				}catch(...){}
 			master::world.m.unlock();
 		mutex.unlock();
