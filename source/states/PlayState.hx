@@ -98,7 +98,6 @@ class PlayState extends CSState
 	
 	override public function create():Void 
 	{	
-	
 		FlxG.stage.addEventListener(openfl.events.KeyboardEvent.KEY_UP, checkKeyBack);
 		
 //		LEVEL_MIN_X = -FlxG.stage.stageWidth / 2;
@@ -109,6 +108,7 @@ class PlayState extends CSState
 		CSObjects.init();
 		
 		super.create();
+		trace("play state");
 		game = cast FlxG.game;
 		
 		id = game.id;
@@ -288,6 +288,7 @@ class PlayState extends CSState
 		checkPackets(elapsed);
 
 		super.update(elapsed);
+		
 	}
 	
 	override

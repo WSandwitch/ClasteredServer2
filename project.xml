@@ -50,7 +50,7 @@
 	
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape" />-->
-	<haxelib name="polygonal-ds" />
+	<haxelib name="polygonal-ds" version="1.4.1" />
 	<haxelib name="yaml" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->

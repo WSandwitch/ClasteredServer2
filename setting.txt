@@ -1,0 +1,24 @@
+npc - type - base type, includes energy source(reactor), and basic armor -> object{class: 1(BASE), type: }
+
+
+object{
+	id - int //
+	kind - int //BASE, WEAPON, ...
+	type - int //organic, electro, ...
+	cost - int //cost in 1 money
+	deps - [[int]] //dependency objects sets
+	
+	weapon.dist - int //distance of shot
+	weapon.ang_diap - short //
+	weapon.ang_shift - short //shift of angle 
+	weapon.attacks - short //targets/bullets per shot
+	weapon.warmup - float //in seconds
+	weapon.cooldown - float //in seconds
+	weapon.latency - float //latency between shots in seconds
+	weapon.shoot_id - short //type of shooting
+	weapon.move_id - short //type of bullet moving
+	weapon.attackable - char //bullet can be attacked
+	
+	base.health - short //basic health max, of health addition
+}
+

@@ -181,7 +181,7 @@ import flixel.math.FlxPoint;
     // Add a segment, where the first point shows up in the
     // visualization but the second one does not. (Every endpoint is
     // part of two segments, but we want to only show them once.)
-    public function addSegment(x1:Float, y1:Float, x2:Float, y2:Float) {
+    public function addSegment(x1:Float, y1:Float, x2:Float, y2:Float):Segment {
         var segment:Segment = null;
         var p1:EndPoint = new EndPoint(0.0, 0.0);
         p1.segment = segment;
@@ -201,6 +201,7 @@ import flixel.math.FlxPoint;
         segments.append(segment);
         endpoints.append(p1);
         endpoints.append(p2);
+		return segment;
     }
 
 

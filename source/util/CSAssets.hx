@@ -28,7 +28,11 @@ class CSAssets
 	#if !flash
 		try{
 			var data:Bytes = File.getBytes(id);
+		#if openfl_legacy
 			return FlxG.bitmap.add(BitmapData.loadFromBytes(ByteArray.fromBytes(data)), false, id);
+		#else
+			return FlxG.bitmap.add(BitmapData.fromBytes(ByteArray.fromBytes(data)), false, id);
+		#end
 		}catch(e:Dynamic){
 //			trace("no file");
 		}
@@ -44,7 +48,11 @@ class CSAssets
 					var data:Null<Bytes> = Reader.unzip(entry);
 					if (data != null){
 						f.close();
+					#if openfl_legacy
 						return FlxG.bitmap.add(BitmapData.loadFromBytes(ByteArray.fromBytes(data)), false, id);
+					#else
+						return FlxG.bitmap.add(BitmapData.fromBytes(ByteArray.fromBytes(data)), false, id);
+					#end
 					}
 				}	
 			}
