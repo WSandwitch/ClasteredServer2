@@ -22,6 +22,8 @@ SLAVE:=slave
 SLAVE_SOURCES=$(wildcard $(SRC)/$(SLAVE)/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*.cpp) $(wildcard $(SRC)/$(SLAVE)/*/*/*.cpp)
 SLAVE_OBJECTS=$(addprefix $(OBJDIR)/, $(SLAVE_SOURCES:.cpp=.o))
 
+DEPS := $(SHARE_OBJECTS:.o=.d) $(PUBLIC_OBJECTS:.o=.d) $(SLAVE_OBJECTS:.o=.d)
+
 STORAGE?=TEXT
 
 DEFINES:= -DSTORAGE_$(STORAGE)
@@ -54,6 +56,11 @@ ifeq ($(OPTIMISATION),1)
 		CPPFLAGS += -march=native
 		LDFLAGS += -march=native
 	endif
+	ifneq ($(filter $(ARCH), armv7l),)
+		CFLAGS += -mfpu=neon
+		CPPFLAGS += -mfpu=neon
+		LDFLAGS += -mfpu=neon
+	endif
 endif
 
 all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
@@ -73,7 +80,7 @@ $(OBJDIR)/%.o: %.c
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	$(GCC) -c $(CPPFLAGS) $(DEFINES) $(HEADERS) $< -o $@
+	$(GCC) -c $(CPPFLAGS) $(DEFINES) $(HEADERS) -MMD $< -o $@
 	
 fast: $(PUBLIC)_fast
 	
@@ -82,3 +89,5 @@ $(PUBLIC)_fast:
 
 clean:
 	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o
+	
+-include $(DEPS)
