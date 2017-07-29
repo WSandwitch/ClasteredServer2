@@ -3,7 +3,8 @@
 #include <math.h>
 
 #include "map.h"
-#include "system/log.h"
+//#include "system/log.h"
+#include "crypt/crc32.h"
 #include "NLTmxMap/NLTmxMap.h"
 
 namespace share{
@@ -30,9 +31,9 @@ namespace share{
 		return buffer;
 	}
 	
-	map::map(int x, int y, char* path): offset(50){
-		cell.x=x;
-		cell.y=y;
+	map::map(char* path): offset(50){
+		cell.x=25;
+		cell.y=25;
 //		grid=0;
 		map_size[0]=200;
 		map_size[1]=200;
@@ -57,33 +58,42 @@ namespace share{
 	void map::reconfigure(char* path){
 		char * xml = (char*) loadFile( path, true );
 		if (xml){
-			NLTmxMap* map = NLLoadTmxMap( xml );
-			//fill data
-			map_size[0]=map->tileWidth*map->width;
-			map_size[1]=map->tileHeight*map->height;
-			for(auto group: map->groups){
-				if (group->name==std::string("collision")){
-					for(auto obj: group->objects){
-						if (obj->type==OBJECT_QUAD){
-							segments.push_back(new segment(obj->x, obj->y, obj->x+obj->width, obj->y));
-							segments.push_back(new segment(obj->x+obj->width, obj->y, obj->x+obj->width, obj->y+obj->height));
-							segments.push_back(new segment(obj->x+obj->width, obj->y+obj->height, obj->x, obj->y+obj->height));
-							segments.push_back(new segment(obj->x, obj->y+obj->height, obj->x, obj->y));
-						}else{
-							for(int i=1, end=obj->points.size();i<end;i++)
-								segments.push_back(new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y));
+			try{
+				NLTmxMap* map = NLLoadTmxMap( xml );
+				//fill data
+				if (map->cell_x)
+					cell.x=map->cell_x;
+				if (map->cell_y)
+					cell.y=map->cell_y;
+				map_size[0]=map->tileWidth*map->width;
+				map_size[1]=map->tileHeight*map->height;
+				for(auto group: map->groups){
+					if (group->name==std::string("collision")){
+						for(auto obj: group->objects){
+							if (obj->type==OBJECT_QUAD){
+								segments.push_back(new segment(obj->x, obj->y, obj->x+obj->width, obj->y));
+								segments.push_back(new segment(obj->x+obj->width, obj->y, obj->x+obj->width, obj->y+obj->height));
+								segments.push_back(new segment(obj->x+obj->width, obj->y+obj->height, obj->x, obj->y+obj->height));
+								segments.push_back(new segment(obj->x, obj->y+obj->height, obj->x, obj->y));
+							}else{
+								for(int i=1, end=obj->points.size();i<end;i++)
+									segments.push_back(new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y));
+							}
 						}
-					}
-				}else if (group->name==std::string("safezones")){
-					for(auto obj: group->objects){
-						if (obj->type==OBJECT_QUAD){
-							safezones[obj->gid]=quad(obj->x, obj->y, obj->width, obj->height);
+					}else if (group->name==std::string("safezones")){
+						for(auto obj: group->objects){
+							if (obj->type==OBJECT_QUAD){
+								safezones[obj->gid]=quad(obj->x, obj->y, obj->width, obj->height);
+							}
 						}
-					}
+					}// add teleport zones with id fix
 				}
+				delete map;
+				free(xml);
+//				printf("Map %s loaded\n", path);				
+			}catch(...){
+				printf("Error loading map %s\n", path);
 			}
-			delete map;
-			free(xml);
 		}else{
 			printf("Can't loadFile map %s\n", path);
 		}
@@ -239,5 +249,9 @@ namespace share{
 			}
 		}
 		return out;
+	}
+	
+	int map::getId(char *s){
+		return crc32((const void*)s, (size_t)strlen(s));
 	}
 }

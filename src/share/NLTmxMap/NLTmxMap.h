@@ -88,6 +88,8 @@ public:
     
     int width;
     int height;
+	int cell_x;
+	int cell_y;
     int tileWidth;
     int tileHeight;
     

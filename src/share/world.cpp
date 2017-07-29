@@ -1,6 +1,7 @@
 #include <queue>
 
 #include "../share/network/packet.h"
+#include "../share/system/folder.h"
 #include "world.h"
 
 /*
@@ -69,8 +70,7 @@ namespace share {
 		main_loop(0),
 		sock(0)
 	{	
-		map_size[0]=320;
-		map_size[1]=320;
+//		folder::forEachFile((char*)"../maps/*.tmx", [&maps](char *s){ maps[map::getId(s)]=new map(s); });
 	}
 	
 	world::~world(){

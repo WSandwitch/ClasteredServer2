@@ -37,7 +37,7 @@ namespace share {
 			int map_size[2];
 			int offset;
 		
-			map(int x=10, int y=10, char *path="../maps/map.tmx");
+			map(char *path="../maps/map.tmx");
 			~map();
 			share::cell* cells(int id);
 			share::cell* cells(point &p);
@@ -57,6 +57,8 @@ namespace share {
 			quad& nearest_safezone(typeof(point::x) x, typeof(point::y) y);
 			quad& nearest_safezone(point& p);
 			int nearest_safezone_id(point& p);
+			
+			static int getId(char* s);
 			
 			friend std::ostream& operator<<(std::ostream &stream, const map &m);
 		private:

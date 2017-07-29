@@ -29,7 +29,6 @@ namespace share {
 
 	struct world {
 		int id;
-		float map_size[2];
 		float map_offset;
 		bool main_loop;
 		short tps;
@@ -37,6 +36,7 @@ namespace share {
 		share::mutex npcs_m;
 		share::socket* sock;
 		share::map map;
+		std::unordered_map<int, share::map*> maps; //TODO: change map to this
 		std::list<npc*> new_npcs;
 		std::unordered_set<int> old_npcs;
 		std::unordered_map<int, npc*> npcs;
