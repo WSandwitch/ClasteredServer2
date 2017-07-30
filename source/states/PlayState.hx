@@ -75,7 +75,7 @@ class PlayState extends CSState
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
 	private var _map:CSMap;
-	private var _gamepad:ScreenGamepad;
+	private var _gamepad:Null<ScreenGamepad>;
 	
 	private var _map_group:FlxGroup = new FlxGroup();
 	private var _hud_group:FlxGroup = new FlxGroup();
@@ -157,10 +157,8 @@ class PlayState extends CSState
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
 */
-	#if mobile
-		_gamepad = new ScreenGamepad();
-		add(_gamepad);
-	#end
+		//add gamepad to screen
+		addGamepad();
 		//change to normal mapping
 		var a = actions.addAction(GO_UP);
 		a.addKey(FlxKey.W);
@@ -297,6 +295,19 @@ class PlayState extends CSState
 		var _w:Int = Std.int(w / FlxG.scaleMode.scale.x);
 		var _h:Int = Std.int(h / FlxG.scaleMode.scale.y);
 		_map.resize(_w, _h);
+		
+		addGamepad();
+	}
+	
+	public function addGamepad(){
+	#if mobile
+		if (_gamepad != null){
+			remove(_gamepad);
+			_gamepad.destroy();
+		}
+		_gamepad = new ScreenGamepad();
+		add(_gamepad);
+	#end
 	}
 	
 	private function checkInput(elapsed:Float) {

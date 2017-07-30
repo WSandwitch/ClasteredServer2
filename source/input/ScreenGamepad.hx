@@ -76,7 +76,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	private var _offset:FlxPoint = new FlxPoint();
 	private var _random:FlxRandom = new FlxRandom();
 	private var _ids:Array<Int> = [];
-	private var _scale_dpi:Float = 1;
+	private var _scale:Float = 1;
 	/**
 	 * Create a gamepad which contains 4 directional buttons and 4 action buttons, and 2 analog sticks.
 	 * 
@@ -85,17 +85,14 @@ class ScreenGamepad extends FlxSpriteGroup{
 	 * @param 	buttonSize		Size of the button.
 	 * @param 	offset		Offset of the screen borders, and between buttons/analog.
 	 */
-	public function new(?M:FlxMode, useStartBack:Bool=true, ?buttonSize:FlxPoint, ?offset:FlxPoint){	
+	public function new(scale:Float=1.0, ?M:FlxMode, useStartBack:Bool=true, ?buttonSize:FlxPoint, ?offset:FlxPoint){	
 		super();
+		_scale = scale;
 		id = _random.int(1, 1000, _ids);
 		_ids.push(id);
 		if (buttonSize==null)
 			buttonSize = new FlxPoint(32, 32);
-	#if mobile
-		_scale_dpi = Capabilities.screenDPI / 125; //125 - default dpi
-	#end
-	
-		_buttonSize = new FlxPoint(Math.round(buttonSize.x*_scale_dpi), Math.round(buttonSize.y*_scale_dpi));
+		_buttonSize = new FlxPoint(Math.round(buttonSize.x*_scale), Math.round(buttonSize.y*_scale));
 		if (offset==null)
 			offset = new FlxPoint(_buttonSize.x*0.7, _buttonSize.y*0.7);
 		_offset = offset;
@@ -157,7 +154,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogLeft.base.y += analogLeft.base.height / 2;
 		analogLeft.base.frames = base_sprite.frames;
 		analogLeft.base.resetSizeFromFrame();
-		analogLeft.base.scale.set(_scale_dpi, _scale_dpi);
+		analogLeft.base.scale.set(_scale, _scale);
 		analogLeft.base.updateHitbox();
 		analogLeft.base.x -= analogLeft.base.width / 2;
 		analogLeft.base.y -= analogLeft.base.height / 2;
@@ -165,7 +162,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogLeft.thumb.y += analogLeft.thumb.height / 2;
 		analogLeft.thumb.frames = thumb_sprite.frames;
 		analogLeft.thumb.resetSizeFromFrame();
-		analogLeft.thumb.scale.set(_scale_dpi, _scale_dpi);
+		analogLeft.thumb.scale.set(_scale, _scale);
 		analogLeft.thumb.updateHitbox();
 		analogLeft.thumb.x -= analogLeft.thumb.width / 2;
 		analogLeft.thumb.y -= analogLeft.thumb.height / 2;
@@ -180,7 +177,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogRight.base.y += analogRight.base.height / 2;
 		analogRight.base.frames = base_sprite.frames;
 		analogRight.base.resetSizeFromFrame();
-		analogRight.base.scale.set(_scale_dpi, _scale_dpi);
+		analogRight.base.scale.set(_scale, _scale);
 		analogRight.base.updateHitbox();
 		analogRight.base.x -= analogRight.base.width / 2;
 		analogRight.base.y -= analogRight.base.height / 2;
@@ -188,7 +185,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		analogRight.thumb.y += analogRight.thumb.height / 2;
 		analogRight.thumb.frames = thumb_sprite.frames;
 		analogRight.thumb.resetSizeFromFrame();
-		analogRight.thumb.scale.set(_scale_dpi, _scale_dpi);
+		analogRight.thumb.scale.set(_scale, _scale);
 		analogRight.thumb.updateHitbox();
 		analogRight.thumb.x -= analogRight.thumb.width / 2;
 		analogRight.thumb.y -= analogRight.thumb.height / 2;
@@ -197,7 +194,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		add(analogRight);
 		
 		if (_radius == 0)
-			_radius = _scale_dpi*(analogLeft.base.width)/2;
+			_radius = _scale*(analogLeft.base.width)/2;
 		
 		setMode(M);
 		setAlpha(0.5);
@@ -223,6 +220,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 //		trace(M);
 		mode = M;
 	#if mobile
+		//check for scale
 		if (w == null)
 			w = FlxG.width;
 		if (h == null)
@@ -233,7 +231,11 @@ class ScreenGamepad extends FlxSpriteGroup{
 		if (h == null)
 			h = FlxG.camera.height;
 	#end
-		//TODO: add scale correction
+		//scale correction
+//		var _scale_dpi = ((FlxG.scaleMode.scale.x + FlxG.scaleMode.scale.y) / 2);  //Capabilities.screenDPI / 125; //125 - default dpi
+//		w = cast( w / _scale_dpi);
+//		h = cast( h / _scale_dpi);
+
 		var buttons_shift:FlxPoint = new FlxPoint(_distanse.x / 2 + _buttonSize.x, _distanse.y / 2 + _buttonSize.y);
 		switch (M){
 			//TODO: add inverse modes (as it has angle=180)
@@ -312,7 +314,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 		var button = new FlxButton(X, Y);
 		button.frames = _frames[Graphic];
 		button.resetSizeFromFrame();
-		button.scale.set(_scale_dpi, _scale_dpi);
+		button.scale.set(_scale, _scale);
 		button.updateHitbox();
 		button.solid = false;
 		button.immovable = true;

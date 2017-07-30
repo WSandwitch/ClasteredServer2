@@ -37,7 +37,7 @@ namespace share{
 		} weapon;
 		struct {
 			short health; //basic health max, of health addition
-		} base; //commen for base, addition for speciales
+		} base; //common for base, addition for speciales
 		///----------
 		object();
 		void init_attrs();

@@ -123,7 +123,7 @@ namespace share {
 			void move();
 			void shoot();
 			void set_dir();
-			void set_dir(float x, float y);
+			void set_dir(float x, float y, bool to_1=1);
 			float vel_angle(float max);
 			bool hurt(short d);
 			void hurt(npc* n);

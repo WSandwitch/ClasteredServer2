@@ -338,11 +338,11 @@ namespace share {
 			set_dir(direction.x, direction.y);
 	}
 
-	void npc::set_dir(float x, float y){
+	void npc::set_dir(float x, float y, bool to_1){
 		set_attr(direction.x, x);
 		set_attr(direction.y, y);
 		timestamp=share::time(0);
-		direction.normalize();
+		direction.normalize(to_1);
 	}
 	
 //hurt for d health

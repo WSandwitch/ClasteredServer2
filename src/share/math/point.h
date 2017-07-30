@@ -12,7 +12,7 @@ namespace share {
 				
 				point_();
 				point_(T _x, T _y);
-				void normalize();
+				void normalize(bool _const=1);
 				char to_angle();
 				template <class T1>
 					void by_angle(char angle, T1 l=1);

@@ -15,9 +15,9 @@ namespace share {
 		}
 
 	template<class T>		
-		void point_<T>::normalize(){
+		void point_<T>::normalize(bool _const){
 			float l=sqrtf(sqr(x)+sqr(y));
-			if (l>0){
+			if (_const ? l>0 : l>1){
 				x=x/l;
 				y=y/l;
 			}

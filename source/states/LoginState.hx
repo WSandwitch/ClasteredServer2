@@ -39,14 +39,15 @@ class LoginState extends CSState
 		
 		trace("login state");
 		
-		
 		//add show cursor
 		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
+	
 		////end
 		if (game.login == null && game.pass == null)
 			FlxG.switchState(new LoadState());
 		else
 			trace("Login error");
+		
 	}
 	
 	override 

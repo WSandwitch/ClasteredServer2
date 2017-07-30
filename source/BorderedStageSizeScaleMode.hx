@@ -9,7 +9,11 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 	
 	public function new(scale:Float = 1){
 		super();
-		_scale_val = scale;
+		updateScale(scale);
+	}
+	
+	public function updateScale(s:Float){
+		_scale_val = s;
 		onMeasure(FlxG.width, FlxG.height); 
 	}
 	
@@ -26,8 +30,8 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 			var oldW = FlxG.camera.width;
 			var oldH = FlxG.camera.height;
 			
-			var newW = Math.ceil(Width / FlxG.camera.zoom / _scale_val);
-			var newH = Math.ceil(Height / FlxG.camera.zoom / _scale_val);
+			var newW = Math.ceil(Width / _scale_val);
+			var newH = Math.ceil(Height / _scale_val); // / FlxG.camera.zoom 
 			
 			FlxG.camera.setSize(newW, newH);
 			FlxG.camera.flashSprite.x += (newW - oldW) / 2;

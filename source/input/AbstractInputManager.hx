@@ -133,14 +133,14 @@ class AbstractInputManager{
 		}				
 	}
 
-	private static var axis_schema:Map<FlxGamepadInputID, Array<GamepadAxisID>> = [
+	private static var _axis_schema:Map<FlxGamepadInputID, Array<GamepadAxisID>> = [
 		FlxGamepadInputID.LEFT_TRIGGER=> [LEFT_TRIGGER_PLUS, LEFT_TRIGGER_MINUS],
 		FlxGamepadInputID.RIGHT_TRIGGER=> [RIGHT_TRIGGER_PLUS, RIGHT_TRIGGER_MINUS],
 		FlxGamepadInputID.POINTER_X=> [POINTER_X_PLUS, POINTER_X_MINUS],
 		FlxGamepadInputID.POINTER_Y=> [POINTER_Y_PLUS, POINTER_Y_MINUS]
 	];
 
-	private static var axis_xy_schema:Map<FlxGamepadInputID, Array<GamepadAxisID>> = [
+	private static var _axis_xy_schema:Map<FlxGamepadInputID, Array<GamepadAxisID>> = [
 		FlxGamepadInputID.LEFT_ANALOG_STICK=> [LEFT_STICK_X_PLUS, LEFT_STICK_X_MINUS, LEFT_STICK_Y_PLUS, LEFT_STICK_Y_MINUS],
 		FlxGamepadInputID.RIGHT_ANALOG_STICK=> [RIGHT_STICK_X_PLUS, RIGHT_STICK_X_MINUS, RIGHT_STICK_Y_PLUS, RIGHT_STICK_Y_MINUS]
 	];
@@ -219,7 +219,7 @@ class AbstractInputManager{
 				if (gaxis_ignore != null){
 					var axis:Float;
 					for (ai in [FlxGamepadInputID.POINTER_X, FlxGamepadInputID.POINTER_Y]){//, FlxGamepadInputID.LEFT_TRIGGER, FlxGamepadInputID.RIGHT_TRIGGER]){					
-						var schema:Array<GamepadAxisID> = axis_schema[ai];
+						var schema:Array<GamepadAxisID> = _axis_schema[ai];
 						var axis:Float = gamepad.getAxis(ai);
 						if (Math.abs(axis) > treshhold){
 							if (axis>0){
@@ -236,7 +236,7 @@ class AbstractInputManager{
 						}
 					}
 					for (ai in [FlxGamepadInputID.LEFT_ANALOG_STICK, FlxGamepadInputID.RIGHT_ANALOG_STICK]){					
-						var schema:Array<GamepadAxisID> = axis_xy_schema[ai];
+						var schema:Array<GamepadAxisID> = _axis_xy_schema[ai];
 						var axis:Float = gamepad.getXAxis(ai);
 						if (Math.abs(axis) > treshhold){
 							if (axis>0){
@@ -272,6 +272,8 @@ class AbstractInputManager{
 		return null;
 	}
 }
+
+////////////////////////////////////////////////////////////////
 
 class AbstractInputAction{
 	
@@ -447,6 +449,8 @@ class AbstractInputAction{
 	
 }
 
+////////////////////////////////////////////////////////////////
+
 class AbstractInputGamepadAxisID extends AbstractInputID{
 
 	public var key:GamepadAxisID;
@@ -600,7 +604,7 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 
 }
 
-
+////////////////////////////////////////////////////////////////
 
 class AbstractInputGamepadKeyID extends AbstractInputID{
 	
@@ -645,6 +649,8 @@ class AbstractInputGamepadKeyID extends AbstractInputID{
 	}
 
 }
+
+////////////////////////////////////////////////////////////////
 
 class AbstractInputMouseID extends AbstractInputID{
 	
@@ -701,6 +707,8 @@ class AbstractInputMouseID extends AbstractInputID{
 
 }
 
+////////////////////////////////////////////////////////////////
+
 class AbstractInputKeyboardID extends AbstractInputID{
 
 	public var key:FlxKey;
@@ -733,6 +741,8 @@ class AbstractInputKeyboardID extends AbstractInputID{
 	}
 
 }
+
+////////////////////////////////////////////////////////////////
 
 class AbstractInputID{
 	

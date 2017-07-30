@@ -191,7 +191,7 @@ namespace master {
 			}
 			if (dir==2){
 				n->m.lock();
-					n->set_dir(x, y);
+					n->set_dir(x, y, 0);
 				n->m.unlock();
 //				printf("set dir (%d %d)\n", x,y);
 			}

@@ -23,19 +23,20 @@ class Main extends Sprite
 	#end
 		FlxG.autoPause = false;
 		//FlxG.fixedTimestep = false;
-		trace('screen dpi '+Capabilities.screenDPI);
+		trace('screen dpi ' + Capabilities.screenDPI);
+		
 	#if flash //72 dpi
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
 	#else
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(Capabilities.screenDPI/96.0);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
+//		FlxG.scaleMode = new BorderedStageSizeScaleMode(Capabilities.screenDPI/96.0);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(1.4);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
 //		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 	#end
+//		FlxG.camera.zoom = 1.1;
 	//read config and setup
 	#if desktop
 		//you can resize window on fly
-//		FlxG.resizeGame(1024, 800);
-//		FlxG.resizeWindow(1024, 800);
-//		FlxG.camera.setSize(1024, 800);
+//		CSGame.resizeWindow(1024, 768);
 	#end
 		//FlxG.fullscreen = true;
 		//FlxG.switchState(new PlayState());
@@ -43,5 +44,6 @@ class Main extends Sprite
 		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
 	#end
+		trace(FlxG.scaleMode);
 	}
 }
