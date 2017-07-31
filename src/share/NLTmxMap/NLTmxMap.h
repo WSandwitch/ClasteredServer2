@@ -3,6 +3,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -88,10 +89,9 @@ public:
     
     int width;
     int height;
-	int cell_x;
-	int cell_y;
     int tileWidth;
     int tileHeight;
+	map<string, string> properties;
     
     vector<NLTmxMapTileset*> tilesets;
     vector<NLTmxMapLayer*> layers;

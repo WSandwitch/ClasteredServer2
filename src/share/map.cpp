@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <string.h>
 #include <math.h>
 
 #include "map.h"
@@ -61,10 +62,8 @@ namespace share{
 			try{
 				NLTmxMap* map = NLLoadTmxMap( xml );
 				//fill data
-				if (map->cell_x)
-					cell.x=map->cell_x;
-				if (map->cell_y)
-					cell.y=map->cell_y;
+				try{cell.x=stoi(map->properties.at("cell_x"));}catch(...){}
+				try{cell.y=stoi(map->properties.at("cell_y"));}catch(...){}
 				map_size[0]=map->tileWidth*map->width;
 				map_size[1]=map->tileHeight*map->height;
 				for(auto group: map->groups){

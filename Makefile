@@ -29,8 +29,8 @@ STORAGE?=TEXT
 DEFINES:= -DSTORAGE_$(STORAGE)
 
 ifneq ($(DEBUG),0)
-    CFLAGS +=-g -ggdb3 -rdynamic
-    CPPFLAGS +=-g -ggdb3 -rdynamic
+    CFLAGS +=-g -ggdb3 -rdynamic -fno-omit-frame-pointer
+    CPPFLAGS +=-g -ggdb3 -rdynamic -fno-omit-frame-pointer
 	DEFINES += -DDEBUG
 endif
 

@@ -30,13 +30,16 @@ NLTmxMap* NLLoadTmxMap( char *xml )
     xml_node<> *mapnode = doc.first_node("map");
     
     NLTmxMap* map = new NLTmxMap();
-    auto c_x=mapnode->first_attribute( "cell_x" );
-	if (c_x)
-		map->cell_x = atoi( c_x->value() );
-    auto c_y=mapnode->first_attribute( "cell_y" );
-	if (c_y)
-		map->cell_y = atoi( c_y->value() );
-    map->width = atoi( mapnode->first_attribute( "width" )->value() );
+	//get user defined properties
+    auto props=mapnode->first_node( "properties" );
+	if (props){
+		auto prop=mapnode->first_node( "property" );
+		while ( prop ) {
+			map->properties[string(prop->first_attribute( "name" )->value())] = string(prop->first_attribute( "value" )->value());
+			prop = prop->next_sibling( "property" );
+		}
+	}
+	map->width = atoi( mapnode->first_attribute( "width" )->value() );
     map->height = atoi( mapnode->first_attribute( "height" )->value() );
     map->tileWidth = atoi( mapnode->first_attribute( "tilewidth" )->value() );
     map->tileHeight = atoi( mapnode->first_attribute( "tileheight" )->value() );
