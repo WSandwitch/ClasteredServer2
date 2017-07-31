@@ -19,6 +19,7 @@ extern "C"{
 #include "../share/network/bytes_order.h"
 #include "world.h"
 #include "../share/npc.h"
+#include "../share/system/stacktrace.h"
 
 using namespace slave;
 using namespace share;
@@ -37,16 +38,8 @@ static void default_sigaction(int signal, siginfo_t *si, void *arg){
 #ifndef __CYGWIN__
 static void segfault_sigaction(int sig){
 	printf("Cought segfault, exiting\n");
-	void *array[20];
-	size_t size;
-	
-	// get void*'s for all entries on the stack
-	size = backtrace(array, 20);
-
-	// print out all the frames to stderr
-	fprintf(stderr, "Error: signal %d:\n", sig);
-	backtrace_symbols_fd(array, size, STDERR_FILENO);
-	world.main_loop=(world.main_loop+1)&1;
+	print_stacktrace();
+	world.main_loop=0;//(world.main_loop+1)&1; //WHY?
 	exit(1);
 }
 #endif

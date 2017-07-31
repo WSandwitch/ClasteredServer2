@@ -33,6 +33,7 @@
 #include "../share/network/packet.h"
 #include "../share/system/sync.h"
 #include "../share/system/log.h"
+#include "../share/system/stacktrace.h"
 #include "../share/world.h"
 #include "../share/messages.h"
 #include "../share/object.h"
@@ -128,17 +129,7 @@ static void default_sigaction(int signal, siginfo_t *si, void *arg){
 
 static void segfault_sigaction(int sig){
 	printf("Cought segfault, exiting\n");
-#ifndef __CYGWIN__
-	void *array[20];
-	size_t size;
-
-	// get void*'s for all entries on the stack
-	size = backtrace(array, 20);
-
-	// print out all the frames to stderr
-	fprintf(stderr, "Error: signal %d:\n", sig);
-	backtrace_symbols_fd(array, size, STDERR_FILENO);
-#endif
+	print_stacktrace();
 	main_loop=0;
 	exit(1);
 }
@@ -212,6 +203,9 @@ int main(int argc,char* argv[]){
 //				printf("Listener %d added\n",l->sockfd);
 		}
 	}
+	
+	print_stacktrace();
+		int *a=0;a[1]=3;
 
 	storageInit(&config.storage);
 	grid=new master::special::grid(master::world.map.map_size, master::world.map.offset);
