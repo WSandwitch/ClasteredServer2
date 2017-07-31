@@ -54,16 +54,10 @@ public:
     int y;
     int width;
     int height;
-    vector<NLTmxMapObjectProperty*> properties;
+//    vector<NLTmxMapObjectProperty*> properties;
 	vector<NLTmxMapPoint> points; //line from 0 to size()-1
-
-public:
-    
-    ~NLTmxMapObject() {
-        for ( auto property : properties ) {
-            delete property;
-        }
-    }
+	map<string, string> properties;
+	
 };
 
 

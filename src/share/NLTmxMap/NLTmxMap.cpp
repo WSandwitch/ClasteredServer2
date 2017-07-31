@@ -30,8 +30,13 @@ NLTmxMap* NLLoadTmxMap( char *xml )
     xml_node<> *mapnode = doc.first_node("map");
     
     NLTmxMap* map = new NLTmxMap();
+	map->width = atoi( mapnode->first_attribute( "width" )->value() );
+    map->height = atoi( mapnode->first_attribute( "height" )->value() );
+    map->tileWidth = atoi( mapnode->first_attribute( "tilewidth" )->value() );
+    map->tileHeight = atoi( mapnode->first_attribute( "tileheight" )->value() );
+
 	//get user defined properties
-    auto props=mapnode->first_node( "properties" );
+	auto props=mapnode->first_node( "properties" );
 	if (props){
 		auto prop=mapnode->first_node( "property" );
 		while ( prop ) {
@@ -39,11 +44,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
 			prop = prop->next_sibling( "property" );
 		}
 	}
-	map->width = atoi( mapnode->first_attribute( "width" )->value() );
-    map->height = atoi( mapnode->first_attribute( "height" )->value() );
-    map->tileWidth = atoi( mapnode->first_attribute( "tilewidth" )->value() );
-    map->tileHeight = atoi( mapnode->first_attribute( "tileheight" )->value() );
-    
+
     xml_node<> *tilesetnode = mapnode->first_node( "tileset" );
     
     while ( tilesetnode ) {
@@ -119,6 +120,16 @@ NLTmxMap* NLLoadTmxMap( char *xml )
         while ( objectnode ) {
             NLTmxMapObject* object = new NLTmxMapObject();
             
+			//get user defined properties
+			auto oprops=objectnode->first_node( "properties" );
+			if (oprops){
+				auto prop=objectnode->first_node( "property" );
+				while ( prop ) {
+					object->properties[string(prop->first_attribute( "name" )->value())] = string(prop->first_attribute( "value" )->value());
+					prop = prop->next_sibling( "property" );
+				}
+			}
+			
             auto nameattr = objectnode->first_attribute( "name" );
             if ( nameattr ) {
                 object->name = nameattr->value();
@@ -181,23 +192,6 @@ NLTmxMap* NLLoadTmxMap( char *xml )
 				object->type=OBJECT_POLYLINE;
             }
 			
-			xml_node<> *propertiesnode = objectnode->first_node( "properties" );
-            
-            if ( propertiesnode ) {
-                
-                xml_node<> *propertynode = propertiesnode->first_node( "property" );
-                
-                while ( propertynode ) {
-                    NLTmxMapObjectProperty* property = new NLTmxMapObjectProperty();
-                    property->name = propertynode->first_attribute( "name" )->value();
-                    property->value = propertynode->first_attribute( "value" )->value();
-                    
-                    object->properties.push_back( property );
-                    
-                    propertynode = propertynode->next_sibling( "property" );
-                }
-            }
-            
             group->objects.push_back( object );
             
             objectnode = objectnode->next_sibling( "object" );

@@ -88,6 +88,6 @@ $(PUBLIC)_fast:
 	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) $(DEFINES) $(HEADERS) -o bin/$(PUBLIC)
 
 clean:
-	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o
+	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(DEPS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o
 	
 -include $(DEPS)
