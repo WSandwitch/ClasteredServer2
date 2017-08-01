@@ -10,7 +10,10 @@ extern "C"{
 }
 
 namespace share {
-
+	class packet;
+	
+	typedef bool (packet::*add_func)(void*);
+	
 	class packet_chank{
 		public:
 			char type;
@@ -26,6 +29,11 @@ namespace share {
 			int size();
 			void* data();
 			FILE* stream();
+			template<class T> 
+				int size_func();
+			int size_func_str();
+			template<typename T> 
+				void* data_func();
 	};
 	
 	class packet {
@@ -50,8 +58,13 @@ namespace share {
 			bool add(std::string);
 			bool add(char*, short);
 			bool add(void*, short size);
+			bool add(short type, void* data);
+			template<class T> 
+				bool add(void*);
 			template<class T>
 				bool operator<<(T o){return add(o);}
+				
+			static add_func add_funcs[6];
 		private: 
 			std::vector<char> buf;
 			

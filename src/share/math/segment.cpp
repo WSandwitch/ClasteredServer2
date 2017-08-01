@@ -37,6 +37,12 @@ namespace share {
 		return a.distanse(b);
 	}
 
+	float segment::length(float l){
+		b.x=(b.x-a.x)*l;
+		b.y=(b.y-a.y)*l;
+		return a.distanse(b);
+	}
+
 	char segment::cross(segment *s){
 		typeof(point::x) v1=this->vector(s->a);
 		typeof(point::x) v2=this->vector(s->b);

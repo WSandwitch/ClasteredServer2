@@ -20,35 +20,50 @@ extern "C"{
 
 namespace share {
 	
+	typedef int (packet_chank::*size_func_t)();
+	typedef void* (packet_chank::*data_func_t)();
+	
+	template<class T> int packet_chank::size_func(){
+		return sizeof(T);
+	}
+	int packet_chank::size_func_str(){
+		return str.size();
+	}
+	
+	static	size_func_t _size_funcs[7]={0, &packet_chank::size_func<char>, &packet_chank::size_func<short>, &packet_chank::size_func<int>, &packet_chank::size_func<float>, &packet_chank::size_func<double>, &packet_chank::size_func_str};
+	
 	int packet_chank::size(){
-		if (type==1)
-			return sizeof(char);
-		if (type==2)
-			return sizeof(short);
-		if (type==3)
-			return sizeof(int);
-		if (type==4)
-			return sizeof(float);
-		if (type==5)
-			return sizeof(double);
-		if (type==6)
-			return str.size();
+		if (type>0 && type<7)
+			return (this->*_size_funcs[(short)type])();
 		return 0;
 	}
 	
+	template<typename T> void* packet_chank::data_func(){
+		return 0;
+	}
+	template<> void* packet_chank::data_func<char>(){
+		return &value.c;
+	}
+	template<> void* packet_chank::data_func<short>(){
+		return &value.s;
+	}
+	template<> void* packet_chank::data_func<int>(){
+		return &value.i;
+	}
+	template<> void* packet_chank::data_func<float>(){
+		return &value.f;
+	}
+	template<> void* packet_chank::data_func<double>(){
+		return &value.d;
+	}
+	template<> void* packet_chank::data_func<std::string>(){
+		return (void*)str.c_str();
+	}
+	static	data_func_t _data_funcs[7]={0, &packet_chank::data_func<char>, &packet_chank::data_func<short>, &packet_chank::data_func<int>, &packet_chank::data_func<float>, &packet_chank::data_func<double>, &packet_chank::data_func<std::string>}; 
+	
 	void* packet_chank::data(){
-		if (type==1)
-			return &value.c;
-		if (type==2)
-			return &value.s;
-		if (type==3)
-			return &value.i;
-		if (type==4)
-			return &value.f;
-		if (type==5)
-			return &value.d;
-		if (type==6)
-			return (void*)str.c_str();
+		if (type>0 && type<7)
+			return (this->*_data_funcs[(short)type])();
 		return 0;
 	}
 	
@@ -196,6 +211,19 @@ namespace share {
 		buf.insert(buf.end(), data, data+s);
 		buf[1]=buf[1]+1>125?-1:buf[1]+1;
 		return 0;
+	}
+	
+	template<class T>
+		bool packet::add(void *data){
+			return add(*(T*)data);
+		}
+		
+	add_func packet::add_funcs[6]={0, &packet::add<char>, &packet::add<short>, &packet::add<int>, &packet::add<float>, &packet::add<double>};
+		
+	bool packet::add(short type, void* data){
+		if (type>0 && type<6)
+			return (this->*packet::add_funcs[type])(data);
+		return add((char)0);
 	}
 	
 	void packet::parse(){

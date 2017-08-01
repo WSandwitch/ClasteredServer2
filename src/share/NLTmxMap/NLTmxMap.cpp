@@ -123,7 +123,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
 			//get user defined properties
 			auto oprops=objectnode->first_node( "properties" );
 			if (oprops){
-				auto prop=objectnode->first_node( "property" );
+				auto prop=oprops->first_node( "property" );
 				while ( prop ) {
 					object->properties[string(prop->first_attribute( "name" )->value())] = string(prop->first_attribute( "value" )->value());
 					prop = prop->next_sibling( "property" );

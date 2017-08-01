@@ -75,8 +75,12 @@ namespace share{
 								segments.push_back(new segment(obj->x+obj->width, obj->y+obj->height, obj->x, obj->y+obj->height));
 								segments.push_back(new segment(obj->x, obj->y+obj->height, obj->x, obj->y));
 							}else{
-								for(int i=1, end=obj->points.size();i<end;i++)
-									segments.push_back(new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y));
+								for(int i=1, end=obj->points.size();i<end;i++){
+									auto s = new segment(obj->x+obj->points[i-1].x, obj->y+obj->points[i-1].y, obj->x+obj->points[i].x, obj->y+obj->points[i].y);
+									if (obj->properties["directed"]=="true")
+										s->directed=1;
+									segments.push_back(s);
+								}
 							}
 						}
 					}else if (group->name==std::string("safezones")){

@@ -391,11 +391,7 @@ namespace share {
 //					printf("sizeof chank %d\n",p->chanks[i].size());
 					void* data=p->chanks[i].data();
 					if (data && p->chanks[i].size()==attr.size(index)){
-						if (memcmp(pattr, data, p->chanks[i].size())!=0){
-//							printf("%d updated\n", index);
-							attrs[index]=1;//updated
-							memcpy(pattr, data, p->chanks[i].size());
-						}
+						attrs[index]=set_attr(p->chanks[i].type, pattr, data);
 					}else{//smth wrong with server>server proxy
 						printf("npc update corrupt chank %d index %d (size %d == %d)\n", i, (int)index, p->chanks[i].size(), attr.size(index));
 					}
@@ -415,6 +411,21 @@ namespace share {
 			}
 		}
 		return 0;
+	}
+	
+	template<class T>
+		bool npc::set_attr(void* where, void* what){
+			if ((*(T*)where)!=(*(T*)what)){
+				(*(T*)where)=(*(T*)what);
+				return 1;
+			}
+			return 0;
+		}
+		
+	set_attr_func npc::set_attr_funcs[6]={0, &npc::set_attr<char>, &npc::set_attr<short>, &npc::set_attr<int>, &npc::set_attr<float>, &npc::set_attr<double>};
+	
+	bool npc::set_attr(short type, void *attr, void *data){
+		return (this->*set_attr_funcs[type])(attr, data);
 	}
 	
 #define packAttr0(p, a, b)\
@@ -439,35 +450,10 @@ namespace share {
 				p.setType(MESSAGE_NPC_UPDATE);//npc update
 				p.add(id);
 				for(auto $: as){
-					void *a=attr($);
 					if (all || attrs[$]){
+						void *a=attr($);
 						p.add((char)$);
-	//					printf("added type %d index %d\n", attr.type(a), $);
-						switch(attr.type(a)){
-							case 1:
-								p.add(*(char*)a);
-	//							printf("added type value %d\n", *(char*)a);
-								break;
-							case 2:
-								p.add(*(short*)a);
-	//							printf("added type value %d\n", *(short*)a);
-								break;
-							case 3:
-								p.add(*(int*)a);
-	//							printf("added type value %d\n", *(int*)a);
-								break;
-							case 4:
-								p.add(*(float*)a);
-	//							printf("added type value %g\n", *(float*)a);
-								break;
-							case 5:
-								p.add(*(double*)a);
-	//							printf("added type value %lg\n", *(double*)a);
-								break;
-							default:
-								p.add((char)0);
-								break;
-						}
+						p.add(attr.type(a), a);
 					}
 				}
 				_pack.done=1;
@@ -493,8 +479,12 @@ namespace share {
 		return n;
 	}
 	
+	
+	
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
+		segment ps(position,p);
+		ps.length(r*-2);
 		std::list<int> &&ids=world->map.near_cells(x, y, r); //!check this!
 		std::unordered_set<segment*> done;
 		//printf("segments %d \n", world->map.segments.size());
@@ -503,9 +493,11 @@ namespace share {
 			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
 				segment *s=cell->segments[i];
 				if (done.count(s)==0){ //uniq check
-					if(s->distanse(p)<=r){
-						//printf("dist \n");
-						return 0;
+					if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //TODO: check is it right
+						if(s->distanse(p)<=r){
+							//printf("dist \n");
+							return 0;
+						}
 					}
 					done.insert(s);
 				}

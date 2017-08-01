@@ -30,6 +30,7 @@ namespace share {
 	class npc_shoots;
 	class world;
 	
+	typedef bool (npc:: *set_attr_func)(void*, void*);
 	typedef void (npc:: *shoot_func)(typeof(point::x) x, typeof(point::y) y);
 	typedef void (npc:: *move_func)(typeof(point::x) x, typeof(point::y) y);
 	
@@ -135,6 +136,9 @@ namespace share {
 			void pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe
 			bool update_cells();//threadsafe
 			
+			template<class T>
+				bool set_attr(void*, void*);//set attr on addr by type
+			bool set_attr(short type, void *where, void *what);//set attr on addr by type
 			template<class T1, class T2>
 			T1 set_attr(T1 &a, T2 v){
 				T1 $=a;
@@ -146,6 +150,7 @@ namespace share {
 
 			static std::unordered_map<short, move_func> moves;
 			static std::unordered_map<short, shoot_func> shoots;
+			static set_attr_func set_attr_funcs[6];
 			
 			static npc* addBot(share::world *world, int id, float x, float y, short type=0);
 			

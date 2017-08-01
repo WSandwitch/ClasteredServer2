@@ -17,6 +17,7 @@ namespace share {
 			float distanse(point &p);
 			float signed_area2(point &p);
 			float length();
+			float length(float l);
 			char cross(segment *b);
 			typeof(point::x) vector(point &p); //vector mul
 			typeof(segment::a) to_vector(); 
