@@ -35,22 +35,22 @@ namespace share {
 					return _size++;
 				};
 			void* operator()(char id){
-				try{//check if it's slow
+				try{
 					return base+attr_shift.at(id);
 				}catch(...){
 					return 0;
 				}
 			};
 			char operator()(void* attr){
-				try{//check if it's slow
-					return shift_attr.at((size_t)attr-(size_t)base);
+				try{
+					return shift_attr.at((size_t)attr-(size_t)base);//TODO:faster cast
 				}catch(...){
 					return 0;
 				}
 			};
 			char type(void* attr){
-				try{//check if it's slow
-					return attr_type[(size_t)attr-(size_t)base];
+				try{
+					return attr_type.at((size_t)attr-(size_t)base);
 				}catch(...){
 					return 0;
 				}
@@ -59,15 +59,15 @@ namespace share {
 				return attr_size.size();
 			};
 			unsigned short size(char id){
-				try{//check if it's slow
-					return attr_size[id];
+				try{
+					return attr_size.at(id);
 				}catch(...){
 					return 0;
 				}
 			};
 			unsigned short size(void* attr){
-				try{//check if it's slow
-					return attr_size[operator()(attr)];
+				try{
+					return attr_size.at(operator()(attr));
 				}catch(...){
 					return 0;
 				}

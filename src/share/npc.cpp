@@ -419,7 +419,7 @@ namespace share {
 	
 #define packAttr0(p, a, b)\
 	do{\
-		int $=attr(&(a));\
+		register int $=attr(&(a));\
 		if (b || attrs[$]){\
 			p.add((char)$);\
 			p.add(a);\

@@ -9,6 +9,7 @@ namespace share {
 	class segment{
 		public:
 			point a,b;
+			bool directed;
 			
 			segment();
 			segment(point _a, point _b);
@@ -16,7 +17,7 @@ namespace share {
 			float distanse(point &p);
 			float signed_area2(point &p);
 			float length();
-			bool cross(segment *b);
+			char cross(segment *b);
 			typeof(point::x) vector(point &p); //vector mul
 			typeof(segment::a) to_vector(); 
 			typeof(segment::a) rand_point_in();

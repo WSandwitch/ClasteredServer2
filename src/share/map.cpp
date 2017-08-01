@@ -62,8 +62,8 @@ namespace share{
 			try{
 				NLTmxMap* map = NLLoadTmxMap( xml );
 				//fill data
-				try{cell.x=stoi(map->properties.at("cell_x"));}catch(...){}
-				try{cell.y=stoi(map->properties.at("cell_y"));}catch(...){}
+				try{cell.x=atoi(map->properties.at("cell_x").c_str());}catch(...){}
+				try{cell.y=atoi(map->properties.at("cell_y").c_str());}catch(...){}
 				map_size[0]=map->tileWidth*map->width;
 				map_size[1]=map->tileHeight*map->height;
 				for(auto group: map->groups){

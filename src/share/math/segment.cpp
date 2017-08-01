@@ -29,7 +29,7 @@ namespace share {
 		return fabs(signed_area2(p)/length());
 	}
 
-	float segment::signed_area2(point &p){
+	float segment::signed_area2(point &p){ //the same as vector
 		return (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);
 	}
 
@@ -37,7 +37,7 @@ namespace share {
 		return a.distanse(b);
 	}
 
-	bool segment::cross(segment *s){
+	char segment::cross(segment *s){
 		typeof(point::x) v1=this->vector(s->a);
 		typeof(point::x) v2=this->vector(s->b);
 //		printf("%g %g \n",v1,v2);
@@ -45,8 +45,10 @@ namespace share {
 			v1=s->vector(this->a);
 			v2=s->vector(this->b);
 //			printf("%g %g \n",v1,v2);
-			if ((v1>=0 && v2<=0) || (v1<=0 && v2>=0))
+			if (v1>=0 && v2<=0)
 				return 1;
+			if (v1<=0 && v2>=0)
+				return -1;
 		}
 		return 0;
 	}

@@ -23,16 +23,14 @@ static inline long long changeEndianes(long long a){
 
 
 static inline float changeEndianes(float a){
-	register union{typeof(a) orig;int val;} u;
-	u.orig=a;
+	register union{typeof(a) orig;int val;} u={a};
 	u.val = ((u.val << 8) & 0xFF00FF00) | ((u.val >> 8) & 0xFF00FF );
 	u.val = (u.val << 16) | ((u.val >> 16) & 0xFFFF);
 	return u.orig;
 }
 
 static inline double changeEndianes(double a){
-	register union{typeof(a) orig;long long val;}u;
-	u.orig=a;
+	register union{typeof(a) orig;long long val;}u={a};
 	u.val = ((u.val << 8) & 0xFF00FF00FF00FF00ULL ) | ((u.val >> 8) & 0x00FF00FF00FF00FFULL );
 	u.val = ((u.val << 16) & 0xFFFF0000FFFF0000ULL ) | ((u.val >> 16) & 0x0000FFFF0000FFFFULL );
 	u.val = (u.val << 32) | ((u.val >> 32) & 0xFFFFFFFFULL);

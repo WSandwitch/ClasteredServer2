@@ -33,11 +33,12 @@ namespace share {
 	typedef void (npc:: *shoot_func)(typeof(point::x) x, typeof(point::y) y);
 	typedef void (npc:: *move_func)(typeof(point::x) x, typeof(point::y) y);
 	
-	#define attr3b_key(b1, b2, b3) ((b1?1:0)|(b2?2:0)|(b3?4:0))
+//	#define attr3b_key(b1, b2, b3) ((b1?1:0)|(b2?2:0)|(b3?4:0))
+#define attr3b_key(b1, b2, b3) ((b1)|(b2<<1)|(b3<<2))
 	
 	template<class T>
 		struct map3b{
-			std::unordered_map<short, T> p;
+			std::unordered_map<char, T> p;//TODO:maybe short?
 			
 			map3b(){};
 			map3b(map3b& a){};//can't be copyed
