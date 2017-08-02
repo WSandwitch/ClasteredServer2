@@ -134,7 +134,7 @@ namespace share {
 
 	bool npc::clear(){
 		for(auto i: attrs){
-			attrs[i.first]=0;
+			attrs[i.first]=0;//TODO: check for .second=
 		}
 		for(auto i: _packs){
 			i.second.done=0;
@@ -405,7 +405,7 @@ namespace share {
 	
 //check if any attrs were changed
 	bool npc::updated(){
-		for(unsigned i=0;i<attrs.size();i++){
+		for(int i=0, end=attrs.size();i<end;i++){
 			if (attrs[i]){
 				return 1;
 			}
@@ -484,7 +484,7 @@ namespace share {
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
 		segment ps(position,p);
-		ps.length(r*-2);
+		ps.length(r*3);
 		std::list<int> &&ids=world->map.near_cells(x, y, r); //!check this!
 		std::unordered_set<segment*> done;
 		//printf("segments %d \n", world->map.segments.size());

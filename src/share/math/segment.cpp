@@ -38,6 +38,13 @@ namespace share {
 	}
 
 	float segment::length(float l){
+		auto d=length();
+		b.x+=(b.x-a.x)/d*l;
+		b.y+=(b.y-a.y)/d*l;
+		return a.distanse(b);
+	}
+
+	float segment::mul(float l){
 		b.x=(b.x-a.x)*l;
 		b.y=(b.y-a.y)*l;
 		return a.distanse(b);
