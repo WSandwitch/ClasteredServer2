@@ -133,7 +133,7 @@ namespace share {
 			bool suicide(); 			
 			void update(share::packet * p);
 			bool updated(); 
-			void pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe
+			share::packet* pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe over packet
 			bool update_cells();//threadsafe
 			
 			template<class T>

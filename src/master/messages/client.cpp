@@ -164,38 +164,40 @@ namespace master {
 
 	static void *message_MESSAGE_SET_DIRECTION(client*cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
-		try{
-			npc *n=master::world.npcs.at(cl->npc_id);
-			typeof(point::x) x=0;
-			typeof(point::y) y=0;
-			short dir=0;
-			for(int i=0, end=p->chanks.size();i<end;i++){
-				int index=p->chanks[i++].value.c;
-				switch (index){
-					case 0://x
-						x=p->chanks[i].value.c/100.0;
-						dir++;
+//		master::world.m.lock();
+			try{
+				npc *n=master::world.npcs.at(cl->npc_id);
+				typeof(point::x) x=0;
+				typeof(point::y) y=0;
+				short dir=0;
+				for(int i=0, end=p->chanks.size();i<end;i++){
+					int index=p->chanks[i++].value.c;
+					switch (index){
+						case 0://x
+							x=p->chanks[i].value.c/100.0;
+							dir++;
+							break;
+						case 1://y
+							y=p->chanks[i].value.c/100.0;
+							dir++;
+							break;
+						case 2://angle
+							n->set_attr(n->angle, p->chanks[i].value.c);
+							break;
+						case 3://attack
+							n->attack(p->chanks[i].value.c);
+	//						printf("%d attack\n", p->chanks[i].value.c);
 						break;
-					case 1://y
-						y=p->chanks[i].value.c/100.0;
-						dir++;
-						break;
-					case 2://angle
-						n->set_attr(n->angle, p->chanks[i].value.c);
-						break;
-					case 3://attack
-						n->attack(p->chanks[i].value.c);
-//						printf("%d attack\n", p->chanks[i].value.c);
-					break;
+					}
 				}
-			}
-			if (dir==2){
-				n->m.lock();
-					n->set_dir(x, y, 0);
-				n->m.unlock();
-//				printf("set dir (%d %d)\n", x,y);
-			}
-		}catch(...){}
+				if (dir==2){
+					n->m.lock();
+						n->set_dir(x, y, 0);
+					n->m.unlock();
+	//				printf("set dir (%d %d)\n", x,y);
+				}
+			}catch(...){}
+//		master::world.m.unlock();
 		return 0;
 	}
 

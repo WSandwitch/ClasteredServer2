@@ -291,10 +291,7 @@ int main(int argc,char* argv[]){
 				}
 			master::world.npcs_m.unlock();
 			for(auto ni: master::world.npcs){
-				npc *n=ni.second;
-				if(n){
-					n->m.lock();
-				}
+				ni.second->m.lock();
 			}
 #ifdef _GLIBCXX_PARALLEL
 			int threads=omp_get_max_threads();
@@ -347,15 +344,13 @@ int main(int argc,char* argv[]){
 									}
 									break;
 								case 1: //new npc
-									n->pack(1,1);
-									s->sock->send(&n->packs(1,1));
+									s->sock->send(n->pack(1,1));
 									n->slaves.insert(slave.first);
 //									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
 									if (n->updated()){
-										n->pack(1,0,1);
-										s->sock->send(&n->packs(1,0,1));									
+										s->sock->send(n->pack(1,0,1));									
 									}
 									n->slaves.insert(slave.first);
 									break;
@@ -421,8 +416,7 @@ int main(int argc,char* argv[]){
 								case 1: {//new npc
 									try{
 										npc *n=master::world.npcs.at(i.first);
-										n->pack(0,1); //all attrs
-										c->sock->send(&n->packs(0,1));
+										c->sock->send(n->pack(0,1));//all attrs
 										withLock(c->mutex, c->npcs.insert(i.first));
 	//									printf("(client)send new npc\n");
 									}catch(...){}
@@ -432,8 +426,7 @@ int main(int argc,char* argv[]){
 									try{
 										npc *n=master::world.npcs.at(i.first);
 										if (n->updated()){
-											n->pack(0); 
-											c->sock->send(&n->packs(0));
+											c->sock->send(n->pack(0));
 										}
 										//withLock(c->mutex, c->npcs.insert(i.first));
 									}catch(...){}
@@ -460,7 +453,7 @@ int main(int argc,char* argv[]){
 					packet p;
 					p.setType(MESSAGE_NPC_REMOVE);
 					for(int id: master::world.old_npcs)
-						p.add(id);
+						p.add(id);//TODO:add check for overflow and send then
 #ifdef _GLIBCXX_PARALLEL
 					shift=server::all.size()/threads+server::all.size()%threads?1:0;
 					#pragma omp parallel for

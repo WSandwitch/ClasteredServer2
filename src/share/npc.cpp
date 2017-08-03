@@ -428,29 +428,23 @@ namespace share {
 		return (this->*set_attr_funcs[type])(attr, data);
 	}
 	
-#define packAttr0(p, a, b)\
-	do{\
-		register int $=attr(&(a));\
-		if (b || attrs[$]){\
-			p.add((char)$);\
-			p.add(a);\
-		}\
-	}while(0)
+
 	
 	//create packet with attr that have been changed
 //s - for server, all - pack all attrs for curr type, ts - to slave(only for to server)
-	void npc::pack(bool s, bool all, bool ts){
+	packet* npc::pack(bool s, bool all, bool ts){
 		auto _pack=_packs(s,all,ts);
+packet &p=packs(s,all,ts);
 		_pack.m.lock();//TODO: move mutex to packet
 			if (!_pack.done){
 				auto as=pack_attrs(s,all,ts);
 	//			printf("pack %d %d %d, %d \n", s,all,ts, as.size());
-				packet &p=packs(s,all,ts);
+
 				p.init();
 				p.setType(MESSAGE_NPC_UPDATE);//npc update
 				p.add(id);
 				for(auto $: as){
-					if (all || attrs[$]){
+					if (all || attrs[$]){//all needs here
 						void *a=attr($);
 						p.add((char)$);
 						p.add(attr.type(a), a);
@@ -459,8 +453,9 @@ namespace share {
 				_pack.done=1;
 			}
 		_pack.m.unlock();
+return &p;
 	}
-#undef packAttr
+
 
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
