@@ -193,6 +193,7 @@ namespace share {
 		
 		if (world){
 			position=world->map.nearest_safezone(position).rand_point_in();
+//			printf("position %g, %g\n", position.x, position.y);
 		}else{
 			printf("npc without world\n");
 			///for testing
@@ -379,7 +380,7 @@ namespace share {
 	}
 	
 //update attrs by income packet
-	void npc::update(packet * p){
+	void npc::update(packet * p, int update_attrs){
 		for(unsigned i=1;i<p->chanks.size();i++){
 			int index=(int)p->chanks[i++].value.c;
 			void *pattr=attr(index);
@@ -391,7 +392,7 @@ namespace share {
 //					printf("sizeof chank %d\n",p->chanks[i].size());
 					void* data=p->chanks[i].data();
 					if (data && p->chanks[i].size()==attr.size(index)){
-						attrs[index]=set_attr(p->chanks[i].type, pattr, data);
+						attrs[index]=update_attrs & set_attr(p->chanks[i].type, pattr, data);
 					}else{//smth wrong with server>server proxy
 						printf("npc update corrupt chank %d index %d (size %d == %d)\n", i, (int)index, p->chanks[i].size(), attr.size(index));
 					}
@@ -448,6 +449,8 @@ packet &p=packs(s,all,ts);
 						void *a=attr($);
 						p.add((char)$);
 						p.add(attr.type(a), a);
+//						if ($==3 || $==4)
+//							printf("sent (%g %g)\n", direction.x,direction.y);
 					}
 				}
 				_pack.done=1;

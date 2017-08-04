@@ -93,6 +93,7 @@ int slave_main(int argc, char* argv[]){
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
 				n->m.lock();
+//				n->clear();
 			}
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
@@ -121,8 +122,7 @@ int slave_main(int argc, char* argv[]){
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
 				if (n->updated()){
-					n->pack(1,0);
-					world.sock->send(&n->packs(1,0));
+					world.sock->send(n->pack(1,0));
 				}
 			}
 //		world.m.unlock();

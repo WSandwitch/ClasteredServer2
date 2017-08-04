@@ -29,10 +29,11 @@ namespace slave {
 				slave::world.npcs_m.unlock();
 			}
 			n->m.lock();
-				n->update(p);
+				n->update(p, 0);
+//				n->attrs[8]=1;//TODO: update this dirty hack, why it needs to be marked
 			n->m.unlock();
 		slave::world.m.unlock();
-//		printf("%g %g\n", n->position.x, n->position.y);
+//		printf("%g %g\n", n->direction.x, n->direction.y);
 		return 0;
 	}
 	

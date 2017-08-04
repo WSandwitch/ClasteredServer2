@@ -230,7 +230,7 @@ namespace share{
 	
 	quad& map::nearest_safezone(point& p){
 		quad *out=0;
-		float d;
+		float d=0;
 		for (auto i: safezones){
 			float $=i.second.distanse(p);
 			if (out==0 || $<d){
@@ -243,7 +243,7 @@ namespace share{
 	
 	int map::nearest_safezone_id(point& p){
 		int out=-1;
-		float d;
+		float d=0;
 		for (auto i: safezones){
 			float $=i.second.distanse(p);
 			if (out<0 || $<d){

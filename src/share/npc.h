@@ -131,7 +131,7 @@ namespace share {
 			void hurt(npc* n);
 			void make_shot(char angle);
 			bool suicide(); 			
-			void update(share::packet * p);
+			void update(share::packet * p, int update_attrs=1);
 			bool updated(); 
 			share::packet* pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe over packet
 			bool update_cells();//threadsafe
