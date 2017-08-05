@@ -1,6 +1,6 @@
 package;
 
-import states.LoginState;
+import states.InitState;
 import openfl.display.Sprite;
 
 import flixel.FlxG;
@@ -15,10 +15,10 @@ class Main extends Sprite
 	{
 		super();
 	#if mobile
-		addChild(new CSGame(0, 0, LoginState));
+		addChild(new CSGame(0, 0, InitState));
 	#else
 		//add load saved screen size
-		addChild(new CSGame(720, 560, LoginState));
+		addChild(new CSGame(720, 560, InitState));
 		FlxG.resizeWindow(FlxG.width, FlxG.height);
 	#end
 		FlxG.autoPause = false;

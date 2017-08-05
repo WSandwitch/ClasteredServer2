@@ -11,7 +11,7 @@ namespace share {
 		
 	}
 
-	segment::segment(point _a, point _b){
+	segment::segment(point _a, point _b):directed(0){
 		a=_a;
 		b=_b;
 	}

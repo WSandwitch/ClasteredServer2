@@ -25,20 +25,23 @@ import input.AbstractInputManager.*;
 import util.CSAssets;
 
 
+import clasteredServerClient.MessageIds;
+
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
  
+//class Test{}
+
 class LoginState extends CSState
 {
-	var g:ScreenGamepad;
 	override public function create():Void 
 	{	
 		var game:CSGame = cast FlxG.game;
 		super.create();
 		
 		trace("login state");
-		
+
 		//add show cursor
 		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 	
