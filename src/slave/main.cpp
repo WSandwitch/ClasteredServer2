@@ -90,6 +90,14 @@ int slave_main(int argc, char* argv[]){
 		syncer.timePassed();
 		//now move
 		world.m.lock();
+		while(world.pause){
+			world.m.unlock();
+				usleep(100);
+			world.m.lock();
+		}
+		world.m.unlock();
+		
+		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
 				n->m.lock();

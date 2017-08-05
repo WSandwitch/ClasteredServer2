@@ -92,7 +92,9 @@ namespace master {
 		m.unlock();
 		printf("removed server %d\n", id);
 		//add grid update
-		master::grid->remove(s->id);
+		server::setPause(1);
+			master::grid->remove(s->id);
+		server::setPause(0);
 	}
 
 	static int checkSlaves(slave_info *si, void *arg){
@@ -148,18 +150,25 @@ namespace master {
 		}
 	}
 
-	int server::idByAddress(std::string address, int port){ //return 6 bytes integer
-		char str[100];
-		sprintf(str, "%s:%d", address.data(), port);
-		return crc32((const void*)str, (size_t)strlen(str));
-	}
-
 	void server::sendAll(packet* p){
 		m.lock();
 			for (auto i:all){
 				i.second->sock->send(p);
 			}
 		m.unlock();
+	}
+
+	int server::idByAddress(std::string address, int port){ //return 6 bytes integer
+		char str[100];
+		sprintf(str, "%s:%d", address.data(), port);
+		return crc32((const void*)str, (size_t)strlen(str));
+	}
+
+	void server::setPause(bool on){ //return 6 bytes integer
+		packet p;
+		p.setType(MESSAGE_PAUSE);
+		p.add((char)on);
+		sendAll(&p);
 	}
 
 	void server::set_ready(){

@@ -55,8 +55,17 @@ namespace slave {
 		return 0;
 	}
 	
+	static void* message_MESSAGE_PAUSE(packet* p){
+		slave::world.m.lock();
+			slave::world.pause=p->chanks[0].value.c;
+			printf("pause %d\n", slave::world.pause);
+		slave::world.m.unlock();
+		return 0;
+	}
+	
 	processors::processors(){
 		messages[MESSAGE_NPC_UPDATE]=&message_NPC_UPDATE;
 		messages[MESSAGE_NPC_REMOVE]=&message_NPC_REMOVE;
+		messages[MESSAGE_PAUSE]=&message_MESSAGE_PAUSE;
 	}
 }

@@ -78,7 +78,10 @@ namespace share {
 	}
 	
 	typeof(segment::a) segment::rand_point_in(){
+//		printf("rand point in (%g, %g) - (%g, %g)\n", a.x,a.y,this->b.x,this->b.y);
 		typeof(segment::a) out(a.x+((rand()%((int)(b.x*10000)+1))/10000.0), a.y+((rand()%((int)(b.y*10000)+1))/10000.0));
+//		printf("rand point in (%g, %g) - (%g, %g)\n", a.x,a.y,this->b.x,this->b.y);
+		//TODO: why it different on cygwin
 		return out;
 	}
 }

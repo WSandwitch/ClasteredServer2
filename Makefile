@@ -48,9 +48,14 @@ ifeq ($(GPROF),1)
 endif
 
 ifeq ($(OPTIMISATION),1)
-    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
-    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
-    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -flto -funroll-loops
+    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
+    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
+    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
+	ifneq ($(NO_LTO),1)
+		CFLAGS +=-flto
+		CPPFLAGS +=-flto
+		LDFLAGS +=-flto
+	endif
 	ifeq ($(filter $(ARCH),ppc ppc64),)
 		CFLAGS += -march=native
 		CPPFLAGS += -march=native

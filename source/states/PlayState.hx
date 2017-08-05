@@ -71,7 +71,7 @@ class PlayState extends CSState
 	private static inline var MSG_SET_DIRECTION:Int = 2;
 	//in messages
 	private static inline var MSG_NPC_UPDATE:Int=3;
-	private static inline var MESSAGE_NPC_REMOVE:Int=5;
+	private static inline var MESSAGE_NPC_REMOVE:Int=4;
 	private static inline var MSG_CLIENT_UPDATE:Int=6;
 	///
 	private var _map:CSMap;

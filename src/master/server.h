@@ -38,6 +38,7 @@ namespace master {
 			static void check();
 			static void sendAll(share::packet* p);
 			static int idByAddress(std::string s, int port);
+			static void setPause(bool on);
 	};
 /*
 //initialization

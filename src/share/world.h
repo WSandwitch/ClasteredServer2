@@ -31,6 +31,7 @@ namespace share {
 		int id;
 		float map_offset;
 		bool main_loop;
+		bool pause;
 		short tps;
 		share::mutex m;
 		share::mutex npcs_m;
