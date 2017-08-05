@@ -136,8 +136,8 @@ namespace share {
 		for(auto i: attrs){
 			attrs[i.first]=0;//TODO: check for .second=
 		}
-		for(auto i: _packs){
-			i.second.done=0;
+		for(auto &i: _packs){
+			i.done=0;
 		}
 		if (health<=0){
 			return 1;
@@ -405,9 +405,12 @@ namespace share {
 	}
 	
 //check if any attrs were changed
-	bool npc::updated(){
-		for(int i=0, end=attrs.size();i<end;i++){
-			if (attrs[i]){
+	bool npc::updated(bool s, bool all, bool ts){
+		if (all)
+			return 1;
+		auto as=pack_attrs(s,all,ts);
+		for(auto $: as){
+			if (attrs[$]){
 				return 1;
 			}
 		}

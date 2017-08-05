@@ -129,7 +129,7 @@ int slave_main(int argc, char* argv[]){
 //		world.m.lock();
 			for(auto it = world.npcs.begin(), end = world.npcs.end();it != end; ++it){
 				npc* n=it->second;
-				if (n->updated()){
+				if (n->updated(1,0)){
 					world.sock->send(n->pack(1,0));
 				}
 			}

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <set>
 #include <list>
+#include <array>
 #include <vector>
 #include "../share/system/time.h"
 #include "../share/system/mutex.h"
@@ -39,7 +40,8 @@ namespace share {
 	
 	template<class T>
 		struct map3b{
-			std::unordered_map<char, T> p;//TODO:maybe short?
+			//std::unordered_map<char, T> p;//TODO:maybe short?
+			std::array<T, 8> p;
 			
 			map3b(){};
 			map3b(map3b& a){};//can't be copyed
@@ -132,7 +134,7 @@ namespace share {
 			void make_shot(char angle);
 			bool suicide(); 			
 			void update(share::packet * p, int update_attrs=1);
-			bool updated(); 
+			bool updated(bool server=0, bool all=0, bool to_slave=0); 
 			share::packet* pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe over packet
 			bool update_cells();//threadsafe
 			

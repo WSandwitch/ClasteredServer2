@@ -309,7 +309,7 @@ int main(int argc,char* argv[]){
 					auto ni=*it;
 #else
 			{
-				for(auto ni: master::world.npcs){
+				for(auto& ni: master::world.npcs){
 #endif				
 					npc *n=ni.second;
 //					printf("%d %d\n", n->id, n->health);
@@ -349,7 +349,7 @@ int main(int argc,char* argv[]){
 //									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
-									if (n->updated()){
+									if (n->updated(1,0,1)){
 										s->sock->send(n->pack(1,0,1));									
 									}
 									n->slaves.insert(slave.first);
@@ -425,7 +425,7 @@ int main(int argc,char* argv[]){
 								case 3: {//already had npc
 									try{
 										npc *n=master::world.npcs.at(i.first);
-										if (n->updated()){
+										if (n->updated(0)){
 											c->sock->send(n->pack(0));
 										}
 										//withLock(c->mutex, c->npcs.insert(i.first));
