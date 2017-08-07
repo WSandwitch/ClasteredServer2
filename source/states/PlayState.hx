@@ -32,9 +32,14 @@ import flixel.system.macros.FlxMacroUtil;
  */
 
  
-@:build(clasteredServerClient.MessageIds.build())
 class PlayState extends CSState
 {
+	//message ids
+	public var MESSAGE_SET_DIRECTION:Int;
+	public var MESSAGE_NPC_UPDATE:Int;
+	public var MESSAGE_NPC_REMOVE:Int;
+	public var MESSAGE_CLIENT_UPDATE:Int;
+	
 	// Demo arena boundaries
 	static var LEVEL_MIN_X;
 	static var LEVEL_MAX_X;
@@ -99,7 +104,7 @@ class PlayState extends CSState
 //		LEVEL_MAX_X = FlxG.stage.stageWidth * 1.5;
 //		LEVEL_MIN_Y = -FlxG.stage.stageHeight / 2;
 //		LEVEL_MAX_Y = FlxG.stage.stageHeight * 1.5;
-		
+		MessageIds.build(this);
 		CSObjects.init();
 		
 		super.create();
@@ -336,7 +341,7 @@ class PlayState extends CSState
 //			npc.angle = Math.round(angle / 3.14 * 180);
 		}
 		if (p.chanks.length>0){
-			p.type = _MESSAGE_SET_DIRECTION;
+			p.type = MESSAGE_SET_DIRECTION;
 //			trace(connection);
 			connection.sendPacket(p);
 //			trace("sended");
@@ -376,7 +381,7 @@ class PlayState extends CSState
 				p = packets.pop();
 			l.unlock();
 			if (p!=null){
-				if (p.type==_MESSAGE_NPC_UPDATE){
+				if (p.type==MESSAGE_NPC_UPDATE){
 					var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 					if (n == null){
 						n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of creen
@@ -384,7 +389,7 @@ class PlayState extends CSState
 						_map.set_npc(p.chanks[0].i, n);
 					}
 					n.update_attributes(p);
-				} else if (p.type==_MESSAGE_NPC_REMOVE){
+				} else if (p.type==MESSAGE_NPC_REMOVE){
 					for (chank in p.chanks){
 						var nid = chank.i;
 						if (npc_id==nid){
@@ -398,7 +403,7 @@ class PlayState extends CSState
 							}
 						}
 					}
-				} else if (p.type==_MESSAGE_CLIENT_UPDATE){
+				} else if (p.type==MESSAGE_CLIENT_UPDATE){
 					var i:Int=0;
 					while(i<p.chanks.length-1){
 						switch p.chanks[i].i {

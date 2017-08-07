@@ -37,8 +37,9 @@ class LoadState extends CSState
 		game.pass = "qwer";
 		
 		try{
-//			(new Connection()).connect("172.16.1.40", 8000, false, function(conn:Connection){				
-			(new Connection()).connect("localhost", 8000, false, function(conn:Connection){				
+			(new Connection()).connect("172.16.1.40", 8000, false, function(conn:Connection){				
+//			(new Connection()).connect("192.168.1.245", 8000, false, function(conn:Connection){			
+//			(new Connection()).connect("localhost", 8000, false, function(conn:Connection){				
 	//			conn.connect("localhost", 8000);
 				game.connection = conn;
 				delay(function(){

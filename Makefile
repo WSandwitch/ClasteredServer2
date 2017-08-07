@@ -1,5 +1,6 @@
-OBJDIR ?= /tmp/CCS2_build
-ARCH ?= $(uname -m)
+TMP ?= /tmp
+OBJDIR ?= $(TMP)/CS2_build
+ARCH ?= $(shell uname -m)
 GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline
 CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
@@ -71,13 +72,13 @@ endif
 all: $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(SLAVE_SOURCES) $(SLAVE) $(PUBLIC) 
 	
 $(PUBLIC): $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(SLAVE_OBJECTS)
-	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(DEFINES) $(SLAVE_OBJECTS) $(LDFLAGS) -lcrypto -o bin/$@
+	$(GCC) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(DEFINES) $(SLAVE_OBJECTS) $(LDFLAGS) -lcrypto -o bin/$@.$(ARCH)
 
 $(TEST): $(SHARE_OBJECTS) $(TEST_OBJECTS) 
-	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(DEFINES) $(LDFLAGS) -o bin/$@
+	$(GCC) $(SHARE_OBJECTS) $(TEST_OBJECTS) $(DEFINES) $(LDFLAGS) -o bin/$@.$(uname -a)
 
 $(SLAVE): $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(OBJDIR)/src/slave_main.o
-	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o bin/$@
+	$(GCC) $(SHARE_OBJECTS) $(SLAVE_OBJECTS) $(DEFINES) $(OBJDIR)/src/slave_main.o $(LDFLAGS) -o bin/$@.$(ARCH)
 
 $(OBJDIR)/%.o: %.c 
 	@mkdir -p $(@D)
@@ -90,7 +91,7 @@ $(OBJDIR)/%.o: %.cpp
 fast: $(PUBLIC)_fast
 	
 $(PUBLIC)_fast:
-	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) $(DEFINES) $(HEADERS) -o bin/$(PUBLIC)
+	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) $(DEFINES) $(HEADERS) -o bin/$(PUBLIC).$(ARCH)
 
 clean:
 	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(DEPS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o

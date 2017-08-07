@@ -1,30 +1,23 @@
 package clasteredServerClient;
 
-import haxe.macro.Context;
-import haxe.macro.Expr;
+import util.CSAssets;
 
 class MessageIds{
 	
-	macro static public function build():Array<Field> {
-		var fields = Context.getBuildFields();
+	static public function build(?obj:Dynamic){
 		var arr = getPairs();
 		for (e in arr){
-			var val = Std.parseInt(e[1]);
-			var newField = {
-			  name: "_"+e[0],
-			  doc: null,
-			  meta: [],
-			  access: [AStatic, APublic],
-			  kind: FVar(macro : Int, Context.makeExpr(val, Context.currentPos())),
-			  pos: Context.currentPos()
-			};
-			fields.push(newField);
+			try{
+				var val = Std.parseInt(e[1]);
+				Reflect.setProperty(obj, e[0], val);
+			}catch(e:Dynamic){
+				trace(e);
+			}
 		}
-		return fields;
 	}
 	
 	static function getPairs(){
-		var data = loadFileAsString("src/share/messages.h");
+		var data = loadFileAsString("assets/messages.h");
 		
 		var regexp:EReg = ~/define[ ]+[A-Z_]+[ ]+[0-9]+/;
 
@@ -40,14 +33,6 @@ class MessageIds{
 	}
 	
 	static function loadFileAsString(path:String) {
-		try {
-			var p = Context.resolvePath(path);
-			Context.registerModuleDependency(Context.getLocalModule(),p);
-			
-			return sys.io.File.getContent(p);
-		}
-		catch(e:Dynamic) {
-			return haxe.macro.Context.error('Failed to load file $path: $e', Context.currentPos());
-		}
+		return CSAssets.getText(path);
 	}
 }
