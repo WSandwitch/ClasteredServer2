@@ -39,12 +39,13 @@ namespace master {
 		for(i=0;i<checks;i++){
 			if (s->sock->recv_check()!=0){
 				if (s->sock->recv(&p)>0){
-//					printf("(slave) got message %d\n", ((char*)p.data())[0]);
+					//printf("(slave) got message %d from %d\n", ((char*)p.data())[0], s->id);
 					s->proceed(&p);//proceed packet
 				}else{
 					printf("Server %d connection lost\n", s->id);
 					storageSlaveSetBroken((char*)s->host.data(), s->port);//??
-					all.erase(s->id);
+//					all.erase(s->id);
+					server::remove(s); 
 					return s;
 				}
 			}else

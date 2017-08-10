@@ -328,7 +328,7 @@ int main(int argc,char* argv[]){
 					auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
 //					printf("%d %d\n", slave_id, n->slave_id);
 					if (slave_id!=n->slave_id){
-//						printf("slave updated %d -> %d\n", slave_id, n->slave_id);
+//						printf("slave updated %d <- %d\n", slave_id, n->slave_id);
 						slave_id=n->set_attr(n->slave_id, slave_id);
 					}
 					//move in map

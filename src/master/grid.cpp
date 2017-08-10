@@ -70,7 +70,7 @@ namespace master {
 		//add server id
 		bool grid_::add_server(int _id, bool rec){
 			server_ids.push_back(_id);
-			std::sort(server_ids.begin(), server_ids.end());
+//			std::sort(server_ids.begin(), server_ids.end());
 			server_ids.erase(std::unique(server_ids.begin(), server_ids.end()),server_ids.end());
 			if (rec)
 				reconfigure();
@@ -86,13 +86,18 @@ namespace master {
 		}
 
 		//private	
+		int grid_::to_grid(const int x, const int y){
+			int index=y*grid_size[0]+x;
+	//		printf("on %d %d cell %d | %d\n",x,y,index, grid_size[0]*grid_size[1]);
+			return (index>0 && index<grid_size[0]*grid_size[1])?index:0;
+		}
+
 		//update internal data, may be rather slow
 		bool grid_::reconfigure(){
 			int counts[2]={1,1};
-			
 			servers.clear();
 //			std::sort(server_ids.begin(), server_ids.end());
-			std::random_shuffle(server_ids.begin(), server_ids.end()); //shuffle elements, on many maps, different servers will get defferent areas
+			std::random_shuffle(server_ids.begin(), server_ids.end()); //shuffle elements, on many maps, different servers will get different areas
 			//cleanup
 			if (data){
 				for(auto it: cells)
@@ -219,12 +224,6 @@ namespace master {
 		}
 	#undef pushShares
 		
-		int grid_::to_grid(const int x, const int y){
-			int index=y*grid_size[0]+x;
-	//		printf("on %d %d cell %d | %d\n",x,y,index, grid_size[0]*grid_size[1]);
-			return (index>0 && index<grid_size[0]*grid_size[1])?index:0;
-		}
-
 ////////////////////////////////////////////////////////////////
 		
 		grid::grid(){
@@ -256,7 +255,7 @@ namespace master {
 		}
 		
 		//add server id
-		bool grid::add_server(int _id, bool rec){
+		bool grid::add_server(int _id, bool rec){ //1 server can't be added more than 1 time
 			server_ids.push_back(_id);
 			for(auto gi: grids){
 				gi.second->add_server(_id, rec);
@@ -268,7 +267,7 @@ namespace master {
 		bool grid::remove_server(int _id, bool rec){
 			server_ids.erase(std::remove(server_ids.begin(), server_ids.end(), _id), server_ids.end());
 			for(auto gi: grids){
-				gi.second->add_server(_id, rec);
+				gi.second->remove_server(_id, rec);
 			}
 			return 0;
 		}

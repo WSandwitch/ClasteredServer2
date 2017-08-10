@@ -23,10 +23,11 @@ namespace slave {
 			try{
 				n=slave::world.npcs.at(id);
 			}catch(...){
-				n=new npc(&slave::world, id);
+				n=new npc(&slave::world, id); //TODO: check get from new_npcs
 				slave::world.npcs_m.lock();
 					slave::world.new_npcs.push_back(n);
 				slave::world.npcs_m.unlock();
+				printf("added npc %d\n", id);
 			}
 			n->m.lock();
 				n->update(p, 0);

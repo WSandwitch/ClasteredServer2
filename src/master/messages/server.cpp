@@ -95,9 +95,12 @@ namespace master {
 					master::world.new_npcs.push_back(n);
 				master::world.npcs_m.unlock();
 			}
-			n->m.lock();
-				n->update(p);
-			n->m.unlock();
+			if (sv->id==n->slave_id || n->slave_id==0){ //update only by owner or new npc
+				n->m.lock();
+					n->update(p);
+				n->m.unlock();
+			}
+//			printf("updated %d\n", id);
 		master::world.m.unlock();
 		return 0;
 	}

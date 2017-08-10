@@ -63,33 +63,31 @@ namespace share {
 	}
 	
 	void npc::remove(){
-		do{
-			if (world){
-				for(auto i: cells){
-					auto cell=world->map->cells(i);
-					withLock(cell->m, cell->npcs.erase(id));
-				}
-				if (world->id==0){//on master
+		if (world){
+			for(auto i: cells){
+				auto cell=world->map->cells(i);
+				withLock(cell->m, cell->npcs.erase(id));
+			}
+			if (world->id==0){//on master
+				world->npcs_m.lock();
+					world->old_npcs.insert(id);
+				world->npcs_m.unlock();
+			
+				//respawn with same id
+				//if it is bot, or assigned to player
+				if (bot.used || (owner_id!=0)){//TODO: add respawn mark
 					world->npcs_m.lock();
-						world->old_npcs.insert(id);
+						world->new_npcs.push_back(clone());
 					world->npcs_m.unlock();
-				
-					//respawn with same id
-					//if it is bot, or assigned to player
-					if (bot.used || (owner_id!=0)){//TODO: add respawn mark
-						world->npcs_m.lock();
-							world->new_npcs.push_back(clone());
-						world->npcs_m.unlock();
-						printf("%d respawned\n", id);
-						break;//no delete
-					}else{
-		//				printf("%d died\n", id);
-						world->putId(id);
-					}
+					printf("%d respawned\n", id);
+					return;//no delete
+				}else{
+	//				printf("%d died\n", id);
+					world->putId(id);
 				}
 			}
-			delete this;
-		}while(0);
+		}
+		delete this;
 	}
 	
 /*	void npc::operator delete(void *n_){
@@ -157,8 +155,8 @@ namespace share {
 		*/
 		///(attr, client_all, client, master_slave_all, from_slave, to_slave)
 		attr.set_base(this);
-		packAttr(position.x,1,1,1,1,0); //1cm
-		packAttr(position.y,1,1,1,1,0); //2cm
+		packAttr(position.x,1,1,1,1,1); //1cm
+		packAttr(position.y,1,1,1,1,1); //2cm
 		packAttr(direction.x,1,1,1,1,1); //3cms
 		packAttr(direction.y,1,1,1,1,1); //4cms
 		packAttr(state,1,1,1,1,1); //5cms

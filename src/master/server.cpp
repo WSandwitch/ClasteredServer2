@@ -93,7 +93,7 @@ namespace master {
 		printf("removed server %d\n", id);
 		//add grid update
 		server::setPause(1);
-			master::grid->remove_server(s->id);
+			master::grid->remove_server(id);
 		server::setPause(0);
 	}
 
