@@ -27,6 +27,7 @@ namespace share {
 
 	class map {
 		public:
+			int id;
 			point source;
 			pointi size;
 			point cell;

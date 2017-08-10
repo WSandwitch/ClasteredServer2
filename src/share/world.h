@@ -36,7 +36,7 @@ namespace share {
 		share::mutex m;
 		share::mutex npcs_m;
 		share::socket* sock;
-		share::map map;
+		share::map* map;
 		std::unordered_map<int, share::map*> maps; //TODO: change map to this
 		std::list<npc*> new_npcs;
 		std::unordered_set<int> old_npcs;

@@ -41,9 +41,9 @@ namespace share{
 
 		//for cells
 		std::unordered_set<npc*> npcs;
-		auto cells=world->map.cells(position, dist);
+		auto cells=world->map->cells(position, dist);
 		for(auto c: cells){
-			auto cell=world->map.cells(c);
+			auto cell=world->map->cells(c);
 			for(auto n: cell->npcs)
 				if (attackCheck(n.second)){
 //					printf("added %d !=%d\n", n.second->id, id);
@@ -105,9 +105,9 @@ namespace share{
 		short attacks=weapon.attacks;
 		
 		std::unordered_set<npc*> npcs;
-		auto cells=world->map.cells(position, r);
+		auto cells=world->map->cells(position, r);
 		for(auto c: cells){
-			auto cell=world->map.cells(c);
+			auto cell=world->map->cells(c);
 			for(auto n: cell->npcs)
 				if (attackCheck(n.second)){
 //					printf("added %d !=%d\n", n.second->id, id);

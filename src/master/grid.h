@@ -25,16 +25,17 @@ namespace master {
 			server_area area;
 		};
 
-		class grid {
+		class grid_ {
 			public:
 				float cell[2]; //size of cell in units
 				std::map<int, grid_server> servers;
 
-				grid(int s[2], int o);
-				~grid();
+				grid_(int s[2], int o);
+				~grid_();
 				void setId(int id);
-				bool add(int id, bool rec=1);
-				bool remove(int id, bool rec=1);
+				bool add_server(int id, bool rec=1);
+				bool remove_server(int id, bool rec=1);
+				bool reconfigure();
 				int get_owner(const float x, const float y);
 				std::vector<int>& get_shares(const float x, const float y);//return array of int of different size
 			private:
@@ -47,8 +48,31 @@ namespace master {
 				std::map<data_cell, data_cell*> cells; //all cells used in grid
 				
 				int to_grid(int x, int y);
-				bool reconfigure();
 		};
+		
+		struct grid_map{
+			int size[2];
+		};
+		
+		class grid {
+			public:
+				float cell[2]; //size of cell in units
+				std::map<int, grid_*> grids;
+
+				grid();
+				~grid();
+				bool add_server(int id, bool rec=1);
+				bool remove_server(int id, bool rec=1);
+				bool add_map(int id, int s[2], int o);
+				bool remove_map(int id);
+				int get_owner(const float x, const float y, int id=0);
+				std::vector<int>& get_shares(const float x, const float y, int id=0);//return array of int of different size
+			private:
+				std::vector<int> server_ids; //ids of server, sorted
+				std::vector<int> shares_; 
+		};
+		
+		
 	}
 }
 

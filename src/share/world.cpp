@@ -1,7 +1,6 @@
 #include <queue>
 
 #include "../share/network/packet.h"
-#include "../share/system/folder.h"
 #include "world.h"
 
 /*
@@ -70,7 +69,7 @@ namespace share {
 		main_loop(0),
 		sock(0)
 	{	
-//		folder::forEachFile((char*)"../maps/*.tmx", [&maps](char *s){ maps[map::getId(s)]=new map(s); });
+
 	}
 	
 	world::~world(){

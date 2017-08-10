@@ -66,7 +66,7 @@ namespace share {
 		do{
 			if (world){
 				for(auto i: cells){
-					auto cell=world->map.cells(i);
+					auto cell=world->map->cells(i);
 					withLock(cell->m, cell->npcs.erase(id));
 				}
 				if (world->id==0){//on master
@@ -192,7 +192,7 @@ namespace share {
 		//else nearest safe zone
 		
 		if (world){
-			position=world->map.nearest_safezone(position).rand_point_in();
+			position=world->map->nearest_safezone(position).rand_point_in();
 //			printf("position %g, %g\n", position.x, position.y);
 		}else{
 			printf("npc without world\n");
@@ -299,10 +299,10 @@ namespace share {
 	}
 	
 	bool npc::update_cells(){//TODO:improve performance
-		int _cell_id=world->map.to_grid(position.x, position.y);
+		int _cell_id=world->map->to_grid(position.x, position.y);
 		if (cell_id!=_cell_id){//if npc move to another cell
 			std::unordered_map<int, short> e;
-			std::list<int> &&v=world->map.near_cells(_cell_id, r);
+			std::list<int> &&v=world->map->near_cells(_cell_id, r);
 			//set old cells to 2
 			for(auto i: cells){
 				e[i]=2;
@@ -312,7 +312,7 @@ namespace share {
 				e[i]++;
 			}
 			for(auto i: e){
-				auto $=world->map.cells(i.first);
+				auto $=world->map->cells(i.first);
 				switch(i.second){
 					case 1: //new
 						withLock($->m, $->npcs[id]=this);
@@ -486,11 +486,11 @@ return &p;
 		point p(x,y);
 		segment ps(position,p);
 		ps.length(r*3);
-		std::list<int> &&ids=world->map.near_cells(x, y, r); //!check this!
+		std::list<int> &&ids=world->map->near_cells(x, y, r); //!check this!
 		std::unordered_set<segment*> done;
-		//printf("segments %d \n", world->map.segments.size());
+		//printf("segments %d \n", world->map->segments.size());
 		for(auto c: ids){//TODO: change to check by map grid
-			share::cell *cell=world->map.cells(c);
+			share::cell *cell=world->map->cells(c);
 			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
 				segment *s=cell->segments[i];
 				if (done.count(s)==0){ //uniq check

@@ -52,6 +52,7 @@ static void segfault_sigaction(int sig){
 #endif
 
 int slave_main(int argc, char* argv[]){
+	srand(share::time(0));
 	world.tps=24;
 	share::sync syncer;
 	struct sigaction sa;
@@ -72,7 +73,14 @@ int slave_main(int argc, char* argv[]){
 #ifndef DEBUG
 	//add log init
 #endif
-	srand(share::time(0));
+	
+	world.map=new map("../maps/map.tmx");
+//	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
+//		auto m=new map(s); 
+//		world.maps[m->id]=m;
+//	});
+
+	
 	//init map
 	{
 		//initialize listener

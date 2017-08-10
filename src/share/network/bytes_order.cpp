@@ -35,6 +35,26 @@ int wrongByteOrder(){
 		perror("wrongByteOrder double");
 		o++;
 	}
+	if (sizeof(char)!=1){
+		perror("sizeof char != 1");
+		o++;
+	}
+	if (sizeof(short)!=2){
+		perror("sizeof short != 2");
+		o++;
+	}
+	if (sizeof(int)!=4){
+		perror("sizeof int != 4");
+		o++;
+	}
+	if (sizeof(float)!=4){
+		perror("sizeof float != 4");
+		o++;
+	}
+	if (sizeof(double)!=8){
+		perror("sizeof double != 8");
+		o++;
+	}
 	return o;
 }
 

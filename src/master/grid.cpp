@@ -11,7 +11,7 @@
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
-║ functions for work with grid of clastered server areas 			                       ║
+║ functions for work with grid_ of clastered server areas 			                       ║
 ║ created by Dennis Yarikov						                       ║
 ║ aug 2016									                       ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -28,7 +28,7 @@ namespace master {
 		}
 
 		//cpp class and code
-		grid::grid(int s[2], int o){
+		grid_::grid_(int s[2], int o){
 			int i;
 			offset=o;
 			for (i=0;i<2;i++){
@@ -41,7 +41,7 @@ namespace master {
 			reconfigure();
 		}
 		
-		grid::~grid(){
+		grid_::~grid_(){
 			//free every cell
 			if (data){
 				for(std::map<data_cell, data_cell*>::const_iterator it = cells.begin(), end = cells.end(); it != end; ++it)
@@ -51,20 +51,24 @@ namespace master {
 			cells.clear();
 		}
 		
-		int grid::get_owner(const float x, const float y){
+		//owner server id
+		int grid_::get_owner(const float x, const float y){
 			//printf("on %g %g(%g %g) index %d owner %d\n",x, y, x/cell[0], y/cell[1], to_grid(x/cell[0], y/cell[1]), data[to_grid(x/cell[0], y/cell[1])]);
 			return data[to_grid(x/cell[0], y/cell[1])]->owner;
 		}
 		
-		std::vector<int>& grid::get_shares(const float x, const float y){//return array of int of different size
+		//shared server ids only for cell contains point
+		std::vector<int>& grid_::get_shares(const float x, const float y){//return array of int of different size
 			return data[to_grid(x/cell[0], y/cell[1])]->shares;
 		}
-
-		void grid::setId(int _id){
+		
+		//set id of current server, used if slaves calculate grid_ by themselves
+		void grid_::setId(int _id){//unused
 			id=_id;
 		}
 		
-		bool grid::add(int _id, bool rec){
+		//add server id
+		bool grid_::add_server(int _id, bool rec){
 			server_ids.push_back(_id);
 			std::sort(server_ids.begin(), server_ids.end());
 			server_ids.erase(std::unique(server_ids.begin(), server_ids.end()),server_ids.end());
@@ -73,7 +77,8 @@ namespace master {
 			return 0;
 		}
 		
-		bool grid::remove(int _id, bool rec){
+		//remove server id
+		bool grid_::remove_server(int _id, bool rec){
 			server_ids.erase(std::remove(server_ids.begin(), server_ids.end(), _id), server_ids.end());
 			if (rec)
 				reconfigure();
@@ -81,11 +86,13 @@ namespace master {
 		}
 
 		//private	
-		bool grid::reconfigure(){
+		//update internal data, may be rather slow
+		bool grid_::reconfigure(){
 			int counts[2]={1,1};
 			
 			servers.clear();
-			std::sort(server_ids.begin(), server_ids.end());
+//			std::sort(server_ids.begin(), server_ids.end());
+			std::random_shuffle(server_ids.begin(), server_ids.end()); //shuffle elements, on many maps, different servers will get defferent areas
 			//cleanup
 			if (data){
 				for(auto it: cells)
@@ -212,10 +219,78 @@ namespace master {
 		}
 	#undef pushShares
 		
-		int grid::to_grid(const int x, const int y){
+		int grid_::to_grid(const int x, const int y){
 			int index=y*grid_size[0]+x;
 	//		printf("on %d %d cell %d | %d\n",x,y,index, grid_size[0]*grid_size[1]);
 			return (index>0 && index<grid_size[0]*grid_size[1])?index:0;
+		}
+
+////////////////////////////////////////////////////////////////
+		
+		grid::grid(){
+		}
+		
+		grid::~grid(){
+			for (auto gi: grids){
+				delete gi.second;
+			}
+		}
+		
+		//owner server id
+		int grid::get_owner(const float x, const float y, int id){
+			//printf("on %g %g(%g %g) index %d owner %d\n",x, y, x/cell[0], y/cell[1], to_grid(x/cell[0], y/cell[1]), data[to_grid(x/cell[0], y/cell[1])]);
+			try{
+				return grids.at(id)->get_owner(x,y);
+			}catch(...){
+				return 0;
+			}
+		}
+		
+		//shared server ids only for cell contains point
+		std::vector<int>& grid::get_shares(const float x, const float y, int id){//return array of int of different size
+			try{
+				return grids.at(id)->get_shares(x, y);
+			}catch(...){
+				return shares_;
+			}
+		}
+		
+		//add server id
+		bool grid::add_server(int _id, bool rec){
+			server_ids.push_back(_id);
+			for(auto gi: grids){
+				gi.second->add_server(_id, rec);
+			}
+			return 0;
+		}
+		
+		//remove server id
+		bool grid::remove_server(int _id, bool rec){
+			server_ids.erase(std::remove(server_ids.begin(), server_ids.end(), _id), server_ids.end());
+			for(auto gi: grids){
+				gi.second->add_server(_id, rec);
+			}
+			return 0;
+		}
+
+		//add server id
+		bool grid::add_map(int _id, int s[2], int o){
+			auto g=new grid_(s, o);
+			for(auto &s: server_ids){
+				g->add_server(s, 0);
+			}
+			g->reconfigure();
+			grids[_id]=g;
+			return 0;
+		}
+		
+		//remove server id
+		bool grid::remove_map(int _id){
+			try{
+				delete grids.at(_id);
+				grids.erase(_id);
+			}catch(...){}
+			return 0;
 		}
 
 	}
@@ -224,7 +299,7 @@ namespace master {
 /*
 int main(){
 	float a[2]={32000,32000};
-	clasteredServer::grid g(a,20);
+	clasteredServer::grid_ g(a,20);
 	std::vector<int> v;
 	for(int i=1;i<10;i++){
 //		printf("added %d\n",i);

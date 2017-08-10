@@ -36,6 +36,7 @@
 #include "../share/world.h"
 #include "../share/messages.h"
 #include "../share/object.h"
+#include "../share/system/folder.h"
 #include "../slave/main.h"
 
 #define CONFIG_FILE "../config/config.cfg"
@@ -153,7 +154,6 @@ static void segfault_sigaction(int sig){
 	type##workers::create(config.type##workers.total,config.type##workers.tps)
 
 int main(int argc,char* argv[]){
-	object_initializer initializer(master::world);
 	share::sync tv;
 	struct sigaction sa;
 	struct {
@@ -185,9 +185,10 @@ int main(int argc,char* argv[]){
 	config.slaves.start_port=12300;
 		
 	readConfig();
-	log_config::config=config.log;
+	log_config::config=config.log;//log configured
 	master::world.tps=config.tps;
-
+	
+	
 #ifdef _GLIBCXX_PARALLEL
 	omp_set_dynamic(0);
 	omp_set_num_threads((int)(omp_get_max_threads()*2.5f));
@@ -214,8 +215,17 @@ int main(int argc,char* argv[]){
 	}
 
 	storageInit(&config.storage);
-	grid=new master::special::grid(master::world.map.map_size, master::world.map.offset);
-	
+	object_initializer initializer(master::world);
+	//load maps
+	grid=new master::special::grid();
+	master::world.map=new map("../maps/map.tmx");
+	grid->add_map(0, master::world.map->map_size, master::world.map->offset);
+//	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
+//		auto m=new map(s); 
+//		grid->add_map(m->id, m->map_size, m->offset)
+//		master::world.maps[m->id]=m;
+//	});
+
 	clientMessageProcessorInit();
 	serverMessageProcessorInit();
 	
@@ -379,7 +389,7 @@ int main(int argc,char* argv[]){
 					client *c=ci.second;
 					try{
 						npc* cnpc=master::world.npcs.at(c->npc_id);
-						auto cells=master::world.map.cells(
+						auto cells=master::world.map->cells(
 							cnpc->position.x-view_area[0]/2, //l
 							cnpc->position.y-view_area[1]/2, //t
 							cnpc->position.x+view_area[0]/2, //r
@@ -392,7 +402,7 @@ int main(int argc,char* argv[]){
 //						c->npcs.clear();
 						std::unordered_set<npc*> _npcs;
 						for(auto i:cells){
-							auto cell=master::world.map.cells(i);
+							auto cell=master::world.map->cells(i);
 							if (cell){
 								for(auto ni: cell->npcs){
 									_npcs.insert(ni.second);

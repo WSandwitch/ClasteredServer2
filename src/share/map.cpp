@@ -33,8 +33,9 @@ namespace share{
 	}
 	
 	map::map(char* path): offset(50){
-		cell.x=25;
-		cell.y=25;
+		id=getId(path);
+		cell.x=10;
+		cell.y=10;
 //		grid=0;
 		map_size[0]=200;
 		map_size[1]=200;

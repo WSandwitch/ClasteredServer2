@@ -10,8 +10,10 @@ class MessageIds{
 			try{
 				var val = Std.parseInt(e[1]);
 				Reflect.setProperty(obj, e[0], val);
-			}catch(e:Dynamic){
+			}catch (e:Dynamic){
+			#if debug
 				trace(e);
+			#end
 			}
 		}
 	}

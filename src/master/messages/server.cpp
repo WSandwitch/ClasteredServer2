@@ -74,7 +74,7 @@ namespace master {
 	static void* message_SERVER_READY(server *sv, packet *p_){
 		master::world.m.lock();
 			server::setPause(1);
-				master::grid->add(sv->id);
+				master::grid->add_server(sv->id);
 			server::setPause(0);
 		master::world.m.unlock();
 		printf("server %d ready\n", sv->id);
