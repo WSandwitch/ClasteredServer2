@@ -8,6 +8,7 @@
 #include "listenworkers.h"
 #include "socketworkers.h"
 #include "../../share/system/log.h"
+#include "../../share/system/build_defs.h"
 #include "../client.h"
 #include "../server.h"
 #include "../../share/network/listener.h"
@@ -75,21 +76,35 @@ namespace master {
 					//mestype 0 this is hello mes, in other place it is blank mes
 					printf("%s: try as pure socket\n", name.data());
 					s->recv(&c);//elements
-					if (c==1){
+					if (c==2){
 						s->recv(&c);//element type
 						if (c==6){
 							s->recv(&size);
 							s->recv(buf, size);
 							buf[size]=0;
-							//check buf as client key
-							//send answer
-							c=1;
-							p.setType(c);
-							p.add(c);
-							s->send(&p);//[1,1,1,1]
-							printf("%s: got %s, client go to worker\n", name.data(), buf);
-							socketworkers::addWorkAuto(new client(s));//after that client must get id
-							break;
+							printf("got %s ?= %s\n", buf, _build_date_);
+							if (
+							#ifdef DEBUG
+								1 ||
+							#endif
+								strcmp(_build_date_, buf)==0
+							){
+								s->recv(&c);
+								if (c==6){
+									s->recv(&size);
+									s->recv(buf, size);
+									buf[size]=0;
+									//check buf as client key
+									//send answer
+									c=1;
+									p.setType(c);
+									p.add(c);
+									s->send(&p);//[1,1,1,1]
+									printf("%s: got %s, client go to worker\n", name.data(), buf);
+									socketworkers::addWorkAuto(new client(s));//after that client must get id
+									break;
+								}
+							}
 						}
 					}
 				}else if (strstr(buf,"<po")!=0 ){

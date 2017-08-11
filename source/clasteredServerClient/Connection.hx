@@ -46,6 +46,7 @@ class Connection{
 			sock.connect(host, port);
 			sock.endian = LITTLE_ENDIAN;
 			p.type = 0;
+			p.addString(util.CompileTime.getBuildDate());
 			p.addString("Haxe Flash hello");
 			sendPacket(p);
 			if (success != null)
@@ -64,11 +65,16 @@ class Connection{
 		var fail:Null<Void->Void> = Thread.readMessage(true);
 		try{
 			sock.connect(new Host(host), port);
-			sock.input.bigEndian=false;
+			sock.input.bigEndian = false;
 			sock.output.bigEndian = false;
 			sock.setFastSend(true);
 			p.type = 0;
+			p.addString(util.CompileTime.getBuildDate());
+		#if mobile 
+			p.addString("Haxe Android hello");
+		#else
 			p.addString("Haxe Native hello");
+		#end
 			sendPacket(p);
 			if (success != null)
 				success(this);
