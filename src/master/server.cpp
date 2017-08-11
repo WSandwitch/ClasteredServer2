@@ -92,9 +92,11 @@ namespace master {
 		m.unlock();
 		printf("removed server %d\n", id);
 		//add grid update
-		server::setPause(1);
-			master::grid->remove_server(id);
-		server::setPause(0);
+		master::world.m.lock();
+			server::setPause(1);
+				master::grid->remove_server(id);
+			server::setPause(0);
+		master::world.m.unlock();
 	}
 
 	static int checkSlaves(slave_info *si, void *arg){

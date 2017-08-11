@@ -1,5 +1,5 @@
-TMP ?= /tmp
-OBJDIR ?= $(TMP)/CS2_build
+BUILD_TMP ?= /tmp
+OBJDIR ?= $(BUILD_TMP)/CS2_build
 ARCH ?= $(shell uname -m)
 GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline
@@ -49,9 +49,9 @@ ifeq ($(GPROF),1)
 endif
 
 ifeq ($(OPTIMISATION),1)
-    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
-    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
-    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops #-fprofile-use
+    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
+    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
+    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
 	ifneq ($(NO_LTO),1)
 		CFLAGS +=-flto
 		CPPFLAGS +=-flto
@@ -63,9 +63,9 @@ ifeq ($(OPTIMISATION),1)
 		LDFLAGS += -march=native
 	endif
 	ifneq ($(filter $(ARCH), armv7l),)
-		CFLAGS += -mfpu=neon
-		CPPFLAGS += -mfpu=neon
-		LDFLAGS += -mfpu=neon
+		CFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
+		CPPFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
+		LDFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
 	endif
 endif
 

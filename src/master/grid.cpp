@@ -257,18 +257,46 @@ namespace master {
 		//add server id
 		bool grid::add_server(int _id, bool rec){ //1 server can't be added more than 1 time
 			server_ids.push_back(_id);
+#ifdef _GLIBCXX_PARALLEL
+			int $grids=0;
+			grid_ **_grids=new grid_*[grids.size()];
 			for(auto gi: grids){
-				gi.second->add_server(_id, rec);
+				_grids[$grids++]=gi.second;
 			}
+			for(int i;i<$grids;i++){
+				auto g=_grids[i];
+#else
+			for(auto gi: grids){
+				auto g=gi.second;
+#endif
+				g->add_server(_id, rec);
+			}
+#ifdef _GLIBCXX_PARALLEL
+			delete[] _grids;
+#endif
 			return 0;
 		}
 		
 		//remove server id
 		bool grid::remove_server(int _id, bool rec){
 			server_ids.erase(std::remove(server_ids.begin(), server_ids.end(), _id), server_ids.end());
+#ifdef _GLIBCXX_PARALLEL
+			int $grids=0;
+			grid_ **_grids=new grid_*[grids.size()];
 			for(auto gi: grids){
-				gi.second->remove_server(_id, rec);
+				_grids[$grids++]=gi.second;
 			}
+			for(int i;i<$grids;i++){
+				auto g=_grids[i];
+#else
+			for(auto gi: grids){
+				auto g=gi.second;
+#endif
+				g->remove_server(_id, rec);
+			}
+#ifdef _GLIBCXX_PARALLEL
+			delete[] _grids;
+#endif
 			return 0;
 		}
 
