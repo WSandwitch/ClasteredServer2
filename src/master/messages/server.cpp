@@ -118,14 +118,15 @@ namespace master {
 				nn->angle=p->chanks[1].value.c;
 				nn->direction.by_angle(nn->angle, 1); //right dir and full speed
 //				printf("%g %g \n", nn->direction.x, nn->direction.y);
-	//			nn->direction.normalize(); 
+//				nn->r= //set radius of bullet
 				nn->position=n->position;
 				nn->vel=n->weapon.vel;
 				nn->state=STATE_ATTACK;//attacking on every tick
 				nn->bot.owner_id=n->id;
 				nn->weapon.damage=n->weapon.damage;
 				nn->weapon.dist=n->weapon.dist; //set max move dist
-				nn->weapon.next_shot=1;//shoot every tick
+				nn->weapon.next_shot=0;//shoot every tick
+				nn->weapon.latency=0;//shoot every tick
 				nn->weapon.attacks=n->weapon.attacks; //set max targets
 				nn->attackable=n->weapon.attackable;
 				nn->type=2;//TODO: get base type from weapon object

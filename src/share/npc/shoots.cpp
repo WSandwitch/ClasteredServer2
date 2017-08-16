@@ -105,7 +105,7 @@ namespace share{
 		short attacks=weapon.attacks;
 		
 		std::unordered_set<npc*> npcs;
-		auto cells=world->map->cells(position, r);
+		auto cells=world->map->cells(position, 2*r+vel);
 		for(auto c: cells){
 			auto cell=world->map->cells(c);
 			for(auto n: cell->npcs)
@@ -114,11 +114,15 @@ namespace share{
 					npcs.insert(n.second);
 				}
 		}
+		segment s(position, position+point::from_angle(angle, -vel));
+//		printf("(%g %g), (%g %g) -> (%g %g)\n", position.x, position.y, s.a.x, s.a.y, s.b.x, s.b.y);
 		for(auto n: npcs){
-			if(position.distanse2(n->position)<=sqr(r+n->r)){//hurt if touch
-				n->hurt(this);
-				if(attacks--==0){
+			printf("(%g %g) %g, %d\n", n->position.x, n->position.y, s.distanse(n->position), r+n->r);
+			if(s.distanse(n->position)<=r+n->r){//TODO:check
+				n->hurt(this);//hurt if touch
+				if(--attacks==0){
 					suicide();
+					state=STATE_IDLE;
 					break;
 				}
 			}

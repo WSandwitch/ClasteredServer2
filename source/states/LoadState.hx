@@ -33,9 +33,6 @@ class LoadState extends CSState
 		
 		//add loading screen
 		
-		game.login = "qwer";
-		game.pass = "qwer";
-		
 		try{
 			(new Connection()).connect("172.16.1.40", 8000, false, function(conn:Connection){				
 //			(new Connection()).connect("192.168.1.245", 8000, false, function(conn:Connection){			

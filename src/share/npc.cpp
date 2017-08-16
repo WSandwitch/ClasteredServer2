@@ -214,7 +214,7 @@ namespace share {
 		weapon.attacks=1;//2;//bullets for 1 shot
 		if (world){
 			weapon.warmup=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-			weapon.cooldown=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //set
+			weapon.cooldown=0;//NPC_FULL_TEMP/world->tps/1; //set
 			weapon.latency=0.3*world->tps; //tiks
 		}
 	}

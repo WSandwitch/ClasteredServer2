@@ -188,7 +188,6 @@ int main(int argc,char* argv[]){
 	log_config::config=config.log;//log configured
 	master::world.tps=config.tps;
 	
-	
 #ifdef _GLIBCXX_PARALLEL
 	omp_set_dynamic(0);
 	omp_set_num_threads((int)(omp_get_max_threads()*2.5f));
@@ -272,6 +271,8 @@ int main(int argc,char* argv[]){
 	n->_health=5;
 	n->bot.used=1;
 	n->move_id=100;
+	n->position.x=200;
+	n->position.y=200;
 	master::world.new_npcs.push_back(n);
 	
 //	for(int i=0;i<1000;i++){
