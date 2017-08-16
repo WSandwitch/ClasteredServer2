@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <array>
 #include <sys/time.h>
 
 #include "storage.h"
@@ -40,6 +41,9 @@ namespace master {
 			char login[40];
 			char passwd[40];
 			
+			std::array<int, 2> view_area;
+			std::array<int, 2> view_position;
+
 			short conn_type;
 			short broken;
 			int server_id;

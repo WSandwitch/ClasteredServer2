@@ -120,7 +120,8 @@ namespace master {
 //				printf("%g %g \n", nn->direction.x, nn->direction.y);
 	//			nn->direction.normalize(); 
 				nn->position=n->position;
-				nn->state=STATE_ATTACK;
+				nn->vel=n->weapon.vel;
+				nn->state=STATE_ATTACK;//attacking on every tick
 				nn->bot.owner_id=n->id;
 				nn->weapon.damage=n->weapon.damage;
 				nn->weapon.dist=n->weapon.dist; //set max move dist

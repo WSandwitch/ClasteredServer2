@@ -26,7 +26,7 @@ namespace share {
 					point_ operator-(point_<T1> &&b);
 			
 				template <class T1>
-					static point_ from_angle(char angle, T1 l=1);//l is length of vector
+					static point_ from_angle(char angle, T1 l);//l is length of vector
 				template<class T1, class T2>
 					static T scalar(point_<T1> &&a, point_<T2> &&b);
 				template<class T1, class T2>

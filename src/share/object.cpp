@@ -97,6 +97,7 @@ namespace share{
 		add_attr(type);
 		add_attr(cost); 
 		add_attr(deps); 
+		add_attr(weapon.vel); 
 		add_attr(weapon.dist); 
 		add_attr(weapon.ang_diap); 
 		add_attr(weapon.ang_shift); 

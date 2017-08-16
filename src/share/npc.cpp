@@ -98,20 +98,7 @@ namespace share {
 	}
 */	
 	npc* npc::clone(){//TODO: change to update this attrs and return tjis
-/*		npc* n=new npc(*this);
-		//set health and position
-		n->health=n->_health;
-		n->spawn_wait=100;
-		//cleanup and init
-		n->clear();
-		n->init_attrs();
-		n->init_position();
-		n->recalculate_type();
-		n->damagers.clear();
-		n->bot.dist=0;
-		printf("%d cloned\n", id);
-		return n;
-*/		npc* n=this;
+		npc* n=this;
 		//set health and position
 		n->health=n->_health;
 		n->spawn_wait=100;
@@ -179,6 +166,7 @@ namespace share {
 		packAttr(weapon.cooldown,0,0,1,0,1); //22s
 		packAttr(weapon.latency,0,0,1,0,1); //23s
 		packAttr(weapon.next_shot,0,0,1,0,1); //24s //??
+		packAttr(vel,0,0,1,0,0); //25s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -210,22 +198,23 @@ namespace share {
 			weapon.ang_diap=o->weapon.ang_diap;//pdegree
 			weapon.ang_shift=o->weapon.ang_shift;//pdegree
 			weapon.attacks=o->weapon.attacks;
-			weapon.warmup=o->weapon.warmup;
-			weapon.cooldown=o->weapon.cooldown;
+			weapon.warmup=o->weapon.warmup ? NPC_FULL_TEMP/world->tps/o->weapon.warmup : NPC_FULL_TEMP; //warmup in seconds
+			weapon.cooldown=o->weapon.cooldown ? NPC_FULL_TEMP/world->tps/o->weapon.cooldown : NPC_FULL_TEMP;//cooldown in seconds
 			weapon.latency=o->weapon.latency;
 		}catch(...){}
 		
 		///for testing
 		vel=5;
 		r=23;
+		weapon.vel=25;
 		weapon.damage=1;
 		weapon.dist=300;
-		weapon.ang_diap=60;//pdegree
-		weapon.ang_shift=10;//pdegree
-		weapon.attacks=2;
+		weapon.ang_diap=2;//60;//pdegree
+		weapon.ang_shift=0;//10;//pdegree
+		weapon.attacks=1;//2;//bullets for 1 shot
 		if (world){
-			weapon.warmup=NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-			weapon.cooldown=NPC_FULL_TEMP/world->tps/1; //set
+			weapon.warmup=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+			weapon.cooldown=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //set
 			weapon.latency=0.3*world->tps; //tiks
 		}
 	}

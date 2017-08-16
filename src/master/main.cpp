@@ -273,13 +273,13 @@ int main(int argc,char* argv[]){
 	n->bot.used=1;
 	n->move_id=100;
 	master::world.new_npcs.push_back(n);
-/*	
-	for(int i=0;i<500;i++){
-		npc *n=new npc(&master::world, master::world.getId());
-		n->bot.used=1;
-		master::world.new_npcs.push_back(n);
-	}
-*/	
+	
+//	for(int i=0;i<1000;i++){
+//		npc *n=new npc(&master::world, master::world.getId());
+//		n->bot.used=1;
+//		master::world.new_npcs.push_back(n);
+//	}
+	
 	
 	do{
 		timestamp=share::time(0);
@@ -379,10 +379,10 @@ int main(int argc,char* argv[]){
 				try{
 					npc* cnpc=master::world.npcs.at(c->npc_id);
 					auto cells=master::world.map->cells(
-						cnpc->position.x-view_area[0]/2, //l
-						cnpc->position.y-view_area[1]/2, //t
-						cnpc->position.x+view_area[0]/2, //r
-						cnpc->position.y+view_area[1]/2 //b
+						cnpc->position.x-c->view_position[0], //l
+						cnpc->position.y-c->view_position[1], //t
+						cnpc->position.x+c->view_area[0]-c->view_position[0], //r
+						cnpc->position.y+c->view_area[1]-c->view_position[1] //b
 					);
 					std::unordered_map<int, short> npcs;
 					for(auto n: c->npcs){

@@ -6,6 +6,7 @@
 ///massages from client
 #define MESSAGE_AUTH 1
 #define MESSAGE_SET_DIRECTION 2
+#define MESSAGE_SET_ATTRS 3
 
 ///master -> slave
 #define MESSAGE_PAUSE 1

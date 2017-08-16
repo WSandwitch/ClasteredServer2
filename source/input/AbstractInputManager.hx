@@ -855,5 +855,67 @@ enum AbstractSource{
 }
 
 
+/* example basic usage
+
+//enum for bindings
+@:enum
+abstract ActionID(Int) from Int to Int{
+	public static var fromStringMap(default, null):Map<String, ActionID>
+		= FlxMacroUtil.buildMap("PlayState.ActionID");
+		
+	public static var toStringMap(default, null):Map<ActionID, String>
+		= FlxMacroUtil.buildMap("PlayState.ActionID", true);
+
+	var NONE = -1;	
+	var GO_UP = 1;
+	var GO_DOWN = 2;
+	var GO_LEFT = 3;
+	var GO_RIGHT = 4;
+	var ATTACK = 5;
+	
+	@:from
+	public static inline function fromString(s:String)
+	{
+		s = s.toUpperCase();
+		return fromStringMap.exists(s) ? fromStringMap.get(s) : NONE;
+	}
+	
+	@:to
+	public inline function toString():String
+	{
+		return toStringMap.get(this);
+	}	
+		
+}
+
+	//in create
+	var actions:AbstractInputManager = new AbstractInputManager();
+	var a = actions.addAction(GO_UP);
+	a.addKey(FlxKey.W);
+	a.addKey(FlxKey.UP);
+	a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_MINUS);
+	a=actions.addAction(GO_DOWN);
+	a.addKey(FlxKey.S);
+	a.addKey(FlxKey.DOWN);
+	a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_PLUS);
+	a=actions.addAction(GO_LEFT);
+	a.addKey(FlxKey.A);
+	a.addKey(FlxKey.LEFT);
+	a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_MINUS);
+	a=actions.addAction(GO_RIGHT);
+	a.addKey(FlxKey.D);
+	a.addKey(FlxKey.RIGHT);
+	a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_PLUS);
+	a=actions.addAction(ATTACK);
+	a.addMouseKey(MouseID.MOUSE_LEFT);
+	
+	///in update 	
+	actions.update();
+	if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
+		//some actions on actions.value(GO_RIGHT) or other
+	}
+  
+ * */
+
 
 

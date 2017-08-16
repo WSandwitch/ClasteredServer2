@@ -72,6 +72,7 @@ namespace share {
 			short shoot_id; 
 			int weapon_id; //object_id
 			int owner_id; //id of player
+			float vel;
 			char angle; //angle of view in pdegrees
 			share::world *world;
 			share::mutex m;
@@ -93,6 +94,7 @@ namespace share {
 				short ang_shift;//pdegree
 				short attacks;
 				int dist;
+				float vel;
 				
 				short warmup; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
 				short cooldown; //set
@@ -158,7 +160,6 @@ namespace share {
 			
 			friend std::ostream& operator<<(std::ostream &stream, const npc &n);
 		protected:
-			float vel;
 			timestamp_t timestamp;
 			map3b<pack_p> _packs;
 			

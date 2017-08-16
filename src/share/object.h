@@ -23,6 +23,7 @@ namespace share{
 		std::vector<std::vector<int>> deps;  //object dependencies
 		struct {
 			int dist;
+			float vel;
 			short ang_diap; //degrees
 			short ang_shift; //degrees
 			short attacks; //

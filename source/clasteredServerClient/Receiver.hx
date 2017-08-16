@@ -66,7 +66,7 @@ class Receiver{
 						break;
 				}
 			}
-			haxe.Timer.delay(worker, 33);
+			haxe.Timer.delay(worker, 33);//TODO: check
 		}catch(e:Dynamic){
 			trace(e);
 			trace(CallStack.toString(CallStack.exceptionStack()));

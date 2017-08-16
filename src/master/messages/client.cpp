@@ -200,12 +200,43 @@ namespace master {
 		master::world.m.unlock();
 		return 0;
 	}
+	
+	static void *message_MESSAGE_SET_ATTRS(client *cl, packet* p){
+		clientCheckAuth(cl);//client must have id already
+		master::world.m.lock();
+			try{
+				for(int i=0, end=p->chanks.size();i<end;i++){
+					int index=p->chanks[i++].value.c;
+					switch (index){
+						case 1://width
+							cl->view_area[0]=p->chanks[i].value.s;
+//							printf("set width %d\n", cl->view_area[0]);
+							break;
+						case 2://height
+							cl->view_area[1]=p->chanks[i].value.s;
+//							printf("set height %d\n", cl->view_area[1]);
+							break;
+						case 3://width
+							cl->view_position[0]=p->chanks[i].value.s;
+//							printf("set pos x %d\n", cl->view_position[0]);
+							break;
+						case 4://height
+							cl->view_position[1]=p->chanks[i].value.s;
+//							printf("set pos y %d\n", cl->view_position[1]);
+							break;
+					}
+				}
+			}catch(...){}
+		master::world.m.unlock();
+		return 0;
+	}
 
 	voidMessageProcessor(25)
 
 	void clientMessageProcessorInit(){
 		messageprocessorClientAdd(MESSAGE_AUTH, (void*)&message_MESSAGE_AUTH);
 		messageprocessorClientAdd(MESSAGE_SET_DIRECTION, (void*)&message_MESSAGE_SET_DIRECTION);
+		messageprocessorClientAdd(MESSAGE_SET_ATTRS, (void*)&message_MESSAGE_SET_ATTRS);
 
 		clientMessageProcessor(25);
 	}

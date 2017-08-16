@@ -11,6 +11,7 @@ import flixel.FlxObject;
 import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup;
 import flixel.FlxState;
+import flixel.math.FlxPoint;
 import flixel.system.scaleModes.*;
 import flixel.math.FlxMath;
 import flixel.math.FlxRect;
@@ -39,6 +40,7 @@ class PlayState extends CSState
 	public var MESSAGE_NPC_UPDATE:Int;
 	public var MESSAGE_NPC_REMOVE:Int;
 	public var MESSAGE_CLIENT_UPDATE:Int;
+	public var MESSAGE_SET_ATTRS:Int;
 	
 	// Demo arena boundaries
 	static var LEVEL_MIN_X;
@@ -282,11 +284,51 @@ class PlayState extends CSState
 //		trace(elapsed);
 //		trace(Sys.time());
 //		trace(orb.x,orb.y);
+		send_screen_position();
 		checkInput(elapsed);
 		checkPackets(elapsed);
 
 		super.update(elapsed);
 		
+	}
+	
+	private function send_screen_size(_w:Int,_h:Int){
+		try{
+			var p:Packet = new Packet();
+			p.addChar(1);
+			p.addShort(_w);
+			p.addChar(2);
+			p.addShort(_h);
+			p.type = MESSAGE_SET_ATTRS;
+			connection.sendPacket(p);
+		}catch(e:Dynamic){
+			trace(e);
+		}
+	}
+	
+	private var _position:FlxPoint = new FlxPoint(0, 0); 
+	private function send_screen_position(){
+		try{
+			var p:Packet = new Packet();
+			p.type = MESSAGE_SET_ATTRS;
+			if (npc != null){
+				var pos = npc.getScreenPosition();
+				if (pos.x - _position.x > 10 || _position.x - pos.x > 10){
+					_position.x = pos.x;
+					p.addChar(3);
+					p.addShort(Std.int(_position.x));
+				}
+				if (pos.y - _position.y > 10 || _position.y - pos.y > 10){
+					_position.y = pos.y;
+					p.addChar(4);
+					p.addShort(Std.int(_position.y));
+				}
+			}
+			if (p.chanks.length>0)
+				connection.sendPacket(p);
+		}catch(e:Dynamic){
+			trace(e);
+		}
 	}
 	
 	override
@@ -295,6 +337,8 @@ class PlayState extends CSState
 		var _w:Int = Std.int(w / FlxG.scaleMode.scale.x);
 		var _h:Int = Std.int(h / FlxG.scaleMode.scale.y);
 		_map.resize(_w, _h);
+		
+		send_screen_size(_w, _h);
 		
 		addGamepad();
 	}

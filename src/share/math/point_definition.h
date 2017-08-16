@@ -30,7 +30,7 @@ namespace share {
 
 	template<class T>
 		template<class T1>
-			void point_<T>::by_angle(char angle, T1 l){
+			void point_<T>::by_angle(char angle, T1 l){ //vector by angle
 				float rad=from_pdegrees(angle);
 				x=roundf(l*cosf(rad));//TODO:check
 				y=roundf(l*sinf(rad));
