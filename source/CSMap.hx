@@ -59,52 +59,63 @@ class CSMap extends FlxGroup{
 		if (tiles != null){
 			var bm_blank:BitmapData = new BitmapData(tiledmap.tileWidth, tiledmap.tileHeight);
 			var gid = 1;
-			for (ts in tiledmap.tilesetArray){
+			var size = tiledmap.tilesetArray.length;
+			(function _tile(i:Int){
+				if (i == size){
+					tilemap.loadMapFromArray(
+						tiles.tileArray, 
+						tiledmap.width, 
+						tiledmap.height, 
+						FlxTileFrames.combineTileSets(fr, new FlxPoint(tiledmap.tileWidth, tiledmap.tileHeight)), 
+						tiledmap.tileWidth, 
+						tiledmap.tileHeight, 
+						OFF, 1, 1, 1
+					);
+					return;
+				}
+				var ts = tiledmap.tilesetArray[i];
 				trace(gid, ts.firstGID);
 				if (gid < ts.firstGID){
 					for (i in 0...(ts.firstGID - gid))
 						fr.push(bm_blank); //fill missed tile images
 				}
 				if (ts.tileImagesSources == null){
-					var bitmap:Null<BitmapData> = CSAssets.getBitmapData((~/^(..\/)+/).replace(ts.imageSource,""));
-					if (bitmap == null){
-						bitmap = bm_blank;
-						for (i in 1...ts.numTiles)
-							fr.push(bitmap);
-					}else{
-						var tilenum = Math.floor(bitmap.width / ts.tileWidth) * Math.floor(bitmap.height / ts.tileHeight);
-						if (tilenum < ts.numTiles){
-							for (i in 1...(ts.numTiles-tilenum))
-								fr.push(bm_blank);
-						}else if (tilenum < ts.numTiles){
-							trace("wrong size of tileset " + ts.imageSource);
-							//TODO: add crop
+					CSAssets.getBitmapData((~/^(..\/)+/).replace(ts.imageSource,""), function (bitmap:Null<BitmapData>){
+						if (bitmap == null){
+							bitmap = bm_blank;
+							for (i in 1...ts.numTiles)
+								fr.push(bitmap);
+						}else{
+							var tilenum = Math.floor(bitmap.width / ts.tileWidth) * Math.floor(bitmap.height / ts.tileHeight);
+							if (tilenum < ts.numTiles){
+								for (i in 1...(ts.numTiles-tilenum))
+									fr.push(bm_blank);
+							}else if (tilenum < ts.numTiles){
+								trace("wrong size of tileset " + ts.imageSource);
+								//TODO: add crop
+							}
 						}
-					}
-					fr.push(bitmap);
-					gid += ts.numTiles;
+						fr.push(bitmap);
+						gid += ts.numTiles;
+						_tile(i+1);
+					});
 				}else{
-					for (t in ts.tileImagesSources){
-						if (t != null){
-							var bitmap:Null<BitmapData> = CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""));
+					var tsize = ts.tileImagesSources.length;
+					(function _imageSource(ti:Int){
+						if (ti == tsize){
+							_tile(i+1);
+						}
+						var t = ts.tileImagesSources[ti];
+						CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""), function(bitmap:Null<BitmapData>){
 							if (bitmap == null)
 								bitmap = bm_blank;
 							fr.push(bitmap);
 							gid++;
-						}
-					}
+							_imageSource(ti+1);
+						});
+					})(0);
 				}
-			}
-			tilemap.loadMapFromArray(
-				tiles.tileArray, 
-				tiledmap.width, 
-				tiledmap.height, 
-				FlxTileFrames.combineTileSets(fr, new FlxPoint(tiledmap.tileWidth, tiledmap.tileHeight)), 
-				tiledmap.tileWidth, 
-				tiledmap.tileHeight, 
-				OFF, 1, 1, 1
-			);
-			
+			})(0);
 		}
 		var obj_layer:Null<TiledObjectLayer> = cast tiledmap.getLayer("collision");
 		if (obj_layer != null){
@@ -148,3 +159,24 @@ class CSMap extends FlxGroup{
 		_npcs.remove(id);
 	}
 }
+
+
+/* //async sync example
+
+var urls = [
+  "//ru.stackoverflow.com/",
+  "//meta.ru.stackoverflow.com/",
+  "//ru.stackoverflow.com/q/619018/178988"
+];
+
+(function go(i) {
+  if (i < urls.length) {
+    fetch(urls[i], {mode:'no-cors'}).then(function () {
+      console.log(urls[i]);
+      go(i+1);
+    })
+  }
+})(0);
+
+
+*/

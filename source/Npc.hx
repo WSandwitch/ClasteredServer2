@@ -25,7 +25,6 @@ class Npc extends FlxSpriteGroup
 	public var sprite_updated:Bool = false;
 	
 	public var sprite:Null<FlxSprite> = null;
-	public var shadow:Null<FlxSprite> = null;
 	
 	public function new (x:Float, y:Float, type:Int)
 	{
@@ -65,15 +64,6 @@ class Npc extends FlxSpriteGroup
 			dest_y = null;
 		}
 		super.update(elapsed);
-		if (FlxG.camera.target != null && FlxG.camera.followLead.x == 0) // target check is used for debug purposes.
-		{
-			x = Math.round(x); // Smooths camera and orb shadow following. Does not work well with camera lead.
-			y = Math.round(y); // Smooths camera and orb shadow following. Does not work well with camera lead.
-		}
-		if (shadow != null){
-			shadow.x = Math.round(x);
-			shadow.y = Math.round(y);
-		}
 	}
 	
 	public function update_attributes(p:Packet){
@@ -122,4 +112,9 @@ class Npc extends FlxSpriteGroup
 		});
 	}
 	
+	override public function destroy(){
+		remove(sprite);
+		sprite.destroy();
+		super.destroy();
+	}
 }

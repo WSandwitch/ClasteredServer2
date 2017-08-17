@@ -428,9 +428,9 @@ class PlayState extends CSState
 				if (p.type==MESSAGE_NPC_UPDATE){
 					var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 					if (n == null){
-						n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of creen
+						n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of screen
 						n.id = p.chanks[0].i;
-						_map.set_npc(p.chanks[0].i, n);
+						_map.set_npc(n.id, n);
 					}
 					n.update_attributes(p);
 				} else if (p.type==MESSAGE_NPC_REMOVE){
@@ -439,9 +439,10 @@ class PlayState extends CSState
 						if (npc_id==nid){
 							//player npc add screen you are died
 						}else{
+							trace("dead npc " + nid);
 							var n:Null<Npc> = _map.get_npc(nid);
+							_map.remove_npc(nid);
 							if (n != null){
-								_map.remove_npc(nid);
 								n.destroy();
 								n = null;
 							}
