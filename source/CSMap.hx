@@ -61,7 +61,7 @@ class CSMap extends FlxGroup{
 			var gid = 1;
 			var size = tiledmap.tilesetArray.length;
 			(function _tile(i:Int){
-				if (i == size){
+				if (i >= size){
 					tilemap.loadMapFromArray(
 						tiles.tileArray, 
 						tiledmap.width, 
@@ -74,7 +74,7 @@ class CSMap extends FlxGroup{
 					return;
 				}
 				var ts = tiledmap.tilesetArray[i];
-				trace(gid, ts.firstGID);
+//				trace(gid, ts.firstGID);
 				if (gid < ts.firstGID){
 					for (i in 0...(ts.firstGID - gid))
 						fr.push(bm_blank); //fill missed tile images
@@ -102,17 +102,24 @@ class CSMap extends FlxGroup{
 				}else{
 					var tsize = ts.tileImagesSources.length;
 					(function _imageSource(ti:Int){
-						if (ti == tsize){
+						if (ti >= tsize){
 							_tile(i+1);
+							return;
 						}
 						var t = ts.tileImagesSources[ti];
-						CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""), function(bitmap:Null<BitmapData>){
-							if (bitmap == null)
-								bitmap = bm_blank;
-							fr.push(bitmap);
+						if (t!=null){
+							CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""), function(bitmap:Null<BitmapData>){
+								if (bitmap == null)
+									bitmap = bm_blank;
+								fr.push(bitmap);
+								gid++;
+								_imageSource(ti+1);
+							});
+						}else{
+							fr.push(bm_blank);
 							gid++;
-							_imageSource(ti+1);
-						});
+							haxe.Timer.delay(_imageSource.bind(ti+1), 1);
+						}
 					})(0);
 				}
 			})(0);

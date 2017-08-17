@@ -4,9 +4,18 @@ import flixel.graphics.FlxGraphic;
 import haxe.io.Bytes;
 import openfl.Assets;
 import flixel.FlxG;
+import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.events.Event;
+import openfl.events.HTTPStatusEvent;
+import openfl.events.IOErrorEvent;
+import openfl.events.SecurityErrorEvent;
 import openfl.utils.ByteArray;
 import haxe.Timer.delay;
+// This is what we need to retrieve the image
+import openfl.display.Loader;	
+// This is how we specify the location of the image	
+import openfl.net.URLRequest;
 #if !flash
 	import sys.io.File;
 	import sys.io.FileInput;
@@ -15,6 +24,7 @@ import haxe.Timer.delay;
 class CSAssets
 {
 	static inline var _delay:Int = 1;
+	static var _host:String = "http://host.from/";
 	
 	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool=true):Null<FlxGraphic>{
 		var g:Null<FlxGraphic>=FlxG.bitmap.get(id);
@@ -63,8 +73,33 @@ class CSAssets
 //			trace("no file");
 		}
 	#end	
-		//TODO: add load from web
-		
+//		trace("from web");
+		if (callback != null){
+			var loader = new Loader();
+			var status:Int;
+			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
+				if ( status == 200 ) {	// 200 is a successful HTTP status
+					try{
+						var b:Bitmap = event.target.content;
+						callback(FlxG.bitmap.add(b.bitmapData, false, id));
+					}catch(e:Dynamic){
+						trace("load error: " + e);
+					}
+				}
+			});
+			loader.contentLoaderInfo.addEventListener( HTTPStatusEvent.HTTP_STATUS, function(event:HTTPStatusEvent){
+				status = event.status; // Hopefully this is 200
+			});
+			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
+				trace("ioErrorHandler: " + event);
+			});
+			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
+				trace("securityErrorHandler: " + event); 
+			});
+			//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
+			//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );
+			loader.load(new URLRequest(_host+id));
+		}
 		return null;
 	}
 	
@@ -108,7 +143,9 @@ class CSAssets
 //			trace("no file");
 		}
 	#end	
+	if (callback != null){
 		//TODO: add load from web
+	}
 		return null;
 	}
 	

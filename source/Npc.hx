@@ -30,13 +30,12 @@ class Npc extends FlxSpriteGroup
 	{
 		super(x, y);
 		sprite = new FlxSprite(0, 0);// , "assets/npc/solder_gun128.png"); //base sprite
-//		sprite.x =-sprite.width / 2;
-//		sprite.y =-sprite.height / 2;
 		add(sprite);
 		var that = this;
 		//moves = false;
 		//this.field("aaa")();
         //untyped this["aaa"]();
+		//must not update sprites in updaters
 		updater[1] = function(a:Dynamic){
 			that.dest_x = a;
 		};
@@ -48,12 +47,13 @@ class Npc extends FlxSpriteGroup
 			sprite_updated = true;
 		};
 		updater[9] = function(a:Dynamic){
-			that.setAngle(Math.round(a / 120.0 * 180)); 
+			that.angle=Math.round(a / 120.0 * 180); 
 		};
 		//antialiasing = true;
 	}
 	
-	override public function update(elapsed:Float):Void 
+	override 
+	public function update(elapsed:Float):Void 
 	{
 		if (dest_x!=null){
 			x = dest_x;
@@ -106,13 +106,16 @@ class Npc extends FlxSpriteGroup
 		sprite.y -= sprite.height / 2;
 	}
 	
-	public function setAngle(a:Int){
+	override
+	private function set_angle(Value:Float):Float{
 		forEach(function(s:FlxSprite){
-			s.angle = a; 
+			s.angle = Value; 
 		});
+		return super.set_angle(Value);
 	}
 	
-	override public function destroy(){
+	override 
+	public function destroy(){
 		remove(sprite);
 		sprite.destroy();
 		super.destroy();
