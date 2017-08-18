@@ -46,7 +46,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
 	}
 
     xml_node<> *tilesetnode = mapnode->first_node( "tileset" );
-    
+/*    
     while ( tilesetnode ) {
         NLTmxMapTileset* tileset = new NLTmxMapTileset();
         
@@ -54,7 +54,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
         tileset->name = tilesetnode->first_attribute( "name" )->value();
         tileset->tileWidth =  atoi( tilesetnode->first_attribute( "tilewidth" )->value() );
         tileset->tileHeight = atoi( tilesetnode->first_attribute( "tileheight" )->value() );
-        tileset->filename = tilesetnode->first_node( "image" )->first_attribute( "source" )->value();
+        tileset->filename = tilesetnode->first_node( "image" )->first_attribute( "source" )->value();//check for tiset of images
         
         //cout << "Tileset " << tileset->name << " filename " << tileset->filename << endl;
         
@@ -62,7 +62,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
         
         tilesetnode = tilesetnode->next_sibling( "tileset" );
     }
-    
+*/    
     const char *separators = " \t,\n\r";
     
     xml_node<> *layernode = mapnode->first_node( "layer" );

@@ -43,7 +43,7 @@ class Main extends Sprite
 	#if (mobile && debug)
 		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
-	#end
 		trace(openfl.utils.SystemPath.applicationStorageDirectory);
+	#end
 	}
 }

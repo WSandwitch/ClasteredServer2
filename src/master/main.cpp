@@ -328,39 +328,41 @@ int main(int argc,char* argv[]){
 				}
 				//move in map
 				n->update_cells(); //threadsafe
-				//update n->slaves
-				std::unordered_map<int, short> slaves;
-				for(auto slave: n->slaves)//set had to 2
-					slaves[slave]=2;
-				n->slaves.clear();
-				for(auto slave: share_ids)
-					slaves[slave]++; //inc real
-				slaves[n->slave_id]++;
-				for(auto slave: slaves){
-					server *s=server::get(slave.first);
-					if (s){
-						switch(slave.second){
-							case 2: //need to remove
-								{
-									packet p;
-									p.setType(MESSAGE_NPC_REMOVE);
-									p.add(n->id);
-									s->sock->send(&p);
-								}
-								break;
-							case 1: //new npc
-								s->sock->send(n->pack(1,1));
-								n->slaves.insert(slave.first);
-//									printf("(slave)send new npc\n");
-								break;
-							case 3: //already had npc
-								if (n->updated(1,0,1)){
-									s->sock->send(n->pack(1,0,1));									
-								}
-								n->slaves.insert(slave.first);
-								break;
-						}
-					}	
+				if (!n->non_target){
+					//update n->slaves
+					std::unordered_map<int, short> slaves;
+					for(auto slave: n->slaves)//set had to 2
+						slaves[slave]=2;
+					n->slaves.clear();
+					for(auto slave: share_ids)
+						slaves[slave]++; //inc real
+					slaves[n->slave_id]++;
+					for(auto slave: slaves){
+						server *s=server::get(slave.first);
+						if (s){
+							switch(slave.second){
+								case 2: //need to remove
+									{
+										packet p;
+										p.setType(MESSAGE_NPC_REMOVE);
+										p.add(n->id);
+										s->sock->send(&p);
+									}
+									break;
+								case 1: //new npc
+									s->sock->send(n->pack(1,1));
+									n->slaves.insert(slave.first);
+	//									printf("(slave)send new npc\n");
+									break;
+								case 3: //already had npc
+									if (n->updated(1,0,1)){
+										s->sock->send(n->pack(1,0,1));									
+									}
+									n->slaves.insert(slave.first);
+									break;
+							}
+						}	
+					}
 				}
 			}	
 

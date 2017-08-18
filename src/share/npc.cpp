@@ -36,6 +36,7 @@ namespace share {
 	npc::npc(share::world *w, int id, short t): 
 		id(id), 
 		state(0), 
+		non_target(0),
 		health(100),
 		_health(100),
 		type(1), //player/bot npc by default 
