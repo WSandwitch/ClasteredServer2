@@ -98,5 +98,9 @@ $(PUBLIC)_fast:
 
 clean:
 	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(DEPS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o
+
+client:
+	lime build neko -debug #-final
+	
 	
 -include $(DEPS)

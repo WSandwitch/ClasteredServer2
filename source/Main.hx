@@ -26,8 +26,9 @@ class Main extends Sprite
 		trace('screen dpi ' + Capabilities.screenDPI);
 		
 	#if flash //72 dpi
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);
 	#else
+//		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(Capabilities.screenDPI/96.0);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
 //		FlxG.scaleMode = new BorderedStageSizeScaleMode(1.4);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
 //		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
@@ -43,7 +44,7 @@ class Main extends Sprite
 	#if (mobile && debug)
 		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
-		trace(openfl.utils.SystemPath.applicationStorageDirectory);
+//		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	#end
 	}
 }

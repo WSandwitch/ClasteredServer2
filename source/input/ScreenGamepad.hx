@@ -219,22 +219,10 @@ class ScreenGamepad extends FlxSpriteGroup{
 	public function setMode(M:FlxMode, ?w:Int, ?h:Int){
 //		trace(M);
 		mode = M;
-	#if mobile
-		//check for scale
-		if (w == null)
-			w = FlxG.width;
-		if (h == null)
-			h = FlxG.height;
-	#else
 		if (w == null)
 			w = FlxG.camera.width;
 		if (h == null)
 			h = FlxG.camera.height;
-	#end
-		//scale correction
-//		var _scale_dpi = ((FlxG.scaleMode.scale.x + FlxG.scaleMode.scale.y) / 2);  //Capabilities.screenDPI / 125; //125 - default dpi
-//		w = cast( w / _scale_dpi);
-//		h = cast( h / _scale_dpi);
 
 		var buttons_shift:FlxPoint = new FlxPoint(_distanse.x / 2 + _buttonSize.x, _distanse.y / 2 + _buttonSize.y);
 		switch (M){

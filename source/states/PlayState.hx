@@ -90,6 +90,7 @@ class PlayState extends CSState
 				trace("back button");
 				e.stopImmediatePropagation();
 				//TODO: add show menu
+				openfl.Lib.exit();//change to open menu
 //				restartLevel();
 		}
 	}

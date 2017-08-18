@@ -89,7 +89,7 @@ class CSAssets
 //		trace("from web");
 		if (callback != null){
 			var loader = new Loader();
-			var status:Int;
+			var status:Int=0;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
 				if ( status == 200 ) {	// 200 is a successful HTTP status
 					trace("loaded file "+_host+id);

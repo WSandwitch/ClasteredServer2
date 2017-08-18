@@ -36,9 +36,9 @@
 
 	<assets path="assetsExt" rename="assets" if="debug" />
 	<assets path="data" rename="assets/data" if="debug" />
-	<assets path="maps" rename="assets/maps" if="debug" />
+	<assets path="maps" rename="assets/maps" include="*.tmx" if="debug" />
 	<assets path="data" rename="assets/data" embed="true" unless="debug" />
-	<assets path="maps" rename="assets/maps" embed="true" unless="debug" />
+	<assets path="maps" rename="assets/maps" include="*.tmx" embed="true" unless="debug" />
 	<assets path="src/share/messages.h" rename="assets/messages.h" embed="true" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
@@ -75,7 +75,7 @@
 	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
 	
 	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
+	<haxedef name="FLX_NO_SOUND_TRAY" />
 	
 	<!--Disable the Flixel sound management code-->
 	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
@@ -90,13 +90,18 @@
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 	
 	<!--------------------------------CUSTOM---------------------------------------->
-	
+		
+		
+	<!--------------------------------IOS---------------------------------------->
+	<ios deployment="3.2" binaries="fat" devices="universal" if="ios" />
+		
+	<!--------------------------------Android---------------------------------------->
+<!--	<template path="templates/android/AndroidManifest.xml" rename="AndroidManifest.xml" if="android" /> -->
 	<android target-sdk-version="16" if="android" />
+	<!--<android install-location="preferExternal" />-->
+	<!--<android permission="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+	<!--<android permission="android.permission.INTERNET" />-->
 	<!--on release-->
 	<architecture name="x86" if="android" unless="debug" />
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
-	<section unless="flash">
-		 <set name="use_locks"/>
-		 <set name="use_threads" value="true" />
-	</section>
 </project>
