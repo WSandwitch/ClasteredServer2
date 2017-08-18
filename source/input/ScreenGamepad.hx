@@ -105,13 +105,13 @@ class ScreenGamepad extends FlxSpriteGroup{
 		FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.DEVICE_ADDED, true, false, id, 0, 0));
 	#end
 	
-		var base_sprite = new FlxSprite(0, 0, "assets/gamepad/base.png");
-		var thumb_sprite = new FlxSprite(0, 0, "assets/gamepad/thumb.png");
+		var base_sprite = new FlxSprite(0, 0, "assets/images/gamepad/base.png");
+		var thumb_sprite = new FlxSprite(0, 0, "assets/images/gamepad/thumb.png");
 		
 		var button_sprites = ["up","down","left","right","a","b","x","y","back","start"];	
 		var names = ["normal", "highlight", "pressed"];	
 		for (sprite_f in button_sprites){
-			var bmd = FlxG.bitmap.add('assets/gamepad/${sprite_f}.png');
+			var bmd = FlxG.bitmap.add('assets/images/gamepad/${sprite_f}.png');
 			_frames[sprite_f]=FlxTileFrames.fromGraphic(bmd, new FlxPoint(bmd.height/3,bmd.height/3));
 			for( i in 0...3){
 				_frames[sprite_f].frames[i].name = names[i];

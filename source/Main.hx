@@ -44,6 +44,6 @@ class Main extends Sprite
 		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
 	#end
-		trace(FlxG.scaleMode);
+		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	}
 }

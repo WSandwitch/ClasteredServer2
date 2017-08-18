@@ -260,7 +260,7 @@ class PlayState extends CSState
 
 	private function createFloorTiles() 
 	{
-		var	floorImg = Assets.getBitmapData("assets/FloorTexture.png");
+		var	floorImg = Assets.getBitmapData("assets/images/FloorTexture.png");
 		var imgWidth = floorImg.width;
 		var imgHeight = floorImg.height;
 		var i = LEVEL_MIN_X; 

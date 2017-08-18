@@ -34,6 +34,7 @@
 	<classpath name="source" />
 	<assets path="assets" />
 
+	<assets path="assetsExt" rename="assets" if="debug" />
 	<assets path="data" rename="assets/data" if="debug" />
 	<assets path="maps" rename="assets/maps" if="debug" />
 	<assets path="data" rename="assets/data" embed="true" unless="debug" />

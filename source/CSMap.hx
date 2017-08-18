@@ -80,7 +80,7 @@ class CSMap extends FlxGroup{
 						fr.push(bm_blank); //fill missed tile images
 				}
 				if (ts.tileImagesSources == null){
-					CSAssets.getBitmapData((~/^(..\/)+/).replace(ts.imageSource,""), function (bitmap:Null<BitmapData>){
+					CSAssets.getBitmapData(StringTools.replace((~/^(..\/)+/).replace(ts.imageSource,""),"assetsExt","assets"), function (bitmap:Null<BitmapData>){
 						if (bitmap == null){
 							bitmap = bm_blank;
 							for (i in 1...ts.numTiles)
@@ -108,7 +108,7 @@ class CSMap extends FlxGroup{
 						}
 						var t = ts.tileImagesSources[ti];
 						if (t!=null){
-							CSAssets.getBitmapData((~/^(..\/)+/).replace(t.source,""), function(bitmap:Null<BitmapData>){
+							CSAssets.getBitmapData(StringTools.replace((~/^(..\/)+/).replace(t.source,""),"assetsExt","assets"), function(bitmap:Null<BitmapData>){
 								if (bitmap == null)
 									bitmap = bm_blank;
 								fr.push(bitmap);

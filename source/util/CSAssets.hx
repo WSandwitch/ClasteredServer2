@@ -16,6 +16,7 @@ import haxe.Timer.delay;
 import openfl.display.Loader;	
 // This is how we specify the location of the image	
 import openfl.net.URLRequest;
+import openfl.utils.SystemPath;
 #if !flash
 	import sys.io.File;
 	import sys.io.FileInput;
@@ -24,9 +25,21 @@ import openfl.net.URLRequest;
 class CSAssets
 {
 	static inline var _delay:Int = 1;
-	static var _host:String = "http://host.from/";
+	static var _host:String = "http://172.16.1.40:3000/";
 	
-	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool=true):Null<FlxGraphic>{
+	#if mobile
+		static var _base:String = SystemPath.applicationStorageDirectory+'/'; //may be need Application.current.config.packageName
+	#else
+		static var _base:String = "";
+	#end
+	/*
+	var jGetExtDir = nme.JNI.createStaticMethod('android/os/Environment', 'getExternalStorageDirectory', '()Ljava/io/File;');
+	var jGetPath = nme.JNI.createMemberMethod('java/io/File', 'getAbsolutePath', '()Ljava/lang/String;');
+	var jFileObj = jGetExtDir();
+	var extPath : String = jGetPath(jFileObj);
+	*/
+	
+	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool = true):Null<FlxGraphic>{
 		var g:Null<FlxGraphic>=FlxG.bitmap.get(id);
 		if (g != null){
 			if (callback != null){
@@ -55,7 +68,7 @@ class CSAssets
 //		trace("from disk");
 	#if !flash
 		try{
-			var data:Bytes = File.getBytes(id);
+			var data:Bytes = File.getBytes(_base+id);
 		#if openfl_legacy
 			g = FlxG.bitmap.add(BitmapData.loadFromBytes(ByteArray.fromBytes(data)), false, id);
 		#else
@@ -79,11 +92,20 @@ class CSAssets
 			var status:Int;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
 				if ( status == 200 ) {	// 200 is a successful HTTP status
+					trace("loaded file "+_host+id);
 					try{
 						var b:Bitmap = event.target.content;
 						callback(FlxG.bitmap.add(b.bitmapData, false, id));
+					#if !flash
+						// Saving the BitmapData 
+						try{
+							sys.io.File.saveBytes(_base+id, b.bitmapData.encode("png", 1));
+						}catch(e:Dynamic){
+							trace("can't save "+_base+id);
+						}
+					#end
 					}catch(e:Dynamic){
-						trace("load error: " + e);
+						trace("web load error: " + e);
 					}
 				}
 			});
@@ -91,10 +113,10 @@ class CSAssets
 				status = event.status; // Hopefully this is 200
 			});
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
-				trace("ioErrorHandler: " + event);
+				trace("load error " +_host+id);
 			});
 			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
-				trace("securityErrorHandler: " + event); 
+				trace("security error "+_host+id); 
 			});
 			//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
 			//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );
@@ -130,7 +152,7 @@ class CSAssets
 //		trace("from disk");
 	#if !flash
 		try{
-			var data:Bytes = File.getBytes(id);
+			var data:Bytes = File.getBytes(_base+id);
 			if (callback != null){
 				if (async){
 					delay(callback.bind(data), _delay);

@@ -29,7 +29,7 @@ class Npc extends FlxSpriteGroup
 	public function new (x:Float, y:Float, type:Int)
 	{
 		super(x, y);
-		sprite = new FlxSprite(0, 0);// , "assets/npc/solder_gun128.png"); //base sprite
+		sprite = new FlxSprite(0, 0);// , "assets/images/npc/solder_gun128.png"); //base sprite
 		add(sprite);
 		var that = this;
 		//moves = false;
@@ -95,7 +95,7 @@ class Npc extends FlxSpriteGroup
 		try{
 			sprite.loadGraphic(CSAssets.getGraphic(CSObjects.get(type).sprite));
 		}catch(e:Dynamic){
-			sprite.loadGraphic(CSAssets.getGraphic("assets/npc/solder_base.png"));
+			sprite.loadGraphic(CSAssets.getGraphic("assets/images/npc/solder_base.png"));
 		}
 //		sprite.resetSize();
 		sprite.resetSizeFromFrame();
