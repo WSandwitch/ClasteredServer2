@@ -38,6 +38,9 @@ class CSMap extends FlxGroup{
 	private var _npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	private var _npcs_group:FlxGroup = new FlxGroup();
 	
+	public var _tile:Null<Int->Void>;
+	public var _imageSource:Null<Int->Void>;
+	
 	public function new(?map:String)
 	{
 		super();
@@ -60,7 +63,8 @@ class CSMap extends FlxGroup{
 			var bm_blank:BitmapData = new BitmapData(tiledmap.tileWidth, tiledmap.tileHeight);
 			var gid = 1;
 			var size = tiledmap.tilesetArray.length;
-			(function _tile(i:Int){
+			_tile = function(i:Int){
+				trace(i);
 				if (i >= size){
 					tilemap.loadMapFromArray(
 						tiles.tileArray, 
@@ -101,7 +105,8 @@ class CSMap extends FlxGroup{
 					});
 				}else{
 					var tsize = ts.tileImagesSources.length;
-					(function _imageSource(ti:Int){
+					_imageSource=function (ti:Int){
+						trace(ti);
 						if (ti >= tsize){
 							_tile(i+1);
 							return;
@@ -120,9 +125,11 @@ class CSMap extends FlxGroup{
 							gid++;
 							haxe.Timer.delay(_imageSource.bind(ti+1), 1);
 						}
-					})(0);
+					};
+					_imageSource(0);
 				}
-			})(0);
+			};
+			_tile(0);
 		}
 		var obj_layer:Null<TiledObjectLayer> = cast tiledmap.getLayer("collision");
 		if (obj_layer != null){
