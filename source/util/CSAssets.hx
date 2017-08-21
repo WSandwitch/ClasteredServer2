@@ -105,7 +105,7 @@ class CSAssets
 						}
 					#end
 					}catch(e:Dynamic){
-						trace("web load error: " + e);
+						trace("web load parse error: " + e);
 					}
 				}
 			});
@@ -114,9 +114,11 @@ class CSAssets
 			});
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
 				trace("load error " +_host+id);
+				callback(null);
 			});
 			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
 				trace("security error "+_host+id); 
+				callback(null);
 			});
 			//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
 			//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );

@@ -82,6 +82,12 @@ class PlayState extends CSState
 	private var _map_group:FlxGroup = new FlxGroup();
 	private var _hud_group:FlxGroup = new FlxGroup();
 	
+	private function exit(){
+		#if !flash
+			openfl.Lib.exit();
+		#end
+	}
+	
 	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
 	{
 		switch (e.keyCode)
@@ -90,7 +96,7 @@ class PlayState extends CSState
 				trace("back button");
 				e.stopImmediatePropagation();
 				//TODO: add show menu
-				openfl.Lib.exit();//change to open menu
+				exit();//change to open menu
 //				restartLevel();
 		}
 	}

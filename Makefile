@@ -49,9 +49,9 @@ ifeq ($(GPROF),1)
 endif
 
 ifeq ($(OPTIMISATION),1)
-    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
-    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
-    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-fprofile-use
+    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
 	ifneq ($(NO_LTO),1)
 		CFLAGS +=-flto
 		CPPFLAGS +=-flto
@@ -61,6 +61,11 @@ ifeq ($(OPTIMISATION),1)
 		CFLAGS += -march=native
 		CPPFLAGS += -march=native
 		LDFLAGS += -march=native
+	endif
+ifneq ($(filter $(ARCH),ppc ppc64),)
+		CFLAGS += -maltivec
+		CPPFLAGS += -maltivec
+		LDFLAGS += -maltivec
 	endif
 	ifneq ($(filter $(ARCH), armv7l),)
 		CFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
@@ -102,5 +107,14 @@ clean:
 client:
 	lime build neko -debug #-final
 	
+gcc5:  # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+	apt-get update
+	apt-get install gcc-5 g++-5 gcc-5-multilib g++-5-multilib build-essential libssl-dev
+	ln -s -f gcc-5 /usr/bin/gcc
+	
+gcc6:  # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+	apt-get update
+	apt-get install gcc-6 g++-6 gcc-6-multilib g++-6-multilib build-essential libssl-dev
+	ln -s -f gcc-6 /usr/bin/gcc
 	
 -include $(DEPS)

@@ -58,7 +58,12 @@ int slave_main(int argc, char* argv[]){
 	struct sigaction sa;
 	//pthread_t pid;
 	int port=12345;
-	
+#ifdef _GLIBCXX_PARALLEL
+	omp_set_dynamic(0);
+	omp_set_num_threads(1);
+//	omp_set_schedule(omp_sched_dynamic, 4);
+	printf("parallel mode %d\n", 1);
+#endif		
 	sigemptyset(&sa.sa_mask);
 	sa.sa_sigaction = default_sigaction;
 	sa.sa_flags   = SA_SIGINFO;
@@ -85,6 +90,7 @@ int slave_main(int argc, char* argv[]){
 	{
 		//initialize listener
 		share::listener l(port);
+		printf("Waiting for connection on %d\n", port);
 		world.sock=l.accept();
 		world.sock->blocking(1);
 		//pid=
