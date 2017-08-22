@@ -47,7 +47,7 @@ class CSMap extends FlxGroup{
 		tilemap = new FlxTilemap();
 		add(tilemap);
 		add(_npcs_group);
-		fov = new FOV(FlxG.width, FlxG.height, vis, 6, 8);
+		fov = new FOV(FlxG.width, FlxG.height, vis, 4, 4);
 		add(fov);
 		if (map == null)
 			map = "assets/maps/map.tmx";
