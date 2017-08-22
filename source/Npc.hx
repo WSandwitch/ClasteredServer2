@@ -102,8 +102,8 @@ class Npc extends FlxSpriteGroup
 		sprite.updateHitbox();
 //		sprite.x = -sprite.width / 2;
 //		sprite.y = -sprite.height / 2;
-		sprite.x -= sprite.width / 2;
-		sprite.y -= sprite.height / 2;
+		sprite.x = x - sprite.width / 2;
+		sprite.y = y - sprite.height / 2;
 	}
 	
 	override
