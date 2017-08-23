@@ -48,6 +48,7 @@ class FOVSegment{
 
 class FOVSprite extends FlxSprite{
 	public var need_update:Bool = true;
+	public var another_update:Bool = true;
 	public var next_update:Bool = true;
 }
 
@@ -137,7 +138,8 @@ class FOV extends FlxSpriteGroup{
 						}else{
 							bij.dirty = false;
 						}
-						bij.need_update = bij.next_update;
+						bij.need_update = bij.another_update;
+						bij.another_update = bij.next_update;
 						bij.next_update = false;
 						
 						var s1 = new FOVSegment(new FlxPoint(i * _width - off, j * _height - off), new FlxPoint((i + 1) * _width + off, (j) * _height - off));
