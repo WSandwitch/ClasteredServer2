@@ -135,14 +135,16 @@ import flixel.math.FlxPoint;
 
 
     // Helper function to construct segments along the outside perimeter
-    private function loadEdgeOfMap(size:Int, margin:Int) {
-        addSegment(margin, margin, margin, size-margin);
-        addSegment(margin, size-margin, size-margin, size-margin);
-        addSegment(size-margin, size-margin, size-margin, margin);
-        addSegment(size-margin, margin, margin, margin);
+    private function loadEdgeOfMap(size:Int, margin:Int):Array<Segment> {
+        var arr = new Array<Segment>();
+		arr.push(addSegment(margin, margin, margin, size-margin));
+        arr.push(addSegment(margin, size-margin, size-margin, size-margin));
+        arr.push(addSegment(size-margin, size-margin, size-margin, margin));
+        arr.push(addSegment(size-margin, margin, margin, margin));
         // NOTE: if using the simpler distance function (a.d < b.d)
         // then we need segments to be similarly sized, so the edge of
         // the map needs to be broken up into smaller segments.
+		return arr;
     }
 
     
