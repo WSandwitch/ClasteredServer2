@@ -17,7 +17,6 @@
 
 #include "grid.h"
 #include "main.h"
-#include "chat.h"
 #include "client.h"
 #include "server.h"
 #include "listeners.h"
@@ -483,7 +482,6 @@ int main(int argc,char* argv[]){
 			timestamps.servers_check=timestamp;
 		}
 		client::check();
-		chatsCheck();
 		
 #ifdef _GLIBCXX_PARALLEL
 		delete[] servers;
@@ -509,7 +507,6 @@ int main(int argc,char* argv[]){
 	listenworkers::stopAll();
 	
 	delete config.rsa;
-	chatsClear();
 	printf("Chats cleared\n");
 	for (auto i:server::all)
 		delete i.second;

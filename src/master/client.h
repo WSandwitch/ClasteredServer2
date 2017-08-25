@@ -9,7 +9,6 @@
 #include <sys/time.h>
 
 #include "storage.h"
-#include "chat.h"
 #include "../share/npc.h"
 #include "../share/system/time.h"
 #include "../share/system/mutex.h"

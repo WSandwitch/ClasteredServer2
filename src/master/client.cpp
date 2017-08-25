@@ -3,7 +3,6 @@
 #include <cstdlib>
 
 #include "client.h"
-#include "chat.h"
 #include "world.h"
 #include "server.h"
 #include "storage.h"
@@ -174,39 +173,6 @@ namespace master {
 			m.unlock();
 		}
 	}
-
-	void clientChatsAdd(client* cl, void* _c){
-/*		chat *c=_c;
-		t_mutexLock(cl->mutex);
-		if (bintreeAdd(&cl->chats, c->id, c)){
-			t_mutexUnlock(cl->mutex);
-			chatClientsAdd(c, cl);
-			return;
-		}
-		t_mutexUnlock(cl->mutex);
-*/	}
-
-	void* clientChatsGet(client* cl, int id){
-		chat *c=0;
-/*		t_mutexLock(cl->mutex);
-			c=bintreeGet(&cl->chats, id);
-		t_mutexUnlock(cl->mutex);
-*/		return c;
-	}
-
-	void clientChatsRemove(client* cl, void* _c){
-/*		chat *c=_c;
-		chat* found=0;
-		if (cl==0 || c==0)
-			return;
-		void clientChatsRemoveChat(void* data){
-			found=data;
-		}
-		t_mutexLock(cl->mutex);
-			bintreeDel(&cl->chats, c->id, clientChatsRemoveChat);//check for deadlock
-		t_mutexUnlock(cl->mutex);
-		chatClientsRemove(found, cl);
-*/	}
 
 	void client::messages_proceed(){
 		mutex.lock();

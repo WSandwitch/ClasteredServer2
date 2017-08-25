@@ -44,9 +44,9 @@ NLTmxMap* NLLoadTmxMap( char *xml )
 			prop = prop->next_sibling( "property" );
 		}
 	}
-
+	
+/*
     xml_node<> *tilesetnode = mapnode->first_node( "tileset" );
-/*    
     while ( tilesetnode ) {
         NLTmxMapTileset* tileset = new NLTmxMapTileset();
         
