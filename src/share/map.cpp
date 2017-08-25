@@ -223,29 +223,11 @@ namespace share{
 		//TODO: check returned data
 		return cells(x-r, y-r, x+r, y+r);
 	}
-	
-	quad& map::nearest_safezone(typeof(point::x) x, typeof(point::y) y){
-		point p(x, y);
-		return nearest_safezone(p);
-	}
-	
-	quad& map::nearest_safezone(point& p){
-		quad *out=0;
-		float d=0;
-		for (auto i: safezones){
-			float $=i.second.distanse(p);
-			if (out==0 || $<d){
-				d=$;
-				out=&i.second;
-			}
-		}
-		return *out;
-	}
-	
+
 	int map::nearest_safezone_id(point& p){
 		int out=-1;
 		float d=0;
-		for (auto i: safezones){
+		for (auto &&i: safezones){
 			float $=i.second.distanse(p);
 			if (out<0 || $<d){
 				d=$;
@@ -253,6 +235,15 @@ namespace share{
 			}
 		}
 		return out;
+	}
+	
+	quad& map::nearest_safezone(typeof(point::x) x, typeof(point::y) y){
+		point p(x, y);
+		return nearest_safezone(p);
+	}
+	
+	quad& map::nearest_safezone(point& p){
+		return safezones.at(nearest_safezone_id(p));
 	}
 	
 	int map::getId(char *s){

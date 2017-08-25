@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "../../share/system/log.h"
+#include "../../share/crypt/crc32.h"
 #include "../storage.h"
 
 /*
@@ -112,7 +113,7 @@
 		if (f){
 			while(feof(f)==0){
 				memset(&u,0,sizeof(u));
-				if (getUserInfo(f, &u)==2){
+				if (getUserInfo(f, &u)==3){
 					$(&u, arg);
 				}
 			}
@@ -150,6 +151,11 @@
 		if (f){
 			while(feof(f)==0){
 				getUserInfo(f, u);
+				
+				sprintf(u->login, "%s", login);//fake auth for testing
+				sprintf(u->passwd, "%s", login);//fake auth for testing
+				u->id=share::crc32(u->login, strlen(u->login));//fake auth for testing
+				
 				if (strcmp(u->login,login)==0){
 					printf("user with login %s found\n", login);
 					$=1;

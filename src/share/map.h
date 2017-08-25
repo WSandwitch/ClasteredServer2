@@ -55,9 +55,9 @@ namespace share {
 			std::vector<segment> cell_borders(int id);
 			std::list<int> near_cells(int id, typeof(npc::r) r);
 			std::list<int> near_cells(typeof(point::x) x, typeof(point::y) y, typeof(npc::r) r);
+			int nearest_safezone_id(point& p);
 			quad& nearest_safezone(typeof(point::x) x, typeof(point::y) y);
 			quad& nearest_safezone(point& p);
-			int nearest_safezone_id(point& p);
 			
 			static int getId(char* s);
 			

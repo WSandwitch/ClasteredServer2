@@ -49,7 +49,7 @@ class LoginState extends CSState
 		////end
 		if (game.login == null && game.pass == null){
 			//set login pass from fields
-			game.login = "qwer";// Std.string(Std.random(999999999));
+			game.login = "user" + Std.string(Std.random(999999999));
 			game.pass = game.login; //for testing
 			FlxG.switchState(new LoadState());
 		}else{

@@ -1,10 +1,10 @@
 #pragma once
 
 template<class T>
-char get_type(T a){return 0;}
+	static inline char get_type(T){return 0;}
 
-inline char get_type(char &a){return 1;}
-inline char get_type(short &a){return 2;}
-inline char get_type(int &a){return 3;}
-inline char get_type(float &a){return 4;}
-inline char get_type(double &a){return 5;}
+static inline char get_type(char){return 1;}
+static inline char get_type(short){return 2;}
+static inline char get_type(int){return 3;}
+static inline char get_type(float){return 4;}
+static inline char get_type(double){return 5;}

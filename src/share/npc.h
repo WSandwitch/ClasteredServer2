@@ -139,7 +139,8 @@ namespace share {
 			void update(share::packet * p, int update_attrs=1);
 			bool updated(bool server=0, bool all=0, bool to_slave=0); 
 			share::packet* pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe over packet
-			bool update_cells();//threadsafe
+			bool update_cells() 
+				__attribute__ ((hot));//threadsafe
 			
 			template<class T>
 				bool set_attr(void*, void*);//set attr on addr by type

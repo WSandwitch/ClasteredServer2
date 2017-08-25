@@ -3,7 +3,7 @@ OBJDIR ?= $(BUILD_TMP)/CS2_build
 ARCH ?= $(shell uname -m)
 GCC ?= gcc
 CFLAGS= -Wall -fsigned-char -fgnu89-inline
-CPPFLAGS= -Wall -fsigned-char -std=gnu++0x
+CPPFLAGS= -Wall -fsigned-char -std=gnu++0x #-Wextra
 LDFLAGS= -pthread -lpthread -lm -lstdc++
 HEADERS= -Isrc/share/yaml-cpp/include
 SRC=src
