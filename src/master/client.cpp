@@ -51,7 +51,9 @@ namespace master {
 	client::client(socket *sock):
 		id(0),	
 		broken(0),
+		server_id(0),
 		sock(sock),
+		npc_id(0),
 		timestamp(0)
 	{
 		name[0]=0;
@@ -64,7 +66,7 @@ namespace master {
 		mutex.lock();
 			if (sock)
 				delete sock;
-			for (auto mes:messages){
+			for (auto &&mes:messages){
 				delete mes;
 			}
 			master::world.m.lock();
@@ -105,14 +107,14 @@ namespace master {
 	void client::check(){
 		std::list<client*> l;
 		m.lock();
-			for (auto c:all){
+			for (auto &&c:all){
 				if (withLock(c.second->mutex, c.second->broken) || c.second->id==0){
 					if (abs(share::time(0)-c.second->timestamp)>=0){//add 10 seconds for reconnect
 						l.push_back(c.second);
 					}
 				}
 			}
-			for (auto c:l){
+			for (auto &&c:l){
 				printf("client %d removed\n", c->id);
 				all.erase(c->id);
 				delete c;
@@ -157,7 +159,7 @@ namespace master {
 		if (mes){
 			//add to all, and then
 			m.lock();
-				for (auto i:all){
+				for (auto &&i:all){
 					client *c=i.second;
 					c->mutex.lock();
 						c->messages.push_back(mes);

@@ -23,7 +23,7 @@ namespace master{
 	}
 	
 	void listeners::clear(){
-		for (auto l:all){
+		for (auto &&l:all){
 			delete l;
 		}
 	}

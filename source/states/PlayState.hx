@@ -193,101 +193,13 @@ class PlayState extends CSState
 		onResize(FlxG.width, FlxG.height); 
 	}
 	
-	function drawDeadzone() 
-	{
-		deadzoneOverlay.fill(FlxColor.TRANSPARENT);
-		var dz:FlxRect = FlxG.camera.deadzone;
-		if (dz == null)
-			return;
-
-		var lineLength:Int = 20;
-		var lineStyle:LineStyle = { color: FlxColor.WHITE, thickness: 3 };
-		
-		// adjust points slightly so lines will be visible when at screen edges
-		dz.x += lineStyle.thickness / 2;
-		dz.width -= lineStyle.thickness;
-		dz.y += lineStyle.thickness / 2;
-		dz.height -= lineStyle.thickness;
-		
-		// Left Up Corner
-		deadzoneOverlay.drawLine(dz.left, dz.top, dz.left + lineLength, dz.top, lineStyle);
-		deadzoneOverlay.drawLine(dz.left, dz.top, dz.left, dz.top + lineLength, lineStyle);
-		// Right Up Corner
-		deadzoneOverlay.drawLine(dz.right, dz.top, dz.right - lineLength, dz.top, lineStyle);
-		deadzoneOverlay.drawLine(dz.right, dz.top, dz.right, dz.top + lineLength, lineStyle);
-		// Bottom Left Corner
-		deadzoneOverlay.drawLine(dz.left, dz.bottom, dz.left + lineLength, dz.bottom, lineStyle);
-		deadzoneOverlay.drawLine(dz.left, dz.bottom, dz.left, dz.bottom - lineLength, lineStyle);
-		// Bottom Right Corner
-		deadzoneOverlay.drawLine(dz.right, dz.bottom, dz.right - lineLength, dz.bottom, lineStyle);
-		deadzoneOverlay.drawLine(dz.right, dz.bottom, dz.right, dz.bottom - lineLength, lineStyle);
-	}
-	
-	public function setZoom(zoom:Float)
-	{
-		zoom = FlxMath.bound(zoom, 0.5, 4);
-		FlxG.camera.zoom = zoom;
-		
-		var zoomDistDiffY;
-		var zoomDistDiffX;
-/*		
-		if (zoom <= 1) 
-		{
-			zoomDistDiffX = Math.abs((LEVEL_MIN_X + LEVEL_MAX_X) - (LEVEL_MIN_X + LEVEL_MAX_X) / 1 + (1 - zoom));
-			zoomDistDiffY = Math.abs((LEVEL_MIN_Y + LEVEL_MAX_Y) - (LEVEL_MIN_Y + LEVEL_MAX_Y) / 1 + (1 - zoom));
-			zoomDistDiffX *= -.5;
-			zoomDistDiffY *= -.5;
-		}
-		else
-		{
-			zoomDistDiffX = Math.abs((LEVEL_MIN_X + LEVEL_MAX_X) - (LEVEL_MIN_X + LEVEL_MAX_X) / zoom);
-			zoomDistDiffY = Math.abs((LEVEL_MIN_Y + LEVEL_MAX_Y) - (LEVEL_MIN_Y + LEVEL_MAX_Y) / zoom);
-			zoomDistDiffX *= .5;
-			zoomDistDiffY *= .5;
-		}
-*/		
-		zoomDistDiffX = ((LEVEL_MAX_X + (LEVEL_MIN_X))*(zoom-1));
-		zoomDistDiffY = ((LEVEL_MAX_Y + (LEVEL_MIN_Y))*(zoom-1));
-		
-		if (zoom <= 1){
-			zoomDistDiffX *= -1;
-			zoomDistDiffY *= -1;
-		}
-		
-		FlxG.camera.setScrollBoundsRect(
-			LEVEL_MIN_X - zoomDistDiffX*0.5, 
-			LEVEL_MIN_Y - zoomDistDiffY*0.5,
-			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X) + zoomDistDiffX,
-			LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y) + zoomDistDiffY,
-			false);
-		
-		FlxG.scaleMode.onMeasure(0,0);
-		hud.updateZoom(FlxG.camera.zoom);
-	}
-
-	private function createFloorTiles() 
-	{
-		var	floorImg = Assets.getBitmapData("assets/images/FloorTexture.png");
-		var imgWidth = floorImg.width;
-		var imgHeight = floorImg.height;
-		var i = LEVEL_MIN_X; 
-		var j = LEVEL_MIN_Y; 
-		
-		while (i <= LEVEL_MAX_X)  
-		{
-			while (j <= LEVEL_MAX_Y)
-			{
-				add(new FlxSprite(i, j, floorImg));
-				j += imgHeight;
-			}
-			i += imgWidth;
-			j = LEVEL_MIN_Y;
-		}
+	override 
+	public function draw(){	
+		super.draw();
 	}
 	
 	override 
-	public function update(elapsed:Float):Void 
-	{	
+	public function update(elapsed:Float){	
 //		trace(elapsed);
 //		trace(Sys.time());
 //		trace(orb.x,orb.y);
@@ -296,7 +208,6 @@ class PlayState extends CSState
 		checkPackets(elapsed);
 
 		super.update(elapsed);
-		
 	}
 	
 	private function send_screen_size(_w:Int,_h:Int){
@@ -414,10 +325,6 @@ class PlayState extends CSState
 			trace(npc.sprite.x);
 			trace(npc.sprite.y);
 		}
-		if (FlxG.keys.justPressed.O)
-			setZoom(FlxG.camera.zoom + .1);
-		if (FlxG.keys.justPressed.L)
-			setZoom(FlxG.camera.zoom - .1);
 			
 		if (FlxG.keys.justPressed.M)
 			FlxG.camera.shake();
@@ -426,15 +333,16 @@ class PlayState extends CSState
 	
 	private function checkPackets(elapsed:Float) {
 		var p:Null<Packet> = null;
-		
 		do{
 			l.lock();
 				p = packets.pop();
 			l.unlock();
 			if (p!=null){
-				if (p.type==MESSAGE_NPC_UPDATE){
+				if (p.type == MESSAGE_NPC_UPDATE){
+					//trace("update npc " + p.chanks[0].i);
 					var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 					if (n == null){
+//						trace("add new npc " + p.chanks[0].i);
 						n = new Npc(FlxG.camera.scroll.x-100, FlxG.camera.scroll.y-100, 0);//create object out of screen
 						n.id = p.chanks[0].i;
 						_map.set_npc(n.id, n);
@@ -446,10 +354,9 @@ class PlayState extends CSState
 						if (npc_id==nid){
 							//player npc add screen you are died
 						}else{
-							trace("dead npc " + nid);
-							var n:Null<Npc> = _map.get_npc(nid);
-							_map.remove_npc(nid);
+							var n:Null<Npc> = _map.remove_npc(nid, true);
 							if (n != null){
+//								trace("remove npc " + nid);
 								n.destroy();
 								n = null;
 							}
@@ -476,36 +383,17 @@ class PlayState extends CSState
 		}while(p != null);
 	}
 	
-	private function setLead(lead:Float) 
-	{
-		var cam = FlxG.camera;
-		cam.followLead.x += lead;
-		cam.followLead.y += lead;
-		
-		if (cam.followLead.x < 0)
-		{
-			cam.followLead.x = 0;
-			cam.followLead.y = 0;
-		}
-		
-		hud.updateCamLead(cam.followLead.x);
-	}
 	
-	private function setLerp(lerp:Float) 
-	{
-		var cam = FlxG.camera;
-		cam.followLerp += lerp;
-		cam.followLerp = Math.round(10 * cam.followLerp) / 10; // adding or subtracting .1 causes roundoff errors
-		hud.updateCamLerp(cam.followLerp);
-	}
 	
 	//for using custom actions, use with FlxG.autoPause = true;
-	override public function onFocus():Void{
-		
+	override 
+	public function onFocus():Void{
+//		super.onFocus();
 	} 
 	
-	override public function onFocusLost():Void{
-		
+	override 
+	public function onFocusLost():Void{
+//		super.onFocusLost();
 	} 
 	
 }

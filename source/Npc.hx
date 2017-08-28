@@ -22,7 +22,7 @@ class Npc extends FlxSpriteGroup
 	public var dir_x:Null<Int> = 0;
 	public var dir_y:Null<Int> = 0;
 	public var updater:Map<Int, Null<Dynamic->Void>>=new Map<Int, Null<Dynamic->Void>>();
-	public var sprite_updated:Bool = false;
+	public var sprite_update:Bool = false;
 	
 	public var sprite:Null<FlxSprite> = null;
 	
@@ -30,7 +30,7 @@ class Npc extends FlxSpriteGroup
 	{
 		super(x, y);
 		sprite = new FlxSprite(0, 0);// , "assets/images/npc/solder_gun128.png"); //base sprite
-		add(sprite);
+		add(sprite);		
 		var that = this;
 		//moves = false;
 		//this.field("aaa")();
@@ -44,12 +44,13 @@ class Npc extends FlxSpriteGroup
 		};
 		updater[6] = function(a:Dynamic){
 			that.type = a;
-			sprite_updated = true;
+			sprite_update = true;
 		};
 		updater[9] = function(a:Dynamic){
 			that.angle=Math.round(a / 120.0 * 180); 
 		};
 		//antialiasing = true;
+		//exists = false;
 	}
 	
 	override 
@@ -62,6 +63,10 @@ class Npc extends FlxSpriteGroup
 		if (dest_y!=null){
 			y = dest_y;
 			dest_y = null;
+		}
+		if (sprite_update){
+			update_sprite();
+			sprite_update = false;
 		}
 		super.update(elapsed);
 	}
@@ -84,10 +89,6 @@ class Npc extends FlxSpriteGroup
 			}
 			i++;
 		}
-		if (sprite_updated){
-			update_sprite();
-			sprite_updated = false;
-		}
 	}
 	
 	public function update_sprite(){
@@ -104,8 +105,16 @@ class Npc extends FlxSpriteGroup
 //		sprite.y = -sprite.height / 2;
 		sprite.x = x - sprite.width / 2;
 		sprite.y = y - sprite.height / 2;
+		exists = true;
 	}
-	
+/*	
+	override
+	private function set_exists(Value:Bool):Bool{
+		super.set_exists(Value);
+		sprite.exists = Value;
+		return Value;
+	}
+*/	
 	override
 	private function set_angle(Value:Float):Float{
 		forEach(function(s:FlxSprite){

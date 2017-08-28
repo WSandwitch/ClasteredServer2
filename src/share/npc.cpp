@@ -207,7 +207,7 @@ namespace share {
 		///for testing
 		vel=5;
 		r=23;
-		weapon.vel=25;
+		weapon.vel=35;
 		weapon.damage=1;
 		weapon.dist=300;
 		weapon.ang_diap=2;//60;//pdegree

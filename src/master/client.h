@@ -50,7 +50,7 @@ namespace master {
 			int npc_id;
 			share::mutex mutex;
 			std::list<client_message*> messages;
-			std::set<int> npcs; //TODO: change to ids
+			std::set<int> npcs; 
 			timestamp_t timestamp;
 			char token[30];
 			

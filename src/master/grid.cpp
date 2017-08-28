@@ -100,7 +100,7 @@ namespace master {
 			std::random_shuffle(server_ids.begin(), server_ids.end()); //shuffle elements, on many maps, different servers will get different areas
 			//cleanup
 			if (data){
-				for(auto it: cells)
+				for(auto &&it: cells)
 					delete it.second;
 				delete[] data;
 			}
@@ -230,7 +230,7 @@ namespace master {
 		}
 		
 		grid::~grid(){
-			for (auto gi: grids){
+			for (auto &&gi: grids){
 				delete gi.second;
 			}
 		}
@@ -263,7 +263,8 @@ namespace master {
 			for(auto gi: grids){
 				_grids[$grids++]=gi.second;
 			}
-			for(int i;i<$grids;i++){
+			#pragma omp parallel for
+			for(int i=0;i<$grids;i++){
 				auto g=_grids[i];
 #else
 			for(auto gi: grids){
@@ -283,13 +284,14 @@ namespace master {
 #ifdef _GLIBCXX_PARALLEL
 			int $grids=0;
 			grid_ **_grids=new grid_*[grids.size()];
-			for(auto gi: grids){
+			for(auto &&gi: grids){
 				_grids[$grids++]=gi.second;
 			}
-			for(int i;i<$grids;i++){
+			#pragma omp parallel for
+			for(int i=0;i<$grids;i++){
 				auto g=_grids[i];
 #else
-			for(auto gi: grids){
+			for(auto &&gi: grids){
 				auto g=gi.second;
 #endif
 				g->remove_server(_id, rec);
@@ -303,7 +305,7 @@ namespace master {
 		//add server id
 		bool grid::add_map(int _id, int s[2], int o){
 			auto g=new grid_(s, o);
-			for(auto &s: server_ids){
+			for(auto &&s: server_ids){
 				g->add_server(s, 0);
 			}
 			g->reconfigure();

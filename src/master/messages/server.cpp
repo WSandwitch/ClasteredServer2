@@ -113,25 +113,25 @@ namespace master {
 			try{
 				npc *n=master::world.npcs.at(p->chanks[0].value.i);
 				n->m.lock();
-				npc *nn = new npc(n->world, n->world->getId());
-				//set params
-				nn->angle=p->chanks[1].value.c;
-				nn->direction.by_angle(nn->angle, 1); //right dir and full speed
-//				printf("%g %g \n", nn->direction.x, nn->direction.y);
-//				nn->r= //set radius of bullet
-				nn->position=n->position;
-				nn->vel=n->weapon.vel;
-				nn->state=STATE_ATTACK;//attacking on every tick
-				nn->bot.owner_id=n->id;
-				nn->weapon.damage=n->weapon.damage;
-				nn->weapon.dist=n->weapon.dist; //set max move dist
-				nn->weapon.next_shot=0;//shoot every tick
-				nn->weapon.latency=0;//shoot every tick
-				nn->weapon.attacks=n->weapon.attacks; //set max targets
-				nn->attackable=n->weapon.attackable;
-				nn->type=2;//TODO: get base type from weapon object
-				nn->move_id=1;//TODO: change to choose bullet move id 
-				nn->shoot_id=2;//TODO: change to choose bullet shoot id 
+					npc *nn = new npc(n->world, n->world->getId());
+					//set params
+					nn->angle=p->chanks[1].value.c;
+					nn->direction.by_angle(nn->angle, 1); //right dir and full speed
+//					printf("%g %g \n", nn->direction.x, nn->direction.y);
+//					nn->r= //set radius of bullet
+					nn->position=n->position+point::from_angle(nn->angle, n->r);
+					nn->vel=n->weapon.vel;
+					nn->state=STATE_ATTACK;//attacking on every tick
+					nn->bot.owner_id=n->id;
+					nn->weapon.damage=n->weapon.damage;
+					nn->weapon.dist=n->weapon.dist; //set max move dist
+					nn->weapon.next_shot=0;//shoot every tick
+					nn->weapon.latency=0;//shoot every tick
+					nn->weapon.attacks=n->weapon.attacks; //set max targets
+					nn->attackable=n->weapon.attackable;
+					nn->type=2;//TODO: get base type from weapon object
+					nn->move_id=1;//TODO: change to choose bullet move id 
+					nn->shoot_id=2;//TODO: change to choose bullet shoot id 
 				
 				n->m.unlock();
 				master::world.npcs_m.lock();

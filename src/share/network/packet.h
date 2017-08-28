@@ -50,7 +50,7 @@ namespace share {
 			FILE* stream();
 			bool init();
 			bool init(void*, short);
-			bool add(char);
+			bool add(char);//returns 0 if ok
 			bool add(short);
 			bool add(int);
 			bool add(float);
@@ -60,7 +60,7 @@ namespace share {
 			bool add(void*, short size);
 			bool add(short type, void* data);
 			template<class T> 
-				bool add(void*);
+				bool add(void*);//add T type by pointer
 			template<class T>
 				bool operator<<(T o){return add(o);}
 				

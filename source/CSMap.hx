@@ -16,6 +16,7 @@ import flixel.addons.editors.tiled.TiledTileLayer;
 import flixel.addons.editors.tiled.TiledTileSet;
 import flixel.graphics.frames.FlxTileFrames;
 import flixel.group.FlxGroup;
+import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxSpriteUtil;
@@ -36,7 +37,7 @@ class CSMap extends FlxGroup{
 	public var fov:FOV;
 	
 	private var _npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
-	private var _npcs_group:FlxGroup = new FlxGroup();
+	private var _npcs_group:FlxSpriteGroup = new FlxSpriteGroup();
 	
 	public var _tile:Null<Int->Void>;
 	public var _imageSource:Null<Int->Void>;
@@ -163,14 +164,20 @@ class CSMap extends FlxGroup{
 		_npcs_group.add(n);
 	}
 
-	public function get_npc(id:Int):Npc{
+	public function get_npc(id:Int):Null<Npc>{
 		return _npcs.get(id);
 	}
 
-	public function remove_npc(id:Int){
+	public function remove_npc(id:Int, clear:Bool=false):Null<Npc>{
 		var n:Null<Npc> = get_npc(id);
-		_npcs_group.remove(n);
-		_npcs.remove(id);
+		if (n != null){
+			n.exists = false;
+			if (clear){
+				_npcs_group.remove(n, true);
+				_npcs.remove(id);
+			}
+		}
+		return n;
 	}
 }
 

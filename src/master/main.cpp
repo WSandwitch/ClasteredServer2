@@ -204,7 +204,7 @@ int main(int argc,char* argv[]){
 	}
 #endif
 
-	for(auto port: ports){
+	for(auto &&port: ports){
 		listener* l=new listener(port);
 		if (l){
 			listeners::add(l);
@@ -255,7 +255,7 @@ int main(int argc,char* argv[]){
 	serverworkers::startAll();
 	//test
 //	listenersForEach(proceedListener);
-	for (auto l:listeners::all){
+	for (auto &&l:listeners::all){
 		listenworkers::addWorkAll(l);
 	}
 //	listenworkersAddWorkAll(listenersAdd(listenerStart(8000)));
@@ -300,13 +300,13 @@ int main(int argc,char* argv[]){
 					}						
 				}
 			master::world.npcs_m.unlock();
-			for(auto ni: master::world.npcs){
+			for(auto &&ni: master::world.npcs){
 				ni.second->m.lock();
 			}
 #ifdef _GLIBCXX_PARALLEL
 			int $npcs=0;
 			npc **npcs=new npc*[master::world.npcs.size()];
-			for(auto ni: master::world.npcs){
+			for(auto &&ni: master::world.npcs){
 				npcs[$npcs++]=ni.second;
 			}
 			#pragma omp parallel for
@@ -319,7 +319,7 @@ int main(int argc,char* argv[]){
 //				printf("%d %d\n", n->id, n->health);
 //				printf("%d %d\n", omp_get_thread_num(), n);
 				int slave_id=master::grid->get_owner(n->position.x, n->position.y);
-				auto share_ids=master::grid->get_shares(n->position.x, n->position.y);
+				auto &&share_ids=master::grid->get_shares(n->position.x, n->position.y);
 //					printf("%d %d\n", slave_id, n->slave_id);
 				if (slave_id!=n->slave_id){
 //						printf("slave updated %d <- %d\n", slave_id, n->slave_id);
@@ -330,13 +330,13 @@ int main(int argc,char* argv[]){
 				if (!n->non_target){
 					//update n->slaves
 					std::unordered_map<int, short> slaves;
-					for(auto slave: n->slaves)//set had to 2
+					for(auto &&slave: n->slaves)//set had to 2
 						slaves[slave]=2;
 					n->slaves.clear();
 					for(auto slave: share_ids)
 						slaves[slave]++; //inc real
 					slaves[n->slave_id]++;
-					for(auto slave: slaves){
+					for(auto &&slave: slaves){
 						server *s=server::get(slave.first);
 						if (s){
 							switch(slave.second){
@@ -368,19 +368,19 @@ int main(int argc,char* argv[]){
 #ifdef _GLIBCXX_PARALLEL
 			client **clients=new client*[client::all.size()];
 			int $clients=0;
-			for(auto ci:client::all){
+			for(auto &&ci:client::all){
 				clients[$clients++]=ci.second;
 			}
 			#pragma omp parallel for
 			for(int ii=0;ii<$clients;ii++){
 				client* c=clients[ii];
 #else
-			for(auto ci:client::all){
+			for(auto &&ci:client::all){
 				client *c=ci.second;
 #endif
 				try{
 					npc* cnpc=master::world.npcs.at(c->npc_id);
-					auto cells=master::world.map->cells(
+					auto &&cells=master::world.map->cells(
 						cnpc->position.x-c->view_position[0], //l
 						cnpc->position.y-c->view_position[1], //t
 						cnpc->position.x+c->view_area[0]-c->view_position[0], //r
@@ -451,7 +451,7 @@ int main(int argc,char* argv[]){
 #ifdef _GLIBCXX_PARALLEL
 			int $servers=0;
 			server **servers=new server*[server::all.size()];
-			for(auto si: server::all){
+			for(auto &&si: server::all){
 				servers[$servers++]=si.second;
 			}
 #endif
@@ -459,14 +459,29 @@ int main(int argc,char* argv[]){
 				if (master::world.old_npcs.size()>0){
 					packet p;
 					p.setType(MESSAGE_NPC_REMOVE);
-					for(int id: master::world.old_npcs)
-						p.add(id);//TODO:add check for overflow and send then
+					for(int id: master::world.old_npcs){
+						if (p.add(id)){//check for overflow and send then
+#ifdef _GLIBCXX_PARALLEL
+							#pragma omp parallel for
+							for(int ii=0;ii<$servers;ii++){
+								server *$=servers[ii];
+#else
+							for(auto &&s: server::all){
+								server *$=s.second;
+#endif
+								$->sock->send(&p);
+							}
+							p.init();
+							p.setType(MESSAGE_NPC_REMOVE);
+							p.add(id);
+						}
+					}
 #ifdef _GLIBCXX_PARALLEL
 					#pragma omp parallel for
 					for(int ii=0;ii<$servers;ii++){
 						server *$=servers[ii];
 #else
-					for(auto s: server::all){
+					for(auto &&s: server::all){
 						server *$=s.second;
 #endif
 						$->sock->send(&p);
