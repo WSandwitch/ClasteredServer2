@@ -403,15 +403,16 @@ int main(int argc,char* argv[]){
 					for(auto n: _npcs){
 						npcs[n->id]++;
 					}
+					packet remove_packet;
+					remove_packet.setType(MESSAGE_NPC_REMOVE);
+					bool npcs_removed=0;
 					for(auto i: npcs){
 						switch(i.second){
 							case 2: { //need to remove
 //									printf("need to remove %d \n", i.first);
-								packet p;
-								p.setType(MESSAGE_NPC_REMOVE);
-								p.add(i.first);
-								c->sock->send(&p);
+								remove_packet.add(i.first);
 								withLock(c->mutex, c->npcs.erase(i.first));
+								npcs_removed=1;
 								break;
 							}
 							case 1: {//new npc
@@ -435,6 +436,8 @@ int main(int argc,char* argv[]){
 							}
 						}
 					}
+					if (npcs_removed)
+						c->sock->send(&remove_packet);
 				}catch(...){}
 			}
 			std::list<npc*> l;
@@ -456,9 +459,10 @@ int main(int argc,char* argv[]){
 			}
 #endif
 			master::world.npcs_m.lock();
-				if (master::world.old_npcs.size()>0){
+				if (master::world.old_npcs.size()>0){//send dead npcs
 					packet p;
 					p.setType(MESSAGE_NPC_REMOVE);
+					//send to servers
 					for(int id: master::world.old_npcs){
 						if (p.add(id)){//check for overflow and send then
 #ifdef _GLIBCXX_PARALLEL
@@ -485,6 +489,24 @@ int main(int argc,char* argv[]){
 						server *$=s.second;
 #endif
 						$->sock->send(&p);
+					}
+					//send to clients
+					for(auto &&ci: client::all){//TODO: add parallel
+						auto &&c=ci.second;
+						p.init();
+						p.setType(MESSAGE_NPC_REMOVE);
+						bool need_send=0;
+						for(int id: master::world.old_npcs){
+							if (withLock(c->mutex, c->npcs.count(id))>0){
+								withLock(c->mutex, c->npcs.erase(id));
+								p.add(id);//TODO: add check for overflow
+								need_send=1;
+//								printf("remove %d from %d \n", id);
+							}
+						}
+						if(need_send){
+							c->sock->send(&p);
+						}
 					}
 					master::world.old_npcs.clear();
 				}

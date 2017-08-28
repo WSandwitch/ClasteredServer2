@@ -131,16 +131,20 @@ class FOV extends FlxSpriteGroup{
 				for (i in 0..._cols){
 					for (j in 0..._rows){
 						var bij = _bases[i][j];
-						if (bij.need_update){
+						bij.need_update = bij.another_update;
+						bij.another_update = bij.next_update;
+						bij.next_update = false;
+
+						if (bij.need_update || 
+							bij.another_update ||
+							bij.next_update
+						){
 							var bm = bij.graphic.bitmap;
 							bij.graphic.bitmap.copyPixels(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint);
 							bij.dirty = true;
 						}else{
 							bij.dirty = false;
 						}
-						bij.need_update = bij.another_update;
-						bij.another_update = bij.next_update;
-						bij.next_update = false;
 						
 						var s1 = new FOVSegment(new FlxPoint(i * _width - off, j * _height - off), new FlxPoint((i + 1) * _width + off, (j) * _height - off));
 						var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + off, (j + 1) * _height + off));
