@@ -37,8 +37,8 @@ namespace share {
 		id(id), 
 		state(0), 
 		non_target(0),
-		health(100),
-		_health(100),
+		health(10),
+		_health(10),
 		type(1), //player/bot npc by default 
 		owner_id(0), 
 //		bot({0}), 
@@ -83,8 +83,9 @@ namespace share {
 					printf("%d respawned\n", id);
 					return;//no delete
 				}else{
-	//				printf("%d died\n", id);
+//					printf("%d died\n", id);
 					world->putId(id);
+//					printf("new npcs: %d\n", world->new_npcs.size());
 				}
 			}
 		}
@@ -98,7 +99,7 @@ namespace share {
 		::delete n;
 	}
 */	
-	npc* npc::clone(){//TODO: change to update this attrs and return tjis
+	npc* npc::clone(){
 		npc* n=this;
 		//set health and position
 		n->health=n->_health;
@@ -143,31 +144,32 @@ namespace share {
 		*/
 		///(attr, client_all, client, master_slave_all, from_slave, to_slave)
 		attr.set_base(this);
-		packAttr(position.x,1,1,1,1,1); //1cm
-		packAttr(position.y,1,1,1,1,1); //2cm
-		packAttr(direction.x,1,1,1,1,1); //3cms
-		packAttr(direction.y,1,1,1,1,1); //4cms
-		packAttr(state,1,1,1,1,1); //5cms
-		packAttr(type,1,1,1,0,1); //6cms
-		packAttr(slave_id,0,0,1,0,1); //7ms
-		packAttr(health,1,1,0,0,0); //8c
-		packAttr(angle,1,1,1,1,1); //9cms
-		packAttr(bot.goal.x,0,0,1,1,1); //10ms
-		packAttr(bot.goal.y,0,0,1,1,1); //11ms
-		packAttr(bot.used,0,0,1,0,1); //12s
-		packAttr(move_id,0,0,1,0,1); //13s
-		packAttr(shoot_id,0,0,1,0,1); //14s 
-		packAttr(attackable,0,0,1,1,1); //15s //TODO: check can be got from info
-		packAttr(bot.owner_id,0,0,1,0,1); //16s 
-		packAttr(weapon.dist,0,0,1,0,1); //17s
-		packAttr(weapon.ang_shift,0,0,1,0,1); //18s
-		packAttr(weapon.attacks,0,0,1,0,1); //19s
-		packAttr(weapon.ang_diap,0,0,1,0,1); //20s
-		packAttr(weapon.warmup,0,0,1,0,1); //21s
-		packAttr(weapon.cooldown,0,0,1,0,1); //22s
-		packAttr(weapon.latency,0,0,1,0,1); //23s
-		packAttr(weapon.next_shot,0,0,1,0,1); //24s //??
-		packAttr(vel,0,0,1,0,0); //25s 
+		packAttr(position.x,1,1,1,1,1); //1
+		packAttr(position.y,1,1,1,1,1); //2
+		packAttr(direction.x,1,1,1,1,1); //3
+		packAttr(direction.y,1,1,1,1,1); //4
+		packAttr(state,1,1,1,1,1); //5
+		packAttr(type,1,1,1,0,1); //6
+		packAttr(slave_id,0,0,1,0,1); //7
+		packAttr(health,1,1,0,0,0); //8
+		packAttr(angle,1,1,1,1,1); //9
+		packAttr(bot.goal.x,0,0,1,1,1); //10
+		packAttr(bot.goal.y,0,0,1,1,1); //11
+		packAttr(bot.used,0,0,1,0,1); //12
+		packAttr(move_id,0,0,1,0,1); //13
+		packAttr(shoot_id,0,0,1,0,1); //14
+		packAttr(attackable,0,0,1,1,1); //15 //TODO: check can be got from info
+		packAttr(bot.owner_id,0,0,1,0,1); //16 
+		packAttr(weapon.dist,0,0,1,0,1); //17
+		packAttr(weapon.ang_shift,0,0,1,0,1); //18
+		packAttr(weapon.attacks,0,0,1,0,1); //19
+		packAttr(weapon.ang_diap,0,0,1,0,1); //20
+		packAttr(weapon.warmup,0,0,1,0,1); //21
+		packAttr(weapon.cooldown,0,0,1,0,1); //22
+		packAttr(weapon.latency,0,0,1,0,1); //23
+		packAttr(weapon.next_shot,0,0,1,0,1); //24 //??
+		packAttr(vel,1,0,1,0,0); //25s 
+		packAttr(r,1,0,1,0,0); //26s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -204,9 +206,11 @@ namespace share {
 			weapon.latency=o->weapon.latency;
 		}catch(...){}
 		
+		health=_health;
 		///for testing
 		vel=5;
 		r=23;
+		weapon.r=3;
 		weapon.vel=35;
 		weapon.damage=1;
 		weapon.dist=300;

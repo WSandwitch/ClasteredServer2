@@ -491,8 +491,14 @@ int main(int argc,char* argv[]){
 						$->sock->send(&p);
 					}
 					//send to clients
-					for(auto &&ci: client::all){//TODO: add parallel
+#ifdef _GLIBCXX_PARALLEL
+					#pragma omp parallel for
+					for(int ii=0;ii<$clients;ii++){
+						auto &&c=clients[ii];
+#else
+					for(auto &&ci: client::all){
 						auto &&c=ci.second;
+#endif
 						p.init();
 						p.setType(MESSAGE_NPC_REMOVE);
 						bool need_send=0;

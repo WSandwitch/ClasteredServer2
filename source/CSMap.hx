@@ -171,7 +171,7 @@ class CSMap extends FlxGroup{
 	public function remove_npc(id:Int, clear:Bool=false):Null<Npc>{
 		var n:Null<Npc> = get_npc(id);
 		if (n != null){
-			n.exists = false;
+			n.shown(false);
 			if (clear){
 				_npcs_group.remove(n, true);
 				_npcs.remove(id);

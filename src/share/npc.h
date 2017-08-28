@@ -85,6 +85,7 @@ namespace share {
 				int owner_id;//owner for bullet 
 			} bot;
 			struct{
+				short r;
 				short temp; 
 				short next_shot; //tiks
 				

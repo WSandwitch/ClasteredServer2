@@ -89,17 +89,15 @@ namespace master {
 		master::world.m.lock();
 			try{
 				n=master::world.npcs.at(id);
+				if (sv->id==n->slave_id || n->slave_id==0){ //update only by owner or new npc
+					n->m.lock();
+						n->update(p);
+					n->m.unlock();
+				}
 			}catch(...){
-				n=new npc(&master::world, id);
-				master::world.npcs_m.lock();
-					master::world.new_npcs.push_back(n);
-				master::world.npcs_m.unlock();
+				//slave can't create npc
 			}
-			if (sv->id==n->slave_id || n->slave_id==0){ //update only by owner or new npc
-				n->m.lock();
-					n->update(p);
-				n->m.unlock();
-			}
+			
 //			printf("updated %d\n", id);
 		master::world.m.unlock();
 		return 0;
@@ -118,8 +116,8 @@ namespace master {
 					nn->angle=p->chanks[1].value.c;
 					nn->direction.by_angle(nn->angle, 1); //right dir and full speed
 //					printf("%g %g \n", nn->direction.x, nn->direction.y);
-//					nn->r= //set radius of bullet
-					nn->position=n->position+point::from_angle(nn->angle, n->r);
+					nn->position=n->position+point::from_angle(nn->angle, n->r*2);
+					nn->r=n->weapon.r; //set radius of bullet
 					nn->vel=n->weapon.vel;
 					nn->state=STATE_ATTACK;//attacking on every tick
 					nn->bot.owner_id=n->id;

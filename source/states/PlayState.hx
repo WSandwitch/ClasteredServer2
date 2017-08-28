@@ -354,10 +354,10 @@ class PlayState extends CSState
 						if (npc_id==nid){
 							//player npc add screen you are died
 						}else{
-							var n:Null<Npc> = _map.remove_npc(nid, true);
+							var n:Null<Npc> = _map.remove_npc(nid, false);
 							if (n != null){
 //								trace("remove npc " + nid);
-								n.destroy();
+//								n.destroy(); //don't need
 								n = null;
 							}
 						}

@@ -50,7 +50,7 @@ class Npc extends FlxSpriteGroup
 			that.angle=Math.round(a / 120.0 * 180); 
 		};
 		//antialiasing = true;
-		//exists = false;
+		shown(false);
 	}
 	
 	override 
@@ -105,7 +105,7 @@ class Npc extends FlxSpriteGroup
 //		sprite.y = -sprite.height / 2;
 		sprite.x = x - sprite.width / 2;
 		sprite.y = y - sprite.height / 2;
-		exists = true;
+		shown(true);
 	}
 /*	
 	override
@@ -123,10 +123,16 @@ class Npc extends FlxSpriteGroup
 		return super.set_angle(Value);
 	}
 	
-	override 
+	public function shown(b:Bool):Bool{
+		visible = b;
+		return b;
+	}
+	
+/*	override 
 	public function destroy(){
 		remove(sprite);
 		sprite.destroy();
 		super.destroy();
 	}
+*/
 }
