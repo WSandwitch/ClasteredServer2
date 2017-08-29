@@ -2,12 +2,17 @@ package;
 
 import clasteredServerClient.Lock;
 import clasteredServerClient.Packet;
-import flash.geom.Point;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
+import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 import util.CSAssets;
+import openfl.display.BitmapData;
 
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -30,7 +35,8 @@ class Npc extends FlxSpriteGroup
 	{
 		super(x, y);
 		sprite = new FlxSprite(0, 0);// , "assets/images/npc/solder_gun128.png"); //base sprite
-		add(sprite);		
+		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+		add(sprite);
 		var that = this;
 		//moves = false;
 		//this.field("aaa")();
@@ -44,7 +50,7 @@ class Npc extends FlxSpriteGroup
 		};
 		updater[6] = function(a:Dynamic){
 			that.type = a;
-			sprite_update = true;
+			that.sprite_update = true;
 		};
 		updater[9] = function(a:Dynamic){
 			that.angle=Math.round(a / 120.0 * 180); 
@@ -91,21 +97,39 @@ class Npc extends FlxSpriteGroup
 		}
 	}
 	
+	private function addGraficToSprite(s:FlxSprite, gr:FlxGraphic){
+		var w = FlxMath.maxInt(gr.bitmap.width, s.graphic.bitmap.width);
+		var h = FlxMath.maxInt(gr.bitmap.height, s.graphic.bitmap.height);
+		var bm:BitmapData = new BitmapData(w, h, true, 0);
+		//copy current bitmap
+		bm.copyPixels(gr.bitmap, s.graphic.bitmap.rect, new Point((w - s.graphic.bitmap.width) / 2, (h - s.graphic.bitmap.height) / 2));
+		//add new bitmap
+		bm.copyPixels(gr.bitmap, gr.bitmap.rect, new Point((w - gr.bitmap.width) / 2, (h - gr.bitmap.height) / 2));
+		s.loadGraphic(bm); //maybe false, "id")
+	}
+	
 	public function update_sprite(){
 		//TODO: add loading animation sheets
+		var path:String;
 		try{
-			sprite.loadGraphic(CSAssets.getGraphic(CSObjects.get(type).sprite));
-		}catch(e:Dynamic){
-			sprite.loadGraphic(CSAssets.getGraphic("assets/images/npc/solder_base.png"));
+			path = CSObjects.get(type).sprite;
+		}catch (e:Dynamic){
+			path = "assets/images/npc/solder_base.png";
 		}
-//		sprite.resetSize();
-		sprite.resetSizeFromFrame();
-		sprite.updateHitbox();
-//		sprite.x = -sprite.width / 2;
-//		sprite.y = -sprite.height / 2;
-		sprite.x = x - sprite.width / 2;
-		sprite.y = y - sprite.height / 2;
-		shown(true);
+		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+		CSAssets.getGraphic(path, function(gr:Null<FlxGraphic> ){
+			addGraficToSprite(sprite, gr);//recalculate new sprite
+			//add another graphics
+			
+//			sprite.resetSize();
+			sprite.resetSizeFromFrame();
+			sprite.updateHitbox();
+//			sprite.x = -sprite.width / 2;
+//			sprite.y = -sprite.height / 2;
+			sprite.x = x - sprite.width / 2;
+			sprite.y = y - sprite.height / 2;
+			shown(true);
+		});
 	}
 /*	
 	override

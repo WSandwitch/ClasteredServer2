@@ -160,7 +160,7 @@ class FOV extends FlxSpriteGroup{
 									s.cross(s1) ||
 									s.cross(s2) ||
 									s.cross(s3) ||
-									s.cross(s4)
+									s.cross(s4) // add check of in<->out
 //									false
 								)
 							){

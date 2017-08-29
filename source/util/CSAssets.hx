@@ -39,6 +39,46 @@ class CSAssets
 	var extPath : String = jGetPath(jFileObj);
 	*/
 	
+	public static function getGraphicWeb(id:String, callback:Null<FlxGraphic>->Void){
+		var loader = new Loader();
+		var status:Int=0;
+		loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
+			if ( status == 200 ) {	// 200 is a successful HTTP status
+				trace("loaded file "+_host+id);
+				try{
+					var b:Bitmap = event.target.content;
+					callback(FlxG.bitmap.add(b.bitmapData, false, id));
+				#if !flash
+					// Saving the BitmapData 
+					try{
+						sys.io.File.saveBytes(_base+id, b.bitmapData.encode("png", 1));
+					}catch(e:Dynamic){
+						trace("can't save "+_base+id);
+					}
+				#end
+				}catch(e:Dynamic){
+					trace("web load parse error: " + e);
+				}
+			} else {
+				callback(null);
+			}
+		});
+		loader.contentLoaderInfo.addEventListener( HTTPStatusEvent.HTTP_STATUS, function(event:HTTPStatusEvent){
+			status = event.status; // Hopefully this is 200
+		});
+		loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
+			trace("load error " +_host+id);
+			callback(null);
+		});
+		loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
+			trace("security error "+_host+id); 
+			callback(null);
+		});
+		//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
+		//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );
+		loader.load(new URLRequest(_host+id));
+	}
+	
 	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool = true):Null<FlxGraphic>{
 		var g:Null<FlxGraphic>=FlxG.bitmap.get(id);
 		if (g != null){
@@ -88,41 +128,7 @@ class CSAssets
 	#end	
 //		trace("from web");
 		if (callback != null){
-			var loader = new Loader();
-			var status:Int=0;
-			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
-				if ( status == 200 ) {	// 200 is a successful HTTP status
-					trace("loaded file "+_host+id);
-					try{
-						var b:Bitmap = event.target.content;
-						callback(FlxG.bitmap.add(b.bitmapData, false, id));
-					#if !flash
-						// Saving the BitmapData 
-						try{
-							sys.io.File.saveBytes(_base+id, b.bitmapData.encode("png", 1));
-						}catch(e:Dynamic){
-							trace("can't save "+_base+id);
-						}
-					#end
-					}catch(e:Dynamic){
-						trace("web load parse error: " + e);
-					}
-				}
-			});
-			loader.contentLoaderInfo.addEventListener( HTTPStatusEvent.HTTP_STATUS, function(event:HTTPStatusEvent){
-				status = event.status; // Hopefully this is 200
-			});
-			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
-				trace("load error " +_host+id);
-				callback(null);
-			});
-			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
-				trace("security error "+_host+id); 
-				callback(null);
-			});
-			//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
-			//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );
-			loader.load(new URLRequest(_host+id));
+			getGraphicWeb(id, callback);
 		}
 		return null;
 	}
