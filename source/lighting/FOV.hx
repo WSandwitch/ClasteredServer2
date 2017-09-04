@@ -2,7 +2,9 @@ package lighting;
 
 import flash.display.CapsStyle;
 import flixel.group.FlxSpriteGroup;
+import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
+import lighting.FOVSegment;
 import openfl.display.BitmapData;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
@@ -18,33 +20,6 @@ import lighting.Visibility;
  * @author ...
  */
 
-class FOVSegment{
-	public var p1:FlxPoint;
-	public var p2:FlxPoint;
-	
-	public function new(_p1:FlxPoint, _p2:FlxPoint){
-		p1 = _p1;
-		p2 = _p2;
-	}
-	//math
-	public function vector(p:FlxPoint):Float{
-		return (p2.x - p1.x) * (p.y - p1.y) - (p2.y - p1.y) * (p.x - p1.x);
-	}
-	
-	public function cross(s:FOVSegment):Bool{
-		var v1=vector(s.p1);
-		var v2=vector(s.p2);
-		if ((v1>=0 && v2<=0) || (v1<=0 && v2>=0)){
-			v1=s.vector(p1);
-			v2=s.vector(p2);
-			if (v1>=0 && v2<=0)
-				return true;
-			if (v1<=0 && v2>=0)
-				return true;
-		}
-		return false;
-	}
-}
 
 class FOVSprite extends FlxSprite{
 	public var need_update:Bool = true;
@@ -119,11 +94,39 @@ class FOV extends FlxSpriteGroup{
 			FlxSpriteUtil.fill(_shadow, FlxColor.TRANSPARENT);
 //			blend = openfl.display.BlendMode.SCREEN;
 			if (_vis.output.length > 0){
+				var points:Array<FlxPoint> = [];
+				var screen:Array<FlxPoint> = [
+					new FlxPoint(x, y),
+					new FlxPoint(x+_tmp.width, y),
+					new FlxPoint(x+_tmp.width, y+_tmp.height),
+					new FlxPoint(x, y+_tmp.height)
+				];
+				var halfview = 39; //degrees
+				var rad:Float = Math.PI / 180 * (follow.angle);
+				var rad30:Float = Math.PI / 180 * (follow.angle-halfview);
+				var radm30:Float = Math.PI / 180 * (follow.angle+halfview);
+				var l = 10000000;//very very far
+				var ushift = 21;
+				var fx:Float = follow.x-ushift*FlxMath.fastCos(rad);
+				var fy:Float = follow.y-ushift*FlxMath.fastSin(rad);
+				var view:Array<FlxPoint> = [
+					new FlxPoint(fx, fy),
+					new FlxPoint(fx+l*FlxMath.fastCos(rad30), fy+l*FlxMath.fastSin(rad30)),
+					new FlxPoint(fx + l * FlxMath.fastCos(radm30), fy + l * FlxMath.fastSin(radm30))
+				];
+				
 				for (p in _vis.output){
-					p.x -= x;
-					p.y -= y;
+					points.push(p);
 				}
-				FlxSpriteUtil.drawPolygon(_shadow, _vis.output, FILL_COLOR, {color: FILL_COLOR, thickness: 3});
+				var ppoints= FOVCrosser.getCross(points, FOVCrosser.getCross(screen, view)[0]);
+				
+				for (_points in ppoints){
+					for (p in _points){
+						p.x -= x;
+						p.y -= y;
+					}
+					FlxSpriteUtil.drawPolygon(_shadow, _points, FILL_COLOR, {color: FILL_COLOR, thickness: 3});
+				}
 //				blend = openfl.display.BlendMode.MULTIPLY;
 				FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
 				var zpoint = new Point(0, 0);
@@ -135,7 +138,8 @@ class FOV extends FlxSpriteGroup{
 						bij.another_update = bij.next_update;
 						bij.next_update = false;
 
-						if (bij.need_update || 
+						if (//true ||
+							bij.need_update || 
 							bij.another_update ||
 							bij.next_update
 						){
@@ -150,22 +154,26 @@ class FOV extends FlxSpriteGroup{
 						var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + off, (j + 1) * _height + off));
 						var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - off, (j + 1) * _height + off));
 						var s4 = new FOVSegment(s3.p2, s1.p1);
-						for (pi in 0..._vis.output.length){
-							var s = new FOVSegment(_vis.output[pi], _vis.output[ pi == _vis.output.length - 1 ? 0 : pi + 1 ]);
-							if (
-								//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
-								(
-									( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
-									( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
-									s.cross(s1) ||
-									s.cross(s2) ||
-									s.cross(s3) ||
-									s.cross(s4) // add check of in<->out
-//									false
-								)
-							){
-								bij.next_update = true;
-								break;
+						for (_points in ppoints){
+							if (bij.next_update)
+									break;
+							for (pi in 0..._points.length){
+								var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
+								if (
+									//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
+									(
+										( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
+										( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
+										s.cross(s1) ||
+										s.cross(s2) ||
+										s.cross(s3) ||
+										s.cross(s4) // add check of in<->out
+	//									false
+									)
+								){
+									bij.next_update = true;
+									break;
+								}
 							}
 						}
 					}

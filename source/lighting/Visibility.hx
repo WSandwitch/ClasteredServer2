@@ -357,8 +357,7 @@ import flixel.math.FlxPoint;
                     } else {
                         open.insertBefore(node, p.segment);
                     }
-                }
-                else {
+                } else {
                     open.remove(p.segment);
                 }
                 

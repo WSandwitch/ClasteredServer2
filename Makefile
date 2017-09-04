@@ -48,29 +48,57 @@ ifeq ($(GPROF),1)
 	LDFLAGS += -pg
 endif
 
+#ppc64
+ifneq ($(filter $(ARCH),ppc64),)
+	CFLAGS += -m64
+	CPPFLAGS += -m64
+	LDFLAGS += -m64
+endif
+
 ifeq ($(OPTIMISATION),1)
-    CFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
-    CPPFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
-    LDFLAGS +=-O3 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+    CFLAGS +=-O3 -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+    CPPFLAGS +=-O3 -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+    LDFLAGS +=-O3 -fgcse-sm -fgcse-las -fgcse-after-reload -funroll-loops -fmodulo-sched -fmodulo-sched-allow-regmoves #-ftree-vectorizer-verbose=2 #-fprofile-use
+	#not for ppc
+	ifeq ($(filter $(ARCH),ppc ppc64),)
+		CFLAGS += -march=native -ffast-math #check if slave will work with fast-math
+		CPPFLAGS += -march=native -ffast-math 
+		LDFLAGS += -march=native -ffast-math  
+	endif
+	#x86
+	ifneq ($(filter $(ARCH),x86_64 i686 i386 i486 i586),)
+		CFLAGS += -mpc32
+		CPPFLAGS += -mpc32
+		LDFLAGS += -mpc32
+	endif
+	#ppc all
+	ifneq ($(filter $(ARCH),ppc ppc64),)
+		#add fast-math to ppc slave build
+		ifneq ($(filter $(MAKECMDGOALS), slave),)
+			CFLAGS += -ffast-math
+			CPPFLAGS += -ffast-math
+			LDFLAGS += -ffast-math
+		endif
+		CFLAGS += -mabi=altivec -maltivec -mhard-float -msingle-float -mvrsave -misel -mpaired -mfriz
+		CPPFLAGS += -mabi=altivec -maltivec -mhard-float -msingle-float -mvrsave -misel -mpaired -mfriz
+		LDFLAGS += -mabi=altivec -maltivec -mhard-float -msingle-float -mvrsave -misel -mpaired -mfriz
+		#disable lto
+		NO_LTO := 1
+	endif
+	#arm
+	ifneq ($(filter $(ARCH), armv7l aarch64),)
+		CFLAGS += -mfloat-abi=hard -mfpu=neon -marm #-mthumb-interwork
+		CPPFLAGS += -mfloat-abi=hard -mfpu=neon -marm #-mthumb-interwork
+		LDFLAGS += -mfloat-abi=hard -mfpu=neon -marm #-mthumb-interwork
+		ifneq ($(filter $(MAKECMDGOALS), master),)
+			NO_LTO := 1
+		endif
+	endif
+	#may be dangerous
 	ifneq ($(NO_LTO),1)
 		CFLAGS +=-flto
 		CPPFLAGS +=-flto
 		LDFLAGS +=-flto
-	endif
-	ifeq ($(filter $(ARCH),ppc ppc64),)
-		CFLAGS += -march=native
-		CPPFLAGS += -march=native
-		LDFLAGS += -march=native
-	endif
-ifneq ($(filter $(ARCH),ppc ppc64),)
-		CFLAGS += -maltivec
-		CPPFLAGS += -maltivec
-		LDFLAGS += -maltivec
-	endif
-	ifneq ($(filter $(ARCH), armv7l),)
-		CFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
-		CPPFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
-		LDFLAGS += -mfloat-abi=hard -mfpu=neon -mthumb-interwork
 	endif
 endif
 
@@ -102,7 +130,10 @@ $(PUBLIC)_fast:
 	$(GCC) $(CPPFLAGS) $(SHARE_SOURCES) $(PUBLIC_SOURCES) $(LDFLAGS) $(DEFINES) $(HEADERS) -o bin/$(PUBLIC).$(ARCH)
 
 clean:
-	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(DEPS) bin/$(PUBLIC)* bin/$(SLAVE)* src/slave_main.o
+	rm -rf $(SLAVE_OBJECTS) $(SHARE_OBJECTS) $(PUBLIC_OBJECTS) $(TEST_OBJECTS) $(DEPS) src/slave_main.o
+
+cleanall: clean
+	rm  bin/$(PUBLIC)* bin/$(SLAVE)*
 
 client:
 	lime build neko -debug #-final

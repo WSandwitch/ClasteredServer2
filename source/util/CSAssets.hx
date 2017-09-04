@@ -25,7 +25,7 @@ import openfl.utils.SystemPath;
 class CSAssets
 {
 	static inline var _delay:Int = 1;
-	static var _host:String = "http://172.16.1.40:3000/";
+	static var _host:String = "http://home.wsstudio.tk/";
 	
 	#if mobile
 		static var _base:String = SystemPath.applicationStorageDirectory+'/'; //may be need Application.current.config.packageName
