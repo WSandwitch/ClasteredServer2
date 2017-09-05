@@ -231,12 +231,26 @@ namespace master {
 		return 0;
 	}
 
+	static void *message_MESSAGE_GET_NPC_INFO(client *cl, packet* p){
+		clientCheckAuth(cl);//client must have id already
+		master::world.m.lock();
+			for(int i=0, end=p->chanks.size();i<end;i++){
+				try{
+					npc *n=master::world.npcs.at(p->chanks[i++].value.i);
+					withLock(n->m, cl->sock->send(n->pack(0,1)));
+				}catch(...){}
+			}
+		master::world.m.unlock();
+		return 0;
+	}
+
 	voidMessageProcessor(25)
 
 	void clientMessageProcessorInit(){
 		messageprocessorClientAdd(MESSAGE_AUTH, (void*)&message_MESSAGE_AUTH);
 		messageprocessorClientAdd(MESSAGE_SET_DIRECTION, (void*)&message_MESSAGE_SET_DIRECTION);
 		messageprocessorClientAdd(MESSAGE_SET_ATTRS, (void*)&message_MESSAGE_SET_ATTRS);
+		messageprocessorClientAdd(MESSAGE_GET_NPC_INFO, (void*)&message_MESSAGE_GET_NPC_INFO);
 
 		clientMessageProcessor(25);
 	}

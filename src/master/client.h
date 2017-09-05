@@ -2,8 +2,8 @@
 #define CLIENT_HEADER
 
 #include <list>
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <array>
 #include <sys/time.h>
@@ -50,7 +50,7 @@ namespace master {
 			int npc_id;
 			share::mutex mutex;
 			std::list<client_message*> messages;
-			std::set<int> npcs; 
+			std::unordered_set<int> npcs; 
 			timestamp_t timestamp;
 			char token[30];
 			
@@ -61,10 +61,10 @@ namespace master {
 			
 			void messages_proceed();
 			int set_info(user_info *u);
-			void	server_clear();
+			void server_clear();
 		
 			static share::mutex m;
-			static std::map<int, client*> all;
+			static std::unordered_map<int, client*> all;
 		
 			static int add(client* c);
 			static client* get(int id);

@@ -7,6 +7,7 @@
 #define MESSAGE_AUTH 1
 #define MESSAGE_SET_DIRECTION 2
 #define MESSAGE_SET_ATTRS 3
+#define MESSAGE_GET_NPC_INFO 4
 
 ///master -> slave
 #define MESSAGE_PAUSE 1

@@ -26,7 +26,7 @@ namespace master {
 
 	typedef void*(*client_processor)(client*, packet*);
 
-	std::map<int, client*> client::all;
+	std::unordered_map<int, client*> client::all;
 	share::mutex client::m;
 
 
@@ -59,6 +59,10 @@ namespace master {
 		name[0]=0;
 		login[0]=0;
 		passwd[0]=0;
+		view_position[0]=0;
+		view_position[1]=0;
+		view_area[0]=400;
+		view_area[1]=400;
 //		npc=new share::npc(&master::world, master::world.getId());
 	}
 	

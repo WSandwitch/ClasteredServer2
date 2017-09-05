@@ -1,11 +1,13 @@
 package lighting;
 
 import flash.display.CapsStyle;
+import flash.filters.GlowFilter;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import lighting.FOVSegment;
 import openfl.display.BitmapData;
+import openfl.filters.BlurFilter;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import flixel.FlxG;
@@ -28,17 +30,21 @@ class FOVSprite extends FlxSprite{
 }
 
 class FOV extends FlxSpriteGroup{
+	public static inline var BASE_COLOR:Int = 0xEE000000;
+	public static inline var FILL_COLOR:Int = 0xEEEEEEEE;
+
 	public var follow:Null<FlxObject> = null;
-	public var _tmp:FlxSprite = new FlxSprite();
-	public var _base:FlxSprite = new FlxSprite();
-	public var _bases:Array<Array<FOVSprite>> = new Array<Array<FOVSprite>>();
-	public var _shadow:FlxSprite = new FlxSprite();
+	public var use_blur:Bool = false;
+	private var _tmp:FlxSprite = new FlxSprite();
+	private var _base:FlxSprite = new FlxSprite();
+	private var _bases:Array<Array<FOVSprite>> = new Array<Array<FOVSprite>>();
+	private var _shadow:FlxSprite = new FlxSprite();
 	private var _height:Int;
 	private var _width:Int;
 	private var _vis:Visibility;
+	private var _filter:BlurFilter=new BlurFilter(8, 8, 1);
+//	private var _filter:GlowFilter = new GlowFilter(BASE_COLOR, 1, 8, 8, 2, 1, false);
 	
-	public static inline var BASE_COLOR:Int = 0xEE000000;
-	public static inline var FILL_COLOR:Int = 0xEEEEEEEE;
 	
 	private var _rows:Int;
 	private var _cols:Int;
@@ -62,7 +68,8 @@ class FOV extends FlxSpriteGroup{
 				add(base);
 			}
 		}
-		_tmp.makeGraphic(_width*_cols, _height*_rows, BASE_COLOR);
+		_tmp.makeGraphic(_width * _cols, _height * _rows, BASE_COLOR);
+
 		_shadow.makeGraphic(_width*_cols, _height*_rows, FlxColor.TRANSPARENT);
 		//_shadow.blend = openfl.display.BlendMode.SCREEN;
 		_vis = vis;
@@ -74,11 +81,11 @@ class FOV extends FlxSpriteGroup{
 	
 	override
 	public function draw(){//update(elapsed){
+	
 		if (follow != null) {
 //			reset(FlxG.camera.scroll.x, FlxG.camera.scroll.y); //do not use it on sprite group !!!
 			x = FlxG.camera.scroll.x;
 			y = FlxG.camera.scroll.y;
-			
 //			_segment.p1.x = x;
 //			_segment.p1.y = y;
 //			_segment.p2.x = x+200;
@@ -90,10 +97,11 @@ class FOV extends FlxSpriteGroup{
 //			_shadow.graphic.bitmap.lock();
 //			_shadow.graphic.bitmap.fillRect(new Rectangle(0, 0, width, height), FlxColor.TRANSPARENT);
 //			_shadow.graphic.bitmap.unlock();
-//			FlxSpriteUtil.fill(this, FlxColor.TRANSPARENT);
+			FlxSpriteUtil.fill(_tmp, BASE_COLOR);
 			FlxSpriteUtil.fill(_shadow, FlxColor.TRANSPARENT);
 //			blend = openfl.display.BlendMode.SCREEN;
 			if (_vis.output.length > 0){
+				var zpoint = new Point(0, 0);
 				var points:Array<FlxPoint> = [];
 				var screen:Array<FlxPoint> = [
 					new FlxPoint(x, y),
@@ -119,60 +127,66 @@ class FOV extends FlxSpriteGroup{
 					points.push(p);
 				}
 				var ppoints= FOVCrosser.getCross(points, FOVCrosser.getCross(screen, view)[0]);
-				
-				for (_points in ppoints){
-					for (p in _points){
-						p.x -= x;
-						p.y -= y;
-					}
-					FlxSpriteUtil.drawPolygon(_shadow, _points, FILL_COLOR, {color: FILL_COLOR, thickness: 3});
-				}
-//				blend = openfl.display.BlendMode.MULTIPLY;
-				FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
-				var zpoint = new Point(0, 0);
-				
-				for (i in 0..._cols){
-					for (j in 0..._rows){
-						var bij = _bases[i][j];
-						bij.need_update = bij.another_update;
-						bij.another_update = bij.next_update;
-						bij.next_update = false;
-
-						if (//true ||
-							bij.need_update || 
-							bij.another_update ||
-							bij.next_update
-						){
-							var bm = bij.graphic.bitmap;
-							bij.graphic.bitmap.copyPixels(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint);
-							bij.dirty = true;
-						}else{
-							bij.dirty = false;
+				if (ppoints.length>0){
+					for (_points in ppoints){
+						for (p in _points){
+							p.x -= x;
+							p.y -= y;
 						}
-						
-						var s1 = new FOVSegment(new FlxPoint(i * _width - off, j * _height - off), new FlxPoint((i + 1) * _width + off, (j) * _height - off));
-						var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + off, (j + 1) * _height + off));
-						var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - off, (j + 1) * _height + off));
-						var s4 = new FOVSegment(s3.p2, s1.p1);
-						for (_points in ppoints){
-							if (bij.next_update)
-									break;
-							for (pi in 0..._points.length){
-								var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
-								if (
-									//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
-									(
-										( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
-										( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
-										s.cross(s1) ||
-										s.cross(s2) ||
-										s.cross(s3) ||
-										s.cross(s4) // add check of in<->out
-	//									false
-									)
-								){
-									bij.next_update = true;
-									break;
+						FlxSpriteUtil.drawPolygon(_shadow, _points, FILL_COLOR, {color: FILL_COLOR, thickness: 3}, {smoothing:true});
+					}
+//					blend = openfl.display.BlendMode.MULTIPLY;
+					FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
+//					_tmp.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, _tmp.graphic.bitmap.rect, zpoint, _filter);
+					
+					var bshift = 8;
+					for (i in 0..._cols){
+						for (j in 0..._rows){
+							var bij = _bases[i][j];
+							bij.need_update = bij.another_update;
+							bij.another_update = bij.next_update;
+							bij.next_update = false;
+
+							if (//true ||
+								bij.need_update || 
+								bij.another_update ||
+								bij.next_update
+							){
+								var bm = bij.graphic.bitmap;
+								if (use_blur){
+									bij.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint, _filter);
+								}else{
+									bij.graphic.bitmap.copyPixels(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint);
+								}
+								bij.dirty = true;
+							}else{
+								bij.dirty = false;
+							}
+							
+							var s1 = new FOVSegment(new FlxPoint(i * _width - off, j * _height - off), new FlxPoint((i + 1) * _width + off, (j) * _height - off));
+							var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + off, (j + 1) * _height + off));
+							var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - off, (j + 1) * _height + off));
+							var s4 = new FOVSegment(s3.p2, s1.p1);
+							for (_points in ppoints){
+								if (bij.next_update)
+										break;
+								for (pi in 0..._points.length){
+									var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
+									if (
+										//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
+										(
+											( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
+											( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
+											s.cross(s1) ||
+											s.cross(s2) ||
+											s.cross(s3) ||
+											s.cross(s4) // add check of in<->out
+		//									false
+										)
+									){
+										bij.next_update = true;
+										break;
+									}
 								}
 							}
 						}

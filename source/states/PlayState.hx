@@ -41,6 +41,7 @@ class PlayState extends CSState
 	public var MESSAGE_NPC_REMOVE:Int;
 	public var MESSAGE_CLIENT_UPDATE:Int;
 	public var MESSAGE_SET_ATTRS:Int;
+	public var MESSAGE_GET_NPC_INFO:Int;
 	
 	// Demo arena boundaries
 	static var LEVEL_MIN_X;
@@ -219,6 +220,7 @@ class PlayState extends CSState
 			p.addShort(_h);
 			p.type = MESSAGE_SET_ATTRS;
 			connection.sendPacket(p);
+			trace("send screen size");
 		}catch(e:Dynamic){
 			trace(e);
 		}
@@ -339,7 +341,7 @@ class PlayState extends CSState
 			l.unlock();
 			if (p!=null){
 				if (p.type == MESSAGE_NPC_UPDATE){
-					//trace("update npc " + p.chanks[0].i);
+					trace("update npc " + p.chanks[0].i);
 					var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 					if (n == null){
 //						trace("add new npc " + p.chanks[0].i);
@@ -363,14 +365,20 @@ class PlayState extends CSState
 						}
 					}
 				} else if (p.type==MESSAGE_CLIENT_UPDATE){
-					var i:Int=0;
+					var i:Int = 0;
 					while(i<p.chanks.length-1){
 						switch p.chanks[i].i {
 							case 1:
-								npc_id=p.chanks[++i].i;
+								npc_id = p.chanks[++i].i;
+								trace("client npc "+npc_id);
 								if (_map.get_npc(npc_id) == null){
 									_map.set_npc(npc_id, new Npc(0, 0, 0));
 									_map.get_npc(npc_id).id = npc_id;
+									trace("add new npc ");
+									var p:Packet = new Packet();
+									p.addInt(npc_id);
+									p.type = MESSAGE_GET_NPC_INFO;
+									connection.sendPacket(p);
 								}
 								npc = _map.get_npc(npc_id);
 								FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);

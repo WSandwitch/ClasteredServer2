@@ -44,8 +44,8 @@ class CSMap extends FlxGroup{
 	
 	public function new(?map:String)
 	{
-		super();
 		tilemap = new FlxTilemap();
+		super();
 		add(tilemap);
 		add(_npcs_group);
 		fov = new FOV(FlxG.width, FlxG.height, vis, 4, 4);
@@ -65,7 +65,6 @@ class CSMap extends FlxGroup{
 			var gid = 1;
 			var size = tiledmap.tilesetArray.length;
 			_tile = function(i:Int){
-				trace(i);
 				if (i >= size){
 					tilemap.loadMapFromArray(
 						tiles.tileArray, 
@@ -107,7 +106,6 @@ class CSMap extends FlxGroup{
 				}else{
 					var tsize = ts.tileImagesSources.length;
 					_imageSource=function (ti:Int){
-						trace(ti);
 						if (ti >= tsize){
 							_tile(i+1);
 							return;
