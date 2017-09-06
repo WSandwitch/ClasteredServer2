@@ -58,6 +58,10 @@ int slave_main(int argc, char* argv[]){
 	struct sigaction sa;
 	//pthread_t pid;
 	int port=12345;
+	if (wrongByteOrder()){
+		printf("bytes order Error, exiting\n");
+		return 1;
+	}
 #ifdef _GLIBCXX_PARALLEL
 	omp_set_dynamic(0);
 	omp_set_num_threads(1);

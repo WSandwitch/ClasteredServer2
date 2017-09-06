@@ -160,6 +160,11 @@ int main(int argc,char* argv[]){
 		timestamp_t servers_check;
 	} timestamps={0};
 	
+	if (wrongByteOrder()){
+		printf("bytes order Error, exiting\n");
+		return 1;
+	}
+	
 	sigemptyset(&sa.sa_mask);
 	sa.sa_sigaction = default_sigaction;
 	sa.sa_flags   = SA_SIGINFO;

@@ -275,7 +275,6 @@ class PlayState extends CSState
 	}
 	
 	private function checkInput(elapsed:Float) {
-		var speed = 200;
 		var p:Packet = new Packet();
 		var keys_changed:Bool = false;
 		actions.update();
@@ -341,7 +340,7 @@ class PlayState extends CSState
 			l.unlock();
 			if (p!=null){
 				if (p.type == MESSAGE_NPC_UPDATE){
-					trace("update npc " + p.chanks[0].i);
+//					trace("update npc " + p.chanks[0].i);
 					var n:Null<Npc> = _map.get_npc(p.chanks[0].i);
 					if (n == null){
 //						trace("add new npc " + p.chanks[0].i);
@@ -370,15 +369,16 @@ class PlayState extends CSState
 						switch p.chanks[i].i {
 							case 1:
 								npc_id = p.chanks[++i].i;
-								trace("client npc "+npc_id);
+//								trace("client npc "+npc_id);
 								if (_map.get_npc(npc_id) == null){
 									_map.set_npc(npc_id, new Npc(0, 0, 0));
 									_map.get_npc(npc_id).id = npc_id;
-									trace("add new npc ");
+//									trace("add new npc ");
 									var p:Packet = new Packet();
 									p.addInt(npc_id);
 									p.type = MESSAGE_GET_NPC_INFO;
 									connection.sendPacket(p);
+									send_screen_size(FlxG.width, FlxG.height);
 								}
 								npc = _map.get_npc(npc_id);
 								FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);

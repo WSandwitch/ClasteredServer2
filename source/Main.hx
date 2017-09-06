@@ -43,9 +43,10 @@ class Main extends Sprite
 		//FlxG.fullscreen = true;
 		//FlxG.switchState(new PlayState());
 	#if (mobile && debug)
-		FlxG.log.redirectTraces = true;
+//		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
 //		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	#end
+	
 	}
 }

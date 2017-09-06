@@ -12,6 +12,7 @@ import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
 import openfl.utils.ByteArray;
 import haxe.Timer.delay;
+import sys.FileSystem;
 // This is what we need to retrieve the image
 import openfl.display.Loader;	
 // This is how we specify the location of the image	
@@ -28,9 +29,9 @@ class CSAssets
 	static var _host:String = "http://home.wsstudio.tk/";
 	
 	#if mobile
-		static var _base:String = SystemPath.applicationStorageDirectory+'/'; //may be need Application.current.config.packageName
+		static var _base:String = SystemPath.applicationStorageDirectory+'/'; 
 	#else
-		static var _base:String = "";
+		static var _base:String = "";//may be use SystemPath.documentsDirectory+'/'+Application.current.config.packageName+'/'
 	#end
 	/*
 	var jGetExtDir = nme.JNI.createStaticMethod('android/os/Environment', 'getExternalStorageDirectory', '()Ljava/io/File;');
@@ -38,26 +39,33 @@ class CSAssets
 	var jFileObj = jGetExtDir();
 	var extPath : String = jGetPath(jFileObj);
 	*/
-	
+
 	public static function getGraphicWeb(id:String, callback:Null<FlxGraphic>->Void){
 		var loader = new Loader();
 		var status:Int=0;
 		loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
 			if ( status == 200 ) {	// 200 is a successful HTTP status
-				trace("loaded file "+_host+id);
+				trace("[CSAssets] loaded file "+_host+id);
 				try{
 					var b:Bitmap = event.target.content;
 					callback(FlxG.bitmap.add(b.bitmapData, false, id));
 				#if !flash
 					// Saving the BitmapData 
 					try{
+						try{
+							var r = (~/\/.+\//);
+							r.match(_base+id);
+							sys.FileSystem.createDirectory(r.matched(0));
+						}catch (e:Dynamic){
+							trace("[CSAssets] "+e);
+						}
 						sys.io.File.saveBytes(_base+id, b.bitmapData.encode("png", 1));
 					}catch(e:Dynamic){
-						trace("can't save "+_base+id);
+						trace("[CSAssets] can't save "+_base+id+": "+e);
 					}
 				#end
 				}catch(e:Dynamic){
-					trace("web load parse error: " + e);
+					trace("[CSAssets] web load parse error: " + e);
 				}
 			} else {
 				callback(null);
@@ -67,11 +75,11 @@ class CSAssets
 			status = event.status; // Hopefully this is 200
 		});
 		loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
-			trace("load error " +_host+id);
+			trace("[CSAssets] load error " +_host+id);
 			callback(null);
 		});
 		loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
-			trace("security error "+_host+id); 
+			trace("[CSAssets] security error "+_host+id); 
 			callback(null);
 		});
 		//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
@@ -91,9 +99,9 @@ class CSAssets
 			}
 			return g;
 		}
-//		trace("from assets");
+//		trace("[CSAssets] from assets");
 		var bd:BitmapData = Assets.getBitmapData(id);
-//		trace(bd);
+//		trace("[CSAssets] "+bd);
 		if (bd != null){ //check if bd exists
 			g = FlxG.bitmap.add(bd, false, id);
 			if (callback != null){
@@ -105,7 +113,7 @@ class CSAssets
 			}
 			return g;
 		}
-//		trace("from disk");
+//		trace("[CSAssets] from disk");
 	#if !flash
 		try{
 			var data:Bytes = File.getBytes(_base+id);
@@ -123,10 +131,10 @@ class CSAssets
 			}
 			return g;
 		}catch(e:Dynamic){
-//			trace("no file");
+//			trace("[CSAssets] no file");
 		}
 	#end	
-//		trace("from web");
+//		trace("[CSAssets] from web");
 		if (callback != null){
 			getGraphicWeb(id, callback);
 		}
@@ -157,7 +165,7 @@ class CSAssets
 			}
 			return bd;
 		}
-//		trace("from disk");
+//		trace("[CSAssets] from disk");
 	#if !flash
 		try{
 			var data:Bytes = File.getBytes(_base+id);
@@ -170,7 +178,7 @@ class CSAssets
 			}
 			return data;
 		}catch(e:Dynamic){
-//			trace("no file");
+//			trace("[CSAssets] no file");
 		}
 	#end	
 	if (callback != null){
@@ -188,7 +196,7 @@ class CSAssets
 		try{
 			return s.toString();
 		}catch(e:Dynamic){
-			//trace("no file");
+			//trace("[CSAssets] no file");
 		}
 		return null;
 	}
