@@ -25,7 +25,7 @@ import openfl.utils.SystemPath;
 
 class CSAssets
 {
-	static inline var _delay:Int = 1;
+	static inline var _delay:Int = 1; //used for async call
 	static var _host:String = "http://home.wsstudio.tk/";
 	
 	#if mobile
@@ -135,7 +135,7 @@ class CSAssets
 		}
 	#end	
 //		trace("[CSAssets] from web");
-		if (callback != null){
+		if (callback != null && async){
 			getGraphicWeb(id, callback);
 		}
 		return null;

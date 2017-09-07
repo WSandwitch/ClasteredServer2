@@ -7,7 +7,6 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxTileFrames;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
-import flixel.math.FlxRandom;
 import flixel.system.FlxAssets;
 import flixel.text.FlxText;
 import flixel.util.FlxDestroyUtil;
@@ -15,7 +14,6 @@ import flixel.ui.FlxButton;
 import flixel.ui.FlxAnalog;
 
 import openfl.system.Capabilities;
-import openfl.events.JoystickEvent;
 import flixel.input.gamepad.FlxGamepad.FlxGamepadModel;
 import flixel.input.gamepad.id.XInputID;
 import flixel.input.gamepad.FlxGamepadInputID;
@@ -23,7 +21,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import haxe.ds.EnumValueMap;
 
 /**
- * virtual gamepad, that used as real one
+ * screen gamepad, that used as real one
  * worls only with FLX_JOYSTICK_API
  * 
  * based on FlxVirtualPad by Ka Wing Chin
@@ -33,7 +31,7 @@ class ScreenGamepad extends FlxSpriteGroup{
 	/**
 	 * 	id of gamepad
 	 **/
-	public var id:Int = 0;
+	public var id(get, null):Int = 0;
 	
 	/**
 	 * show middle buttons
@@ -67,16 +65,15 @@ class ScreenGamepad extends FlxSpriteGroup{
 	public var analogLeft:Null<FlxAnalog> = null;
 	public var analogRight:Null<FlxAnalog> = null;
 	public var mode:FlxMode = XBOX;
+	public var gamepad:VirtualGamepad = new VirtualGamepad();
 	
-	private var _acc:Array<Float> = [0, 0, 0, 0, 0, 0];
 	private var _radius:Float=0;
 	private var _frames:Map<String, FlxTileFrames> = new Map<String, FlxTileFrames>();
 	private var _buttonSize:FlxPoint=new FlxPoint();
 	private var _distanse:FlxPoint = new FlxPoint();
 	private var _offset:FlxPoint = new FlxPoint();
-	private var _random:FlxRandom = new FlxRandom();
-	private var _ids:Array<Int> = [];
 	private var _scale:Float = 1;
+	
 	/**
 	 * Create a gamepad which contains 4 directional buttons and 4 action buttons, and 2 analog sticks.
 	 * 
@@ -88,8 +85,6 @@ class ScreenGamepad extends FlxSpriteGroup{
 	public function new(scale:Float=1.0, ?M:FlxMode, useStartBack:Bool=true, ?buttonSize:FlxPoint, ?offset:FlxPoint){	
 		super();
 		_scale = scale;
-		id = _random.int(1, 1000, _ids);
-		_ids.push(id);
 		if (buttonSize==null)
 			buttonSize = new FlxPoint(32, 32);
 		_buttonSize = new FlxPoint(Math.round(buttonSize.x*_scale), Math.round(buttonSize.y*_scale));
@@ -100,10 +95,6 @@ class ScreenGamepad extends FlxSpriteGroup{
 			M = mode;		
 		_distanse.x = 1.1 * _buttonSize.x;
 		_distanse.y = 1.1 * _buttonSize.y;
-		
-	#if FLX_JOYSTICK_API
-		FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.DEVICE_ADDED, true, false, id, 0, 0));
-	#end
 	
 		var base_sprite = new FlxSprite(0, 0, "assets/images/gamepad/base.png");
 		var thumb_sprite = new FlxSprite(0, 0, "assets/images/gamepad/thumb.png");
@@ -200,20 +191,23 @@ class ScreenGamepad extends FlxSpriteGroup{
 		setAlpha(0.5);
 	}
 
+	@:noCompletion
+	public function get_id():Int{
+		return gamepad.id;
+	}	
+	
 	override public function destroy():Void{
 		super.destroy();
 		
 		dPad = FlxDestroyUtil.destroy(dPad);
 		actions = FlxDestroyUtil.destroy(actions);
 		center = FlxDestroyUtil.destroy(center);
+		gamepad = FlxDestroyUtil.destroy(gamepad);
 		
 		dPad = null;
 		actions = null;
 		center = null;
-	#if FLX_JOYSTICK_API
-		FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.DEVICE_REMOVED, true, false, id));
-	#end
-
+		gamepad = null;
 	}
 	
 	public function setMode(M:FlxMode, ?w:Int, ?h:Int){
@@ -307,10 +301,8 @@ class ScreenGamepad extends FlxSpriteGroup{
 		button.solid = false;
 		button.immovable = true;
 		button.scrollFactor.set();
-	#if FLX_JOYSTICK_API
-		button.onDown.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_DOWN, true, false, id, I));};
-		button.onOut.callback = button.onUp.callback = function(){FlxG.stage.dispatchEvent(new JoystickEvent(JoystickEvent.BUTTON_UP, true, false, id, I));};
-	#end	
+		button.onDown.callback = function(){gamepad.button_down(I);};
+		button.onOut.callback = button.onUp.callback = function(){gamepad.button_up(I);};
 	#if FLX_DEBUG
 		button.ignoreDrawDebug = true;
 	#end
@@ -319,18 +311,14 @@ class ScreenGamepad extends FlxSpriteGroup{
 	}
 	
 	private function drag_handler(){
-		_acc[0] = analogLeft.acceleration.x/_radius;
-		_acc[1] = analogLeft.acceleration.y/_radius;
-		_acc[2] = 0;
-		_acc[3] = analogRight.acceleration.x/_radius;
-		_acc[4] = analogRight.acceleration.y/_radius;
-		_acc[5] = 0;
-//		trace(_acc);
-	#if FLX_JOYSTICK_API
-		var event = new JoystickEvent(JoystickEvent.AXIS_MOVE, true, false, id);//??
-		event.axis = _acc;
-		FlxG.stage.dispatchEvent(event);
-	#end
+		gamepad.axis_move(
+			analogLeft.acceleration.x/_radius,
+			analogLeft.acceleration.y/_radius,
+			0,
+			analogRight.acceleration.x/_radius,
+			analogRight.acceleration.y/_radius,
+			0
+		);
 	}
 
 	public function setAlpha(a){

@@ -127,6 +127,13 @@ class AbstractInputManager{
 		return a;
 	}
 
+	public function clearSources(name:KeyType){
+		var ss:Array<AbstractInputID> = getSources(name);
+		for (s in ss){
+			removeSource(s);
+		}
+	}
+
 	public function clear(){
 		while (ids.length>0){
 			removeSource(ids[0]);
@@ -486,7 +493,7 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 		}
 	#end
 	}	
-
+#if !FLX_NO_GAMEPAD
 	private function proceedGamepad(gamepad:FlxGamepad, action:AbstractInputAction){
 		switch(key){
 			case LEFT_STICK_X_PLUS:
@@ -596,7 +603,7 @@ class AbstractInputGamepadAxisID extends AbstractInputID{
 			_value = action.value;
 		}
 	}
-	
+#end	
 	override
 	public function toString():String{
 		return key.toString();
@@ -761,10 +768,11 @@ class AbstractInputID{
 	
 	public function addAction(name:KeyType){
 		if (actions.indexOf(name) < 0){
-			if (actions.length > 0)
-				actions[0] = name;
-			else
+			if (actions.length > 0){
+				actions[0] = name; //only 1 action for 1 input
+			}else{
 				actions.push(name);
+			}
 		}
 	}
 

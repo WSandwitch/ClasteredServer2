@@ -189,6 +189,15 @@ class PlayState extends CSState
 		a=actions.addAction(ATTACK);
 		a.addMouseKey(MouseID.MOUSE_LEFT);
 		
+		a=actions.addAction(LOOK_UP);
+		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_Y_MINUS);
+		a=actions.addAction(LOOK_DOWN);
+		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_Y_PLUS);
+		a=actions.addAction(LOOK_LEFT);
+		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_MINUS);
+		a=actions.addAction(LOOK_RIGHT);
+		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_PLUS);
+		
 		//TODO: change to send event
 		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 		onResize(FlxG.width, FlxG.height); 
@@ -420,6 +429,10 @@ abstract ActionID(Int) from Int to Int{
 	var GO_LEFT = 3;
 	var GO_RIGHT = 4;
 	var ATTACK = 5;
+	var LOOK_UP = 6;
+	var LOOK_DOWN = 7;
+	var LOOK_LEFT = 8;
+	var LOOK_RIGHT = 9;
 	
 	@:from
 	public static inline function fromString(s:String)
