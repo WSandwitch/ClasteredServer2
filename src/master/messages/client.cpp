@@ -162,7 +162,8 @@ namespace master {
 		return 0;
 	}
 
-	static void *message_MESSAGE_SET_DIRECTION(client*cl, packet* p){
+	//input from client
+	static void *message_MESSAGE_SET_ACTIONS(client*cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
 		master::world.m.lock();
 			try{
@@ -201,6 +202,7 @@ namespace master {
 		return 0;
 	}
 	
+	//params of client
 	static void *message_MESSAGE_SET_ATTRS(client *cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
 		master::world.m.lock();
@@ -231,6 +233,7 @@ namespace master {
 		return 0;
 	}
 
+	///[id,id,id, ..]
 	static void *message_MESSAGE_GET_NPC_INFO(client *cl, packet* p){
 		clientCheckAuth(cl);//client must have id already
 		master::world.m.lock();
@@ -248,7 +251,7 @@ namespace master {
 
 	void clientMessageProcessorInit(){
 		messageprocessorClientAdd(MESSAGE_AUTH, (void*)&message_MESSAGE_AUTH);
-		messageprocessorClientAdd(MESSAGE_SET_DIRECTION, (void*)&message_MESSAGE_SET_DIRECTION);
+		messageprocessorClientAdd(MESSAGE_SET_ACTIONS, (void*)&message_MESSAGE_SET_ACTIONS);
 		messageprocessorClientAdd(MESSAGE_SET_ATTRS, (void*)&message_MESSAGE_SET_ATTRS);
 		messageprocessorClientAdd(MESSAGE_GET_NPC_INFO, (void*)&message_MESSAGE_GET_NPC_INFO);
 

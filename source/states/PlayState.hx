@@ -36,7 +36,7 @@ import flixel.system.macros.FlxMacroUtil;
 class PlayState extends CSState
 {
 	//message ids
-	public var MESSAGE_SET_DIRECTION:Int;
+	public var MESSAGE_SET_ACTIONS:Int;
 	public var MESSAGE_NPC_UPDATE:Int;
 	public var MESSAGE_NPC_REMOVE:Int;
 	public var MESSAGE_CLIENT_UPDATE:Int;
@@ -289,31 +289,42 @@ class PlayState extends CSState
 		actions.update();
 		if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
 			p.addChar(0);
-			p.addChar(Math.round((actions.value(GO_RIGHT)-(actions.value(GO_LEFT)))*100));
+			p.addChar(Math.round((actions.value(GO_RIGHT)-actions.value(GO_LEFT))*100));
 			p.addChar(1);
-			p.addChar(Math.round((actions.value(GO_DOWN)-(actions.value(GO_UP)))*100));
+			p.addChar(Math.round((actions.value(GO_DOWN)-actions.value(GO_UP))*100));
 		}
 		if (actions.anyChanged([ATTACK])){
 			p.addChar(3);
 			p.addChar(Math.round(actions.value(ATTACK)));
 		}
 		if (npc != null){
+			var angle_send:Bool = false;
 			var angle:Float = 0;
-		#if !FLX_NO_MOUSE
-			angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);		
-		#end
-			//add gamepad sngle control
-//			trace(Math.abs(_angle-angle));
-			if (Math.abs(_angle-angle) >= _d_angle){
-				_angle = angle;
-				p.addChar(2);
-				p.addChar(Math.round(angle/3.14*120));	
+			if (actions.anyChanged([LOOK_UP, LOOK_DOWN, LOOK_LEFT, LOOK_RIGHT])){
+				 var angle = Math.atan2(actions.value(LOOK_DOWN) - actions.value(LOOK_UP), actions.value(LOOK_RIGHT) - actions.value(LOOK_LEFT)); 
+				 if (Math.abs(_angle-angle) >= _d_angle){
+					_angle = angle;
+					angle_send = true;
+//					trace("gamepad angle "+angle);
+				}
 			}
-//			trace(angle / 3.14 * 180);
-//			npc.angle = Math.round(angle / 3.14 * 180);
+		#if !FLX_NO_MOUSE
+			{
+				var angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);	
+				if (Math.abs(_angle-angle) >= _d_angle){
+					_angle = angle;
+					angle_send = true;
+//					trace("mouse angle");
+				}
+			}
+		#end
+			if (angle_send){
+				p.addChar(2);
+				p.addChar(Math.round(_angle/3.14*120));	
+			}
 		}
 		if (p.chanks.length>0){
-			p.type = MESSAGE_SET_DIRECTION;
+			p.type = MESSAGE_SET_ACTIONS;
 //			trace(connection);
 			connection.sendPacket(p);
 //			trace("sended");

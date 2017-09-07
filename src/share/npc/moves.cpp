@@ -21,7 +21,7 @@ namespace share{
 	
 	//common move
 	void npc_moves::move0(typeof(point::x) x, typeof(point::y) y){
-		bool moved=0;
+		char moved=0;
 		if (x!=0)
 			if (check_point(position.x+x,position.y)){
 				set_attr(position.x, position.x+x);
@@ -35,7 +35,7 @@ namespace share{
 		
 		if (bot.used){
 //			printf("bot %d on %g %g -> %g %g\n", id, position.x, position.y, bot.goal.x, bot.goal.y);
-			if (!moved || position.distanse2(bot.goal)<=3*vel){
+			if (!moved || position.distanse2(bot.goal)<=3*vel){//for testing
 				bot.goal.x=(rand()%(((int)world->map->map_size[0]-20)*100))/100.0+10;
 				bot.goal.y=(rand()%(((int)world->map->map_size[1]-20)*100))/100.0+10;
 //				printf("new goal on %d -> %g %g\n", id, bot.goal.x, bot.goal.y);
@@ -50,9 +50,10 @@ namespace share{
 		//it is not bot (for disable respawn)
 		if (x!=0 || y!=0){
 			if (check_point(position.x+x,position.y+y) && (bot.dist<weapon.dist || weapon.dist<=0)){
+				point p=position;
 				set_attr(position.x, position.x+x);
 				set_attr(position.y, position.y+y);
-				bot.dist+=vel;
+				bot.dist+=vel;//p.distanse(position);
 			} else {
 				suicide();//suicide
 			}

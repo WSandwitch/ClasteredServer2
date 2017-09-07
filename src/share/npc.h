@@ -153,7 +153,6 @@ namespace share {
 				attrs[attr(&a)]=1;
 				return $;
 			};
-//			std::vector<int>& gridShares();
 
 			static std::unordered_map<short, move_func> moves;
 			static std::unordered_map<short, shoot_func> shoots;

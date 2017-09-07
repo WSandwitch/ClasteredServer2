@@ -103,26 +103,23 @@ namespace share{
 	//bullet weapon.dist is  move dist
 	void npc_shoots::shoot2(typeof(point::x) x, typeof(point::y) y){
 		short attacks=weapon.attacks;
-		
 		std::unordered_set<npc*> npcs;
 		auto cells=world->map->cells(position, 2*r+vel);
 		for(auto c: cells){
 			auto cell=world->map->cells(c);
 			for(auto n: cell->npcs)
-				if (attackCheck(n.second)){
+				if (attackCheck(n.second)){//macro
 //					printf("added %d !=%d\n", n.second->id, id);
 					npcs.insert(n.second);
 				}
 		}
-		segment s(position, position+point::from_angle(angle, -vel));
-//		printf("(%g %g), (%g %g) -> (%g %g)\n", position.x, position.y, s.a.x, s.a.y, s.b.x, s.b.y);
+		segment s(position, position+point::from_angle(angle, -vel));//way passed on last step 
 		for(auto n: npcs){
-//			printf("(%g %g) %g, %d\n", n->position.x, n->position.y, s.distanse(n->position), r+n->r);
 			if(s.distanse(n->position)<=r+n->r){//TODO:check
 				n->hurt(this);//hurt if touch
 				if(--attacks==0){
 					suicide();
-					state=STATE_IDLE;
+					state=STATE_IDLE;//do not attack more
 					break;
 				}
 			}

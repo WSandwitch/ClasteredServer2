@@ -184,7 +184,7 @@ namespace share {
 			position=world->map->nearest_safezone(position).rand_point_in();
 //			printf("position %g, %g\n", position.x, position.y);
 		}else{
-			printf("npc without world\n");
+			printf("npc %d without world\n", id);
 			///for testing
 			position.x=100;
 			position.y=100;
@@ -268,10 +268,12 @@ namespace share {
 		}
 	}
 
+	//toggle attack
 	void npc::attack(bool s){
 		set_attr(state,s?STATE_WARMUP:STATE_COOLDOWN);
 	}
 
+	//velocity depends on angle
 	float npc::vel_angle(float max){
 		short $=abs((short)direction.to_angle()-(short)angle);
 		return 1-(1-max)*($>PPI?PPI*2-$:$)/PPI;//decrease vel by max if we go back
@@ -420,6 +422,7 @@ namespace share {
 		
 	set_attr_func npc::set_attr_funcs[6]={0, &npc::set_attr<char>, &npc::set_attr<short>, &npc::set_attr<int>, &npc::set_attr<float>, &npc::set_attr<double>};
 	
+	//set attr by pointer and type
 	bool npc::set_attr(short type, void *attr, void *data){
 		return (this->*set_attr_funcs[type])(attr, data);
 	}
@@ -430,7 +433,7 @@ namespace share {
 //s - for server, all - pack all attrs for curr type, ts - to slave(only for to server)
 	packet* npc::pack(bool s, bool all, bool ts){
 		auto _pack=_packs(s,all,ts);
-packet &p=packs(s,all,ts);
+		packet &p=packs(s,all,ts);
 		_pack.m.lock();//TODO: move mutex to packet
 			if (!_pack.done){
 				auto as=pack_attrs(s,all,ts);
@@ -451,9 +454,8 @@ packet &p=packs(s,all,ts);
 				_pack.done=1;
 			}
 		_pack.m.unlock();
-return &p;
+		return &p;
 	}
-
 
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
@@ -472,8 +474,7 @@ return &p;
 		return n;
 	}
 	
-	
-	
+	//check can npc move to point
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
 		point p(x,y);
 		segment ps(position,p);
@@ -483,10 +484,10 @@ return &p;
 		//printf("segments %d \n", world->map->segments.size());
 		for(auto c: ids){//TODO: change to check by map grid
 			share::cell *cell=world->map->cells(c);
-			for(int i=0,end=cell->segments.size();i<end;i++){//TODO: change to check by map grid
+			for(int i=0,end=cell->segments.size();i<end;i++){
 				segment *s=cell->segments[i];
 				if (done.count(s)==0){ //uniq check
-					if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //TODO: check is it right
+					if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //check for directed segments
 						if(s->distanse(p)<=r){
 							//printf("dist \n");
 							return 0;

@@ -5,7 +5,7 @@
 
 ///massages from client
 #define MESSAGE_AUTH 1
-#define MESSAGE_SET_DIRECTION 2
+#define MESSAGE_SET_ACTIONS 2
 #define MESSAGE_SET_ATTRS 3
 #define MESSAGE_GET_NPC_INFO 4
 
