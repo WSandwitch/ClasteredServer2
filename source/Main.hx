@@ -11,6 +11,8 @@ import openfl.system.Capabilities;
 
 class Main extends Sprite
 {
+	public static var tongue:FireTongueEx;
+	
 	public function new()
 	{
 		super();

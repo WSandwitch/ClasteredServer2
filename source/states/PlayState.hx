@@ -16,6 +16,7 @@ import flixel.system.scaleModes.*;
 import flixel.math.FlxMath;
 import flixel.math.FlxRect;
 import flixel.util.FlxColor;
+import flixel.util.FlxDestroyUtil;
 import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
@@ -64,7 +65,7 @@ class PlayState extends CSState
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
 	private var _angle:Float = 0;
-	private static inline var _d_angle:Float = 2 * 3.14 / 180; //2 degree
+	private static inline var _d_angle:Float = 2 * 3.14 / 180; //~2 degree
 	
 	
 	public var l:Lock = new Lock();
@@ -85,7 +86,8 @@ class PlayState extends CSState
 	
 	private function exit(){
 		#if !flash
-			openfl.Lib.exit();
+			openfl.Lib.exit();//TODO: check for android
+			openfl.Lib.close();
 		#end
 	}
 	
@@ -198,7 +200,7 @@ class PlayState extends CSState
 		a=actions.addAction(LOOK_RIGHT);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_PLUS);
 		
-		//TODO: change to send event
+		
 		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 		onResize(FlxG.width, FlxG.height); 
 	}
@@ -276,7 +278,7 @@ class PlayState extends CSState
 	#if mobile
 		if (_gamepad != null){
 			remove(_gamepad);
-			_gamepad.destroy();
+			FlxDestroyUtil.destroy(_gamepad);
 		}
 		_gamepad = new ScreenGamepad();
 		add(_gamepad);
@@ -378,7 +380,7 @@ class PlayState extends CSState
 							var n:Null<Npc> = _map.remove_npc(nid, false);
 							if (n != null){
 //								trace("remove npc " + nid);
-//								n.destroy(); //don't need
+//								FlxDestroyUtil.destroy(n); //don't need
 								n = null;
 							}
 						}

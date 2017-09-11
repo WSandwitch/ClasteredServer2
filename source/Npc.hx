@@ -15,7 +15,7 @@ import util.CSAssets;
 import openfl.display.BitmapData;
 
 /**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
+ * @author Yarikov Denis
  */
 class Npc extends FlxSpriteGroup
 {
@@ -43,10 +43,10 @@ class Npc extends FlxSpriteGroup
         //untyped this["aaa"]();
 		//must not update sprites in updaters
 		updater[1] = function(a:Dynamic){
-			that.dest_x = a;
+			that.dest_x = Std.int(a);
 		};
 		updater[2] = function(a:Dynamic){
-			that.dest_y = a;
+			that.dest_y = Std.int(a);
 		};
 		updater[6] = function(a:Dynamic){
 			that.type = a;

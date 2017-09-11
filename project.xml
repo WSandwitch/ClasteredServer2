@@ -34,7 +34,7 @@
 	<classpath name="source" />
 	<assets path="assets" />
 
-	<assets path="assetsExt" rename="assets" if="debug" />
+	<assets path="assetsExt" rename="ext/assets" if="debug" />
 	<assets path="data" rename="assets/data" if="debug" />
 	<assets path="maps" rename="assets/maps" include="*.tmx" if="debug" />
 	<assets path="data" rename="assets/data" embed="true" unless="debug" />
@@ -49,12 +49,13 @@
 	<haxelib name="flixel-addons" />
 	
 	<!--In case you want to use the ui package-->
-	<!--<haxelib name="flixel-ui" />-->
+	<haxelib name="flixel-ui" />
 	
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape" />-->
 	<haxelib name="polygonal-ds" version="1.4.1" />
 	<haxelib name="yaml" />
+	<haxelib name="firetongue" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />

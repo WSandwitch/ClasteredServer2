@@ -53,7 +53,7 @@ namespace share{
 				point p=position;
 				set_attr(position.x, position.x+x);
 				set_attr(position.y, position.y+y);
-				bot.dist+=vel;//p.distanse(position);
+				bot.dist+=vel;//usualy in full speed//p.distanse(position);
 			} else {
 				suicide();//suicide
 			}

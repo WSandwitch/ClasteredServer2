@@ -24,9 +24,15 @@ import lighting.Visibility;
 
 
 class FOVSprite extends FlxSprite{
-	public var need_update:Bool = true;
-	public var another_update:Bool = true;
-	public var next_update:Bool = true;
+	public var need_update:List<Bool> = new List<Bool>(); //may be it is not good
+//	public var need_update:Bool = true;
+//	public var another_update:Bool = true;
+//	public var next_update:Bool = true;
+	public function new(){
+		super();
+		for (i in 0...4)
+			need_update.add(true);
+	}
 }
 
 class FOV extends FlxSpriteGroup{
@@ -34,7 +40,8 @@ class FOV extends FlxSpriteGroup{
 	public static inline var FILL_COLOR:Int = 0xEEEEEEEE;
 
 	public var follow:Null<FlxObject> = null;
-	public var use_blur:Bool = false;
+
+	public static var use_blur:Bool = #if flash true #else false #end ;
 	private var _tmp:FlxSprite = new FlxSprite();
 	private var _base:FlxSprite = new FlxSprite();
 	private var _bases:Array<Array<FOVSprite>> = new Array<Array<FOVSprite>>();
@@ -77,7 +84,8 @@ class FOV extends FlxSpriteGroup{
 		
 	}
 	
-	static inline var off:Int = 5;
+	static var _off:Int = 5;
+	public static inline var edges:Int = 16;
 	
 	override
 	public function draw(){//update(elapsed){
@@ -109,24 +117,26 @@ class FOV extends FlxSpriteGroup{
 					new FlxPoint(x+_tmp.width, y+_tmp.height),
 					new FlxPoint(x, y+_tmp.height)
 				];
-				var halfview = 39; //degrees
+				var halfview = 30; //degrees
 				var rad:Float = Math.PI / 180 * (follow.angle);
 				var rad30:Float = Math.PI / 180 * (follow.angle-halfview);
 				var radm30:Float = Math.PI / 180 * (follow.angle+halfview);
 				var l = 10000000;//very very far
-				var ushift = 21;
+				var r = 30;
+				var ushift = 23;
 				var fx:Float = follow.x-ushift*FlxMath.fastCos(rad);
 				var fy:Float = follow.y-ushift*FlxMath.fastSin(rad);
+				var rad_shift:Float = Math.PI * 2 / edges;
 				var view:Array<FlxPoint> = [
 					new FlxPoint(fx, fy),
 					new FlxPoint(fx+l*FlxMath.fastCos(rad30), fy+l*FlxMath.fastSin(rad30)),
 					new FlxPoint(fx + l * FlxMath.fastCos(radm30), fy + l * FlxMath.fastSin(radm30))
 				];
-				
+				var circle:Array<FlxPoint> = [for (i in 0...edges) new FlxPoint(follow.x+r*FlxMath.fastCos(rad+i*rad_shift), follow.y+r*FlxMath.fastSin(rad+i*rad_shift))];
 				for (p in _vis.output){
 					points.push(p);
 				}
-				var ppoints= FOVCrosser.getCross(points, FOVCrosser.getCross(screen, view)[0]);
+				var ppoints= FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
 				if (ppoints.length>0){
 					for (_points in ppoints){
 						for (p in _points){
@@ -143,15 +153,16 @@ class FOV extends FlxSpriteGroup{
 					for (i in 0..._cols){
 						for (j in 0..._rows){
 							var bij = _bases[i][j];
-							bij.need_update = bij.another_update;
-							bij.another_update = bij.next_update;
-							bij.next_update = false;
-
-							if (//true ||
-								bij.need_update || 
-								bij.another_update ||
-								bij.next_update
-							){
+							var nu:Bool = false;
+							for (_nu in bij.need_update){
+								if (_nu){
+									nu = true;
+									break;
+								}
+							}
+							bij.need_update.pop();
+							
+							if ( nu ){
 								var bm = bij.graphic.bitmap;
 								if (use_blur){
 									bij.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint, _filter);
@@ -163,12 +174,13 @@ class FOV extends FlxSpriteGroup{
 								bij.dirty = false;
 							}
 							
-							var s1 = new FOVSegment(new FlxPoint(i * _width - off, j * _height - off), new FlxPoint((i + 1) * _width + off, (j) * _height - off));
-							var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + off, (j + 1) * _height + off));
-							var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - off, (j + 1) * _height + off));
+							var s1 = new FOVSegment(new FlxPoint(i * _width - _off, j * _height - _off), new FlxPoint((i + 1) * _width + _off, (j) * _height - _off));
+							var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + _off, (j + 1) * _height + _off));
+							var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - _off, (j + 1) * _height + _off));
 							var s4 = new FOVSegment(s3.p2, s1.p1);
+							var updated = false;
 							for (_points in ppoints){
-								if (bij.next_update)
+								if (updated)
 										break;
 								for (pi in 0..._points.length){
 									var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
@@ -184,11 +196,12 @@ class FOV extends FlxSpriteGroup{
 		//									false
 										)
 									){
-										bij.next_update = true;
+										updated = true;
 										break;
 									}
 								}
 							}
+							bij.need_update.add(updated);
 						}
 					}
 				}
@@ -202,6 +215,7 @@ class FOV extends FlxSpriteGroup{
 	public function resize(width:Int, height:Int){
 		_width = Math.ceil(width/_cols);
 		_height = Math.ceil(height / _rows);
+		_off=FlxMath.maxInt(Math.round(_width*0.15), Math.round(_height*0.15));//FlxMath.maxFloat
 		reset(0, 0);
 		for (i in 0..._cols){
 			for (j in 0..._rows){

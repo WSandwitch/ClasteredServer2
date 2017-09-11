@@ -12,13 +12,13 @@ import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
 import openfl.utils.ByteArray;
 import haxe.Timer.delay;
-import sys.FileSystem;
 // This is what we need to retrieve the image
 import openfl.display.Loader;	
 // This is how we specify the location of the image	
 import openfl.net.URLRequest;
 import openfl.utils.SystemPath;
 #if !flash
+	import sys.FileSystem;
 	import sys.io.File;
 	import sys.io.FileInput;
 #end
@@ -28,11 +28,15 @@ class CSAssets
 	static inline var _delay:Int = 1; //used for async call
 	static var _host:String = "http://home.wsstudio.tk/";
 	
-	#if mobile
-		static var _base:String = SystemPath.applicationStorageDirectory+'/'; 
+#if mobile
+	static var _base:String = SystemPath.applicationStorageDirectory+'/'; 
+#else
+	#if debug
+		static var _base:String = "ext/";
 	#else
-		static var _base:String = "";//may be use SystemPath.documentsDirectory+'/'+Application.current.config.packageName+'/'
+		static var _base:String = SystemPath.applicationStorageDirectory+'/';//may be use SystemPath.documentsDirectory+'/'+Application.current.config.packageName+'/'
 	#end
+#end
 	/*
 	var jGetExtDir = nme.JNI.createStaticMethod('android/os/Environment', 'getExternalStorageDirectory', '()Ljava/io/File;');
 	var jGetPath = nme.JNI.createMemberMethod('java/io/File', 'getAbsolutePath', '()Ljava/lang/String;');
