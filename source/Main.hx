@@ -4,6 +4,7 @@ import states.InitState;
 import openfl.display.Sprite;
 
 import flixel.FlxG;
+import flixel.addons.ui.FlxUIState;
 import flixel.system.scaleModes.*;
 import clasteredServerClient.*;
 
@@ -11,11 +12,16 @@ import openfl.system.Capabilities;
 
 class Main extends Sprite
 {
-	public static var tongue:FireTongueEx;
-	
+	public static var tongue:FireTongueEX;
+
 	public function new()
 	{
 		super();
+		if (Main.tongue == null){
+			Main.tongue = new FireTongueEX();
+			Main.tongue.init("en-US");
+			FlxUIState.static_tongue = Main.tongue;
+		}
 	#if mobile
 		addChild(new CSGame(0, 0, InitState));
 	#else

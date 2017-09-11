@@ -19,9 +19,6 @@
 	<window hardware="true" allow-shaders="true" require-shaders="true" if="cpp"/>
 	<window vsync="true" antialiasing="4" if="cpp" />
 		
-	<!--HTML5-specific-->
-	<window if="html5" resizable="false" />
-	
 	<!--Desktop-specific-->
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" />
 	

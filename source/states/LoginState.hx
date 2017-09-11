@@ -29,7 +29,7 @@ import util.CSAssets;
 import clasteredServerClient.MessageIds;
 
 /**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
+ * 
  */
  
 //class Test{}
@@ -39,11 +39,6 @@ class LoginState extends FlxUIState
 	override public function create():Void 
 	{	
 		var game:CSGame = cast FlxG.game;
-		if (Main.tongue == null){
-			Main.tongue = new FireTongueEx();
-			Main.tongue.init("en-US");
-			FlxUIState.static_tongue = Main.tongue;
-		}
 
 //		_xml_id = "login";
 		

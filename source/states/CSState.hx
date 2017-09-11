@@ -5,7 +5,7 @@ import flixel.FlxState;
 import clasteredServerClient.Connection;
 
 /**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
+ * 
  */
 class CSState extends FlxState
 {
