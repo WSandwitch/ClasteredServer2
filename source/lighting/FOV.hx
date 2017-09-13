@@ -130,7 +130,7 @@ class FOV extends FlxSpriteGroup{
 				var view:Array<FlxPoint> = [
 					new FlxPoint(fx, fy),
 					new FlxPoint(fx+l*FlxMath.fastCos(rad30), fy+l*FlxMath.fastSin(rad30)),
-					new FlxPoint(fx + l * FlxMath.fastCos(radm30), fy + l * FlxMath.fastSin(radm30))
+					new FlxPoint(fx+l*FlxMath.fastCos(radm30), fy+l*FlxMath.fastSin(radm30))
 				];
 				var circle:Array<FlxPoint> = [for (i in 0...edges) new FlxPoint(follow.x+r*FlxMath.fastCos(rad+i*rad_shift), follow.y+r*FlxMath.fastSin(rad+i*rad_shift))];
 				for (p in _vis.output){
@@ -212,10 +212,12 @@ class FOV extends FlxSpriteGroup{
 		super.draw();
 	}
 	
+	static inline var off_mul = 0.17;
+	
 	public function resize(width:Int, height:Int){
 		_width = Math.ceil(width/_cols);
 		_height = Math.ceil(height / _rows);
-		_off=FlxMath.maxInt(Math.round(_width*0.15), Math.round(_height*0.15));//FlxMath.maxFloat
+		_off=FlxMath.maxInt(Math.round(_width*off_mul), Math.round(_height*off_mul));//FlxMath.maxFloat
 		reset(0, 0);
 		for (i in 0..._cols){
 			for (j in 0..._rows){

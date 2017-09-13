@@ -40,12 +40,13 @@ namespace share {
 		};
 	
 	
-	typedef point_<float> point;
 	
 	typedef point_<short> points;
 	typedef point_<int> pointi;
 	typedef point_<float> pointf;
-	
+
+	typedef pointf point;
+
 }
 
 #include "point_definition.h"
