@@ -1,13 +1,13 @@
 package states;
 
 import flixel.FlxG;
+import flixel.FlxState;
 
-class InitState extends CSState
+class InitState extends FlxState
 {
 	override public function create():Void 
 	{	
 		super.create();
-		
 	}
 	
 	override 

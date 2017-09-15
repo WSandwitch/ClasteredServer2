@@ -53,6 +53,7 @@
 	<haxelib name="polygonal-ds" version="1.4.1" />
 	<haxelib name="yaml" />
 	<haxelib name="firetongue" />
+	<haxelib name="samcodes-notifications" />
 	
 	<!--------------------------------HAXEDEFINES----------------------------------->
 	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />

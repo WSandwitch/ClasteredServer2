@@ -49,7 +49,7 @@ class CSAssets
 		var status:Int=0;
 		loader.contentLoaderInfo.addEventListener( Event.COMPLETE, function (event:Event){
 			if ( status == 200 ) {	// 200 is a successful HTTP status
-				trace("[CSAssets] loaded file "+_host+id);
+				trace("[CSAssets] loaded from web "+id);
 				try{
 					var b:Bitmap = event.target.content;
 					callback(FlxG.bitmap.add(b.bitmapData, false, id));
@@ -103,11 +103,13 @@ class CSAssets
 			}
 			return g;
 		}
-//		trace("[CSAssets] from assets");
 		var bd:BitmapData = Assets.getBitmapData(id);
 //		trace("[CSAssets] "+bd);
 		if (bd != null){ //check if bd exists
 			g = FlxG.bitmap.add(bd, false, id);
+		#if debug
+//			trace("[CSAssets] loaded from assets "+id);
+		#end
 			if (callback != null){
 				if (async){
 					delay(callback.bind(g), _delay);
@@ -117,7 +119,6 @@ class CSAssets
 			}
 			return g;
 		}
-//		trace("[CSAssets] from disk");
 	#if !flash
 		try{
 			var data:Bytes = File.getBytes(_base+id);
@@ -125,6 +126,9 @@ class CSAssets
 			g = FlxG.bitmap.add(BitmapData.loadFromBytes(ByteArray.fromBytes(data)), false, id);
 		#else
 			g = FlxG.bitmap.add(BitmapData.fromBytes(ByteArray.fromBytes(data)), false, id);
+		#end
+		#if debug
+			trace("[CSAssets] loaded from disk "+id);
 		#end
 			if (callback != null){
 				if (async){
@@ -146,14 +150,19 @@ class CSAssets
 	}
 	
 	public static function getBitmapData(id:String, ?callback:Null<BitmapData>->Void, async:Bool=true):Null<BitmapData>{
-		var o:Null<FlxGraphic> = getGraphic(id, function(g:Null<FlxGraphic>){
-			try{//catch null pointer
-				callback(g.bitmap); 
-			}catch(e:Dynamic){}
-		}, async);
-		try{
-			return o.bitmap;
-		}catch(e:Dynamic){}
+		if (callback != null){
+			getGraphic(id, function(g:Null<FlxGraphic>){
+				try{//catch null pointer
+					callback(g.bitmap); 
+				}catch(e:Dynamic){
+					callback(null); 
+				}
+			}, async);
+		}else{
+			try{
+				return  getGraphic(id).bitmap;
+			}catch (e:Dynamic){}
+		}
 		return null;
 	}
 	
@@ -169,10 +178,12 @@ class CSAssets
 			}
 			return bd;
 		}
-//		trace("[CSAssets] from disk");
 	#if !flash
 		try{
 			var data:Bytes = File.getBytes(_base+id);
+		#if debug
+			trace("[CSAssets] loaded from disk");
+		#end
 			if (callback != null){
 				if (async){
 					delay(callback.bind(data), _delay);
@@ -185,22 +196,27 @@ class CSAssets
 //			trace("[CSAssets] no file");
 		}
 	#end	
-	if (callback != null){
-		//TODO: add load from web
-	}
+		if (callback != null){
+			//TODO: add load from web
+		}
 		return null;
 	}
 	
 	public static function getText(id:String, ?callback:Null<String>->Void, async:Bool=true):Null<String>{
-		var s=getBytes(id, function (b:Null<Bytes>){
+		if (callback!=null){
+			getBytes(id, function (b:Null<Bytes>){
+				try{
+					callback(b.toString());
+				}catch(e:Dynamic){
+					callback(null);
+				}
+			}, async);
+		}else{
 			try{
-				callback(b.toString());
-			}catch(e:Dynamic){}
-		}, async);
-		try{
-			return s.toString();
-		}catch(e:Dynamic){
-			//trace("[CSAssets] no file");
+				return getBytes(id).toString();
+			}catch(e:Dynamic){
+				//trace("[CSAssets] no file");
+			}
 		}
 		return null;
 	}

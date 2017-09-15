@@ -21,12 +21,11 @@ using flixel.util.FlxSpriteUtil;
 /**
  * 
  */
-class LoadState extends CSState
+class LoadState extends FlxState
 {
 
 	override public function create():Void 
 	{	
-		var game:CSGame = cast FlxG.game;
 		super.create();
 		
 		trace("load state");
@@ -38,15 +37,15 @@ class LoadState extends CSState
 //			(new Connection()).connect("192.168.1.245", 8000, false, function(conn:Connection){			
 //			(new Connection()).connect("localhost", 8000, false, function(conn:Connection){				
 	//			conn.connect("localhost", 8000);
-				game.connection = conn;
+				Main.connection = conn;
 				delay(function(){
-					if (game.id == null)
-						game.connection_lost();
+					if (Main.id == null)
+						Main.connection_lost();
 				}, 10000);//10 seconds for connect and sign in
 				
-				conn.auth(game.login, game.pass, function (i:Int){
-					game.id = i;
-					trace("Got id: ", game.id);
+				conn.auth(Main.login, Main.pass, function (i:Int){
+					Main.id = i;
+					trace("Got id: ", Main.id);
 					
 					FlxG.switchState(new PlayState());
 				});

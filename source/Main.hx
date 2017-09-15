@@ -4,6 +4,7 @@ import states.InitState;
 import openfl.display.Sprite;
 
 import flixel.FlxG;
+import flixel.FlxGame;
 import flixel.addons.ui.FlxUIState;
 import flixel.system.scaleModes.*;
 import clasteredServerClient.*;
@@ -14,6 +15,11 @@ class Main extends Sprite
 {
 	public static var tongue:FireTongueEX;
 
+	public static var id:Null<Int> = null;
+	public static var connection:Null<Connection> = null;
+	public static var login:Null<String> = null;
+	public static var pass:Null<String> = null;
+	
 	public function new()
 	{
 		super();
@@ -23,10 +29,10 @@ class Main extends Sprite
 			FlxUIState.static_tongue = Main.tongue;
 		}
 	#if mobile
-		addChild(new CSGame(0, 0, InitState));
+		addChild(new FlxGame(0, 0, InitState));
 	#else
 		//add load saved screen size
-		addChild(new CSGame(720, 560, InitState));
+		addChild(new FlxGame(720, 560, InitState));
 		FlxG.resizeWindow(FlxG.width, FlxG.height);
 	#end
 		FlxG.autoPause = false;
@@ -55,5 +61,11 @@ class Main extends Sprite
 		FlxG.debugger.visible = true;
 //		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	#end
+	}
+	
+	public static function connection_lost(){
+		connection.close();
+		connection = null;
+		FlxG.switchState(new InitState());
 	}
 }

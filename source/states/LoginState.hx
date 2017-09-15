@@ -38,9 +38,7 @@ class LoginState extends FlxUIState
 {
 	override public function create():Void 
 	{	
-		var game:CSGame = cast FlxG.game;
-
-//		_xml_id = "login";
+		_xml_id = "login";
 		
 		super.create();
 		
@@ -51,14 +49,14 @@ class LoginState extends FlxUIState
 		
 
 		////end
-		if (game.login == null && game.pass == null){
+		if (Main.login == null && Main.pass == null){
 			//set login pass from fields
-			game.login = "user" + Std.string(Std.random(999999999));
-			game.pass = game.login; //for testing
+			Main.login = "user" + Std.string(Std.random(999999999));
+			Main.pass = Main.login; //for testing
 			FlxG.switchState(new LoadState());
 		}else{
-			game.login = null;
-			game.pass = null;
+			Main.login = null;
+			Main.pass = null;
 			trace("Login error");
 		}
 	}

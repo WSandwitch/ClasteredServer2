@@ -29,12 +29,13 @@ import input.ScreenGamepad;
 using flixel.util.FlxSpriteUtil;
 import flixel.system.macros.FlxMacroUtil;
 
+import extension.notifications.Notifications;
 /**
  * 
  */
 
  
-class PlayState extends CSState
+class PlayState extends FlxState
 {
 	//message ids
 	public var MESSAGE_SET_ACTIONS:Int;
@@ -51,7 +52,6 @@ class PlayState extends CSState
 	static var LEVEL_MAX_Y;
 
 	private var actions:AbstractInputManager = new AbstractInputManager();
-	private var game:CSGame;
 	private var orb:Npc;
 	private var orbShadow:FlxSprite;
 	private var hud:HUD;
@@ -60,7 +60,7 @@ class PlayState extends CSState
 	private var deadzoneOverlay:FlxSprite;
 
 	///network attrs
-	public var id:Int;
+	public var id(get,set):Int;
 //	public var npcs:Map<Int,Null<Npc>> = new Map<Int,Null<Npc>>(); 
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
@@ -69,7 +69,7 @@ class PlayState extends CSState
 	
 	
 	public var l:Lock = new Lock();
-	public var connection:Null<Connection> = null;
+	public var connection(get,set):Null<Connection>;
 	public var recv_loop:Bool = true;
 	public var receiver:Null<Receiver> = null;
 	public var packets:Array<Packet> = new Array<Packet>();
@@ -105,7 +105,23 @@ class PlayState extends CSState
 	}
 	
 	public function connection_lost(){
-		CSState.connection_lost();
+		Main.connection_lost();
+	}
+	
+	public function get_id():Int{
+		return Main.id;
+	}
+	
+	public function set_id(id:Int):Int{
+		return Main.id=id;
+	}
+	
+	public function get_connection():Null<Connection>{
+		return Main.connection;
+	}
+	
+	public function set_connection(connection:Null<Connection>):Null<Connection>{
+		return Main.connection=connection;
 	}
 	
 	override public function create():Void 
@@ -121,10 +137,7 @@ class PlayState extends CSState
 		
 		super.create();
 		trace("play state");
-		game = cast FlxG.game;
 		
-		id = game.id;
-		connection = game.connection;
 		recv_loop = true;
 		receiver = new Receiver(this);
 		
@@ -414,16 +427,30 @@ class PlayState extends CSState
 	}
 	
 	
-	
+	private static inline var slot:Int = 7;
+	private static var title:String = "App works on background";
+	private static var button:String = "Tap here to open it";
+	private static var message:String = "App still use internet and cpu";
 	//for using custom actions, use with FlxG.autoPause = true;
 	override 
 	public function onFocus():Void{
 //		super.onFocus();
+#if (android || ios)
+	Notifications.cancelLocalNotifications();
+#end	
+//	trace("focus");
 	} 
 	
 	override 
 	public function onFocusLost():Void{
 //		super.onFocusLost();
+	//set normal message
+#if android
+	Notifications.scheduleLocalNotification(slot, 0, title, button, message, "", false);
+#elseif ios
+	Notifications.scheduleLocalNotification(slot, 0, title, message, button, false);
+#end
+//	trace("focus lost");
 	} 
 	
 }
