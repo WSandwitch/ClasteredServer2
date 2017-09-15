@@ -34,7 +34,11 @@ class CSAssets
 	#if debug
 		static var _base:String = "ext/";
 	#else
-		static var _base:String = SystemPath.applicationStorageDirectory+'/';//may be use SystemPath.documentsDirectory+'/'+Application.current.config.packageName+'/'
+		#if windows
+			static var _base:String = "downloaded/";// SystemPath.applicationStorageDirectory + '/';
+		#else
+			static var _base:String = SystemPath.applicationStorageDirectory+'/';//may be use SystemPath.documentsDirectory+'/'+Application.current.config.packageName+'/'
+	#end
 	#end
 #end
 	/*
@@ -57,7 +61,7 @@ class CSAssets
 					// Saving the BitmapData 
 					try{
 						try{
-							var r = (~/\/.+\//);
+							var r = (~/.+\//);
 							r.match(_base+id);
 							sys.FileSystem.createDirectory(r.matched(0));
 						}catch (e:Dynamic){

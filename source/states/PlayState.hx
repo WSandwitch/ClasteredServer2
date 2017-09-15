@@ -65,7 +65,7 @@ class PlayState extends FlxState
 	public var npc:Null<Npc> = null;
 	public var npc_id:Int = 0;
 	private var _angle:Float = 0;
-	private static inline var _d_angle:Float = 2 * 3.14 / 180; //~2 degree
+	private static var _d_angle:Float = 1 * Math.PI / 120; //~1 pdegree
 	
 	
 	public var l:Lock = new Lock();

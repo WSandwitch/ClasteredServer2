@@ -2,7 +2,7 @@
 <project>
 	<!------------------------------APPLICATION SETTINGS---------------------------->
 	
-	<app title="CSClient" package="com.WSStudio.CSClient" file="CSClient" main="Main" version="0.0.1" company="WSStudio" />
+	<app title="CSClient" package="com.WSStudio.CSClient" file="CSClient" main="Main" version="0.0.2" company="WSStudio" />
 	
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 	<!--or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"!-->
@@ -32,10 +32,11 @@
 	<assets path="assets" />
 
 	<assets path="assetsExt" rename="ext/assets" if="debug" />
+	<assets path="assetsInt" rename="assets" exclude="maps"/>
 	<assets path="data" rename="assets/data" if="debug" />
-	<assets path="maps" rename="assets/maps" include="*.tmx" if="debug" />
 	<assets path="data" rename="assets/data" embed="true" unless="debug" />
-	<assets path="maps" rename="assets/maps" include="*.tmx" embed="true" unless="debug" />
+	<assets path="assetsInt/maps" rename="assets/maps" include="*.tmx" if="debug" />
+	<assets path="assetsInt/maps" rename="assets/maps" include="*.tmx" embed="true" unless="debug" />
 	<assets path="src/share/messages.h" rename="assets/messages.h" embed="true" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
