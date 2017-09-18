@@ -212,10 +212,6 @@ class PlayState extends FlxState
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_MINUS);
 		a=actions.addAction(LOOK_RIGHT);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_PLUS);
-		
-		
-		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
-		onResize(FlxG.width, FlxG.height); 
 	}
 	
 	override 
@@ -278,6 +274,7 @@ class PlayState extends FlxState
 	override
 	public function onResize(w:Int, h:Int){
 //		trace(w);
+		super.onResize(w, h);
 		var _w:Int = Std.int(w / FlxG.scaleMode.scale.x);
 		var _h:Int = Std.int(h / FlxG.scaleMode.scale.y);
 		_map.resize(_w, _h);

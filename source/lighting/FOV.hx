@@ -41,7 +41,7 @@ class FOV extends FlxSpriteGroup{
 
 	public var follow:Null<FlxObject> = null;
 
-	public static var use_blur:Bool = #if flash true #else false #end ;
+	public static var use_blur:Bool = false;// #if flash true #else false #end ;
 	private var _tmp:FlxSprite = new FlxSprite();
 	private var _base:FlxSprite = new FlxSprite();
 	private var _bases:Array<Array<FOVSprite>> = new Array<Array<FOVSprite>>();

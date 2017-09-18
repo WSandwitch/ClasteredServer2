@@ -6,6 +6,9 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.ui.FlxUIButton;
+import flixel.addons.ui.FlxUIGroup;
+import flixel.addons.ui.FlxUIInputText;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.addons.ui.FlxUIState;
 import flixel.system.scaleModes.*;
@@ -36,22 +39,27 @@ import clasteredServerClient.MessageIds;
 
 class LoginState extends FlxUIState
 {
+	var login:String="user" + Std.string(Std.random(999999999));
+	
 	override public function create():Void 
 	{	
 		_xml_id = "login";
-		
+		reload_ui_on_resize = true;
 		super.create();
 		
 		trace("login state");
 
 		//add show cursor
-		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 		
-
+		return;
 		////end
+		
+	}
+	
+	private function connect(l:String, pass:String){
 		if (Main.login == null && Main.pass == null){
 			//set login pass from fields
-			Main.login = "user" + Std.string(Std.random(999999999));
+			Main.login = l;
 			Main.pass = Main.login; //for testing
 			FlxG.switchState(new LoadState());
 		}else{
@@ -60,25 +68,34 @@ class LoginState extends FlxUIState
 			trace("Login error");
 		}
 	}
-	
 	override
 	public function getEvent(name:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		switch (name)
 		{
 			case "finish_load":
-				trace("save");
-				//do something after loading
+//				trace("finish_load");
+				cast(_ui.getAsset("login"), FlxUIInputText).text = login;
 			case "click_button":
-				if (params != null && params.length > 0){
-					switch (Std.string(params[0])){ //get first param, must be button name, or may be get it from sender?
-						case "saves": trace("save");
+//				trace("click_button");
+				try{
+					switch (sender.name){ //object must have name
+						case "connect": connect(cast(_ui.getAsset("login"),FlxUIInputText).text, "");
 					}
+				}catch(e:Dynamic){
+					trace(e);
 				}
 			case "click_radio_group":
-				trace("save");
+//				trace("click_radio_group");
 				//actions on radiogroups
 		}
+	}
+
+	override
+	public function onResize(w:Int, h:Int){
+		//super.onResize(w, h);
+		login = cast(_ui.getAsset("login"), FlxUIInputText).text;
+		reloadUI();
 	}
 	
 	override 

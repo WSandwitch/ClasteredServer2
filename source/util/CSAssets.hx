@@ -10,6 +10,7 @@ import openfl.events.Event;
 import openfl.events.HTTPStatusEvent;
 import openfl.events.IOErrorEvent;
 import openfl.events.SecurityErrorEvent;
+import openfl.net.URLLoader;
 import openfl.utils.ByteArray;
 import haxe.Timer.delay;
 // This is what we need to retrieve the image
@@ -92,7 +93,12 @@ class CSAssets
 		});
 		//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
 		//loader.contentLoaderInfo.addEventListener( ProgressEvent.PROGRESS, onProgress );
-		loader.load(new URLRequest(_host+id));
+		try{
+			loader.load(new URLRequest(_host + id));
+		}catch (e:Dynamic){
+			trace("[CSAssets] load start error "+_host+id); 
+			callback(null);
+		}
 	}
 	
 	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool = true):Null<FlxGraphic>{
@@ -170,6 +176,55 @@ class CSAssets
 		return null;
 	}
 	
+	public static function getBytesWeb(id:String, callback:Null<Bytes>->Void){
+		var loader:URLLoader = new URLLoader();
+		var status:Int = 0;
+		loader.addEventListener( HTTPStatusEvent.HTTP_STATUS, function(event:HTTPStatusEvent){
+			status = event.status; // Hopefully this is 200
+		});
+		loader.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
+			trace("[CSAssets] load error " +_host+id);
+			callback(null);
+		});
+		loader.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
+			trace("[CSAssets] security error "+_host+id); 
+			callback(null);
+		});
+		loader.addEventListener(Event.COMPLETE, function(event:Event){
+			if ( status == 200 ) {
+				try{
+					var bytes:Bytes = Bytes.ofString(event.target.data);
+				#if !flash
+					// Saving got Bytes
+					try{
+						try{
+							var r = (~/.+\//);
+							r.match(_base+id);
+							sys.FileSystem.createDirectory(r.matched(0));
+						}catch (e:Dynamic){
+							trace("[CSAssets] "+e);
+						}
+						sys.io.File.saveBytes(_base+id, bytes);
+					}catch(e:Dynamic){
+						trace("[CSAssets] can't save "+_base+id+": "+e);
+					}
+				#end
+					callback(bytes);//may be need to convert from string to bytes
+				}catch(e:Dynamic){
+					trace("[CSAssets] "+e);
+				}
+			} else {
+				callback(null);
+			}
+		});
+		try{
+			loader.load(new URLRequest(_host+id));
+		}catch (e:Dynamic){
+			trace("[CSAssets] load start error "+_host+id); 
+			callback(null);
+		}
+	}
+	
 	public static function getBytes(id:String, ?callback:Null<Bytes>->Void, async:Bool=true):Null<Bytes>{
 		var bd:Null<Bytes> = Assets.getBytes(id);
 		if (bd != null){ //check if bd exists
@@ -202,6 +257,7 @@ class CSAssets
 	#end	
 		if (callback != null){
 			//TODO: add load from web
+			getBytesWeb(id, callback);
 		}
 		return null;
 	}

@@ -57,7 +57,6 @@ class LoadState extends FlxState
 			trace(CallStack.toString(CallStack.exceptionStack()));
 			//Add move to AuthState
 		}
-		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 	}
 	
 }

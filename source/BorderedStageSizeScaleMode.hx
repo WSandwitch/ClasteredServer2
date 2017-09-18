@@ -17,10 +17,12 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 		onMeasure(FlxG.width, FlxG.height); 
 	}
 	
-	override public function onMeasure(Width:Int, Height:Int):Void
-	{
-		FlxG.width = Width;
-		FlxG.height = Height;
+	override 
+	public function onMeasure(Width:Int, Height:Int):Void{
+		var newW = Math.ceil(Width / _scale_val);
+		var newH = Math.ceil(Height / _scale_val); // / FlxG.camera.zoom 
+		FlxG.width = newW;
+		FlxG.height = newH;
 		
 		scale.set(_scale_val, _scale_val);
 		FlxG.game.x = FlxG.game.y = 0;
@@ -30,8 +32,6 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 			var oldW = FlxG.camera.width;
 			var oldH = FlxG.camera.height;
 			
-			var newW = Math.ceil(Width / _scale_val);
-			var newH = Math.ceil(Height / _scale_val); // / FlxG.camera.zoom 
 			
 			FlxG.camera.setSize(newW, newH);
 			FlxG.camera.flashSprite.x += (newW - oldW) / 2;
