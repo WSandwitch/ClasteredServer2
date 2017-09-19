@@ -96,5 +96,6 @@ src/other/connection_tester.armv7l
 src/other/connection_tester.ppc64
 src/other/connection_tester.x86_64
 src/other/connection_tester.unknown
-data/objects.yml
+data/*.yml
+maps/*.tmx
 

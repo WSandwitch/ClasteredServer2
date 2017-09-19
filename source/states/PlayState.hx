@@ -341,6 +341,9 @@ class PlayState extends FlxState
 			connection.sendPacket(p);
 //			trace("sended");
 		}
+		
+		
+		///test 
 	#if !FLX_NO_KEYBOARD	
 		if (FlxG.keys.justPressed.U)
 			npc.sprite.y+=3;

@@ -201,8 +201,8 @@ namespace share {
 			weapon.ang_diap=o->weapon.ang_diap;//pdegree
 			weapon.ang_shift=o->weapon.ang_shift;//pdegree
 			weapon.attacks=o->weapon.attacks;
-			weapon.warmup=o->weapon.warmup ? NPC_FULL_TEMP/world->tps/o->weapon.warmup : NPC_FULL_TEMP; //warmup in seconds
-			weapon.cooldown=o->weapon.cooldown ? NPC_FULL_TEMP/world->tps/o->weapon.cooldown : NPC_FULL_TEMP;//cooldown in seconds
+			weapon.warmup=o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
+			weapon.cooldown=o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
 			weapon.latency=o->weapon.latency;
 		}catch(...){}
 		

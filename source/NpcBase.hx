@@ -63,19 +63,23 @@ class NpcBase extends FlxSpriteGroup{
 	}
 	
 	//updater functions
+	//position.x
 	function updater_1(a:Dynamic){
 		this.dest_x = Std.int(a*FlxG.scaleMode.scale.x)/FlxG.scaleMode.scale.x;//screan scale fix, position must be int, for normal map tiles positions
 	};
 	
+	//position.y
 	function updater_2(a:Dynamic){
 		this.dest_y = Std.int(a*FlxG.scaleMode.scale.y)/FlxG.scaleMode.scale.y;
 	};
 	
+	//type
 	function updater_6(a:Dynamic){
 		this.type = a;
 		this.sprite_update = true;
 	};
 	
+	//angle
 	function updater_9(a:Dynamic){
 		this.angle=Math.round(a / 120.0 * 180); 
 	};

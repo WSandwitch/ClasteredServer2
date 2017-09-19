@@ -32,11 +32,11 @@
 	<assets path="assets" />
 
 	<assets path="assetsExt" rename="ext/assets" if="debug" />
-	<assets path="assetsInt" rename="assets" exclude="maps"/>
+	<assets path="assetsInt" rename="assets" />
 	<assets path="data" rename="assets/data" if="debug" />
 	<assets path="data" rename="assets/data" embed="true" unless="debug" />
-	<assets path="assetsInt/maps" rename="assets/maps" include="*.tmx" if="debug" />
-	<assets path="assetsInt/maps" rename="assets/maps" include="*.tmx" embed="true" unless="debug" />
+	<assets path="maps" rename="assets/maps" include="*.tmx" if="debug" />
+	<assets path="maps" rename="assets/maps" include="*.tmx" embed="true" unless="debug" />
 	<assets path="src/share/messages.h" rename="assets/messages.h" embed="true" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
