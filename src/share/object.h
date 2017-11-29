@@ -22,8 +22,6 @@ namespace share{
 		int cost;
 		std::vector<std::vector<int>> deps;  //object dependencies
 		struct {
-			int dist;
-			float vel;
 			short ang_diap; //degrees
 			short ang_shift; //degrees
 			short attacks; //
@@ -33,8 +31,12 @@ namespace share{
 			float latency; //sec
 			
 			short shoot_id;
-			short move_id; //of shot
-			char attackable; //of shot
+			short move_id; //of bullet
+			char attackable; //of bullet
+			int dist; //length of way
+			short r; //radius of bullet
+			float vel; //speed of bullet
+			int bullet_type;
 		} weapon;
 		struct {
 			short health; //basic health max, of health addition

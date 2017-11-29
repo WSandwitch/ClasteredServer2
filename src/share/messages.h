@@ -1,6 +1,8 @@
 #pragma once
 
 //auth
+#define MSG_C_SUCCESS 1
+#define MSG_C_AUTH_TOKEN 2
 #define MSG_C_USER_INFO 3
 
 ///massages from client
@@ -8,6 +10,7 @@
 #define MESSAGE_SET_ACTIONS 2
 #define MESSAGE_SET_ATTRS 3
 #define MESSAGE_GET_NPC_INFO 4
+#define MESSAGE_GET_MAP_INFO 5
 
 ///master -> slave
 #define MESSAGE_PAUSE 1
@@ -25,4 +28,5 @@
 
 //master > client
 #define MESSAGE_CLIENT_UPDATE 6 //>c
+#define MESSAGE_MAP_INFO 5 //>c
 

@@ -108,7 +108,10 @@ class FOV extends FlxSpriteGroup{
 			FlxSpriteUtil.fill(_tmp, BASE_COLOR);
 			FlxSpriteUtil.fill(_shadow, FlxColor.TRANSPARENT);
 //			blend = openfl.display.BlendMode.SCREEN;
+//			trace(_vis.output);
+	
 			if (_vis.output.length > 0){
+
 				var zpoint = new Point(0, 0);
 				var points:Array<FlxPoint> = [];
 				var screen:Array<FlxPoint> = [
@@ -136,7 +139,8 @@ class FOV extends FlxSpriteGroup{
 				for (p in _vis.output){
 					points.push(p);
 				}
-				var ppoints= FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
+				var ppoints:Array<Array<FlxPoint>> = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
+
 				if (ppoints.length>0){
 					for (_points in ppoints){
 						for (p in _points){
@@ -205,7 +209,7 @@ class FOV extends FlxSpriteGroup{
 						}
 					}
 				}
-			}
+			} 
 			//another way
 //			FlxSpriteUtil.drawPolygon(_shadow, _vis.output, BASE_COLOR, {color: BASE_COLOR, thickness: 40});
 		}

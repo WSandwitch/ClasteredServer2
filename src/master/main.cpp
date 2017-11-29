@@ -385,6 +385,14 @@ int main(int argc,char* argv[]){
 #endif
 				try{
 					npc* cnpc=master::world.npcs.at(c->npc_id);
+					if (cnpc->map_id!=c->map_id){
+						packet map_packet;
+						map_packet.setType(MESSAGE_CLIENT_UPDATE);
+						map_packet.add((char)2);//index
+						map_packet.add((int)cnpc->map_id);
+						c->sock->send(&map_packet);
+						c->map_id=cnpc->map_id;
+					}
 					auto &&cells=master::world.map->cells(
 						cnpc->position.x-c->view_position[0], //l
 						cnpc->position.y-c->view_position[1], //t

@@ -41,6 +41,7 @@ namespace share {
 		_health(10),
 		type(1), //player/bot npc by default 
 		owner_id(0), 
+		map_id(0), 
 //		bot({0}), 
 		angle(0),
 		world(w),
@@ -194,19 +195,6 @@ namespace share {
 	void npc::recalculate_type(){
 		//update dinamic attrs like damage, health from chosen type and other
 		timestamp=time(0);
-		try{
-			object *o=object::all.at(weapon_id);
-//			weapon.damage=o->weapon.damage;
-			weapon.dist=o->weapon.dist;
-			weapon.ang_diap=o->weapon.ang_diap;//pdegree
-			weapon.ang_shift=o->weapon.ang_shift;//pdegree
-			weapon.attacks=o->weapon.attacks;
-			weapon.warmup=o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
-			weapon.cooldown=o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
-			weapon.latency=o->weapon.latency;
-		}catch(...){}
-		
-		health=_health;
 		///for testing
 		vel=5;
 		r=23;
@@ -222,6 +210,21 @@ namespace share {
 			weapon.cooldown=0;//NPC_FULL_TEMP/world->tps/1; //set
 			weapon.latency=0.3*world->tps; //tiks
 		}
+		
+		try{
+			object *o=object::all.at(weapon_id);
+			_health=o->base.health;
+//			weapon.damage=o->weapon.damage;
+			weapon.dist=o->weapon.dist;
+			weapon.ang_diap=o->weapon.ang_diap;//pdegree
+			weapon.ang_shift=o->weapon.ang_shift;//pdegree
+			weapon.attacks=o->weapon.attacks;
+			weapon.warmup=o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
+			weapon.cooldown=o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
+			weapon.latency=o->weapon.latency;
+		}catch(...){}
+		
+		health=_health;
 	}
 	
 	//example - shoot_type, warmup, cooldown, latency, angle_diap, attacks

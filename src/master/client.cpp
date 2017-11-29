@@ -54,6 +54,7 @@ namespace master {
 		server_id(0),
 		sock(sock),
 		npc_id(0),
+		map_id(-1), //it must be updated on first npc check
 		timestamp(0)
 	{
 		name[0]=0;

@@ -33,7 +33,8 @@ namespace share{
 	}
 	
 	map::map(char* path): offset(50){
-		id=getId(path);
+		name=std::string(strrchr(path,'/')+1,strlen(path)-(int)(strrchr(path,'.')-path)-1);
+		id=getId((char*)name.data());
 		cell.x=25;
 		cell.y=25;
 //		grid=0;

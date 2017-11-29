@@ -37,6 +37,7 @@ namespace share {
 			std::unordered_map<int, quad> safezones;
 			int map_size[2];
 			int offset;
+			std::string name;
 		
 			map(char *path="../maps/map.tmx");
 			~map();

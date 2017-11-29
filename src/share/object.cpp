@@ -230,9 +230,9 @@ namespace share{
 			e->weapon.ang_diap=to_pdegrees(e->weapon.ang_diap);
 			e->weapon.ang_shift=to_pdegrees(e->weapon.ang_shift);
 			//convert to tikc
-			e->weapon.warmup=NPC_FULL_TEMP/(w.tps*e->weapon.warmup);
-			e->weapon.cooldown=NPC_FULL_TEMP/(w.tps*e->weapon.cooldown);
-			e->weapon.latency=NPC_FULL_TEMP/(w.tps*e->weapon.latency);
+			e->weapon.warmup=e->weapon.warmup>0 ? NPC_FULL_TEMP/(w.tps*e->weapon.warmup) : 0;
+			e->weapon.cooldown=e->weapon.cooldown>0 ? NPC_FULL_TEMP/(w.tps*e->weapon.cooldown) : 0;
+			e->weapon.latency=e->weapon.latency>0 ? NPC_FULL_TEMP/(w.tps*e->weapon.latency) : 0;
 		}
 //		exit(0);
 	}

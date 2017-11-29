@@ -205,7 +205,12 @@ import flixel.math.FlxPoint;
         endpoints.append(p2);
 		return segment;
     }
-
+	
+	//clear containers for reuse it 
+	public function clear(){
+		segments.clear();
+		endpoints.clear();
+	}
 
     // Set the light location. Segment and EndPoint data can't be
     // processed until the light location is known.

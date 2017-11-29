@@ -1,5 +1,5 @@
-#ifndef CLASTERED_SERVER_SLAVE_NPC_HEADER
-#define CLASTERED_SERVER_SLAVE_NPC_HEADER
+#ifndef CLASTERED_SERVER_SHARE_NPC_HEADER
+#define CLASTERED_SERVER_SHARE_NPC_HEADER
 
 #include <map>
 #include <unordered_map>
@@ -73,6 +73,7 @@ namespace share {
 			short shoot_id; 
 			int weapon_id; //object_id
 			int owner_id; //id of player
+			int map_id; //id of map
 			float vel;
 			char angle; //angle of view in pdegrees
 			share::world *world;

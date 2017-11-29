@@ -246,6 +246,30 @@ namespace master {
 		master::world.m.unlock();
 		return 0;
 	}
+	
+	static void *message_MESSAGE_GET_MAP_INFO(client *cl, packet* p){
+		clientCheckAuth(cl);//client must have id already
+		master::world.m.lock();
+			packet po;
+			po.setType(MESSAGE_MAP_INFO);
+			if (p->chanks[0].value.i){
+				try{
+					auto m=master::world.maps.at(p->chanks[0].value.i);
+					po.add(m->id);
+					po.add(m->name);
+					cl->sock->send(&po);
+				}catch(...){}
+			} else {
+				for (auto mi: master::world.maps){
+					po.add(mi.second->id);
+					po.add(mi.second->name);
+				}
+				cl->sock->send(&po);
+			}
+			
+		master::world.m.unlock();
+		return 0;
+	}
 
 	voidMessageProcessor(25)
 
@@ -254,6 +278,7 @@ namespace master {
 		messageprocessorClientAdd(MESSAGE_SET_ACTIONS, (void*)&message_MESSAGE_SET_ACTIONS);
 		messageprocessorClientAdd(MESSAGE_SET_ATTRS, (void*)&message_MESSAGE_SET_ATTRS);
 		messageprocessorClientAdd(MESSAGE_GET_NPC_INFO, (void*)&message_MESSAGE_GET_NPC_INFO);
+		messageprocessorClientAdd(MESSAGE_GET_MAP_INFO, (void*)&message_MESSAGE_GET_MAP_INFO);
 
 		clientMessageProcessor(25);
 	}

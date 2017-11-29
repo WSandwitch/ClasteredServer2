@@ -146,7 +146,8 @@ class PlayState extends FlxState
 //		FlxNapeSpace.velocityIterations = 5;
 //		FlxNapeSpace.positionIterations = 5;
 
-		_map = new CSMap();
+		_map = new CSMap(); //must be here because of screen size, or must call resize before add
+	//	_map.load(0);
 		add(_map_group);
 		_map_group.add(_map);
 		
@@ -418,6 +419,10 @@ class PlayState extends FlxState
 								npc = _map.get_npc(npc_id);
 								FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
 								_map.fov.follow = npc;
+								i++;
+							case 2:
+								trace("map id updated");
+								_map.set_current(p.chanks[++i].i);
 								i++;
 						}
 					}
