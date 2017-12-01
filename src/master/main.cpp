@@ -221,13 +221,15 @@ int main(int argc,char* argv[]){
 	object_initializer initializer(master::world);
 	//load maps
 	grid=new master::special::grid();
-	master::world.map=new map("../maps/map.tmx");
-	grid->add_map(0, master::world.map->map_size, master::world.map->offset);
-//	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
-//		auto m=new map(s); 
-//		grid->add_map(m->id, m->map_size, m->offset)
-//		master::world.maps[m->id]=m;
-//	});
+	///for tests
+	master::world.maps[0]=new map("../maps/map.tmx");
+	grid->add_map(0, master::world.maps.at(0)->map_size, master::world.maps.at(0)->offset);
+	//for tests
+	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
+		auto m=new map(s); 
+		grid->add_map(m->id, m->map_size, m->offset);
+		master::world.maps[m->id]=m;
+	});
 
 	clientMessageProcessorInit();
 	serverMessageProcessorInit();
@@ -393,7 +395,8 @@ int main(int argc,char* argv[]){
 						c->sock->send(&map_packet);
 						c->map_id=cnpc->map_id;
 					}
-					auto &&cells=master::world.map->cells(
+					auto nmap=master::world.maps.at(cnpc->map_id);//TODO: add change map to default
+					auto &&cells=nmap->cells(
 						cnpc->position.x-c->view_position[0], //l
 						cnpc->position.y-c->view_position[1], //t
 						cnpc->position.x+c->view_area[0]-c->view_position[0], //r
@@ -406,7 +409,7 @@ int main(int argc,char* argv[]){
 //						c->npcs.clear();
 					std::unordered_set<npc*> _npcs;
 					for(auto i:cells){
-						auto cell=master::world.map->cells(i);
+						auto cell=nmap->cells(i);
 						if (cell){
 							for(auto ni: cell->npcs){
 								_npcs.insert(ni.second);

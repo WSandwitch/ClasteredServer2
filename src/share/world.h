@@ -1,5 +1,4 @@
-#ifndef CLASTERED_SERVER_SLAVE_WORLD_HEADER
-#define CLASTERED_SERVER_SLAVE_WORLD_HEADER
+#pragma once
 
 #include <map>
 #include <unordered_set>
@@ -36,8 +35,8 @@ namespace share {
 		share::mutex m;
 		share::mutex npcs_m;
 		share::socket* sock;
-		share::map* map;
-		std::unordered_map<int, share::map*> maps; //TODO: change map to this
+//		share::map* map;
+		std::unordered_map<int, share::map*> maps; 
 		std::list<npc*> new_npcs;
 		std::unordered_set<int> old_npcs;
 		std::unordered_map<int, npc*> npcs;
@@ -48,8 +47,17 @@ namespace share {
 		static int getId();
 		static void putId(int id);
 	};
+	
+	
+	//TODO: move out of here
+	template<class T>
+		int npc::do_on_map(T f){
+			try{
+				return f(world->maps.at(map_id));
+			}catch(...){
+				printf("npc %d has unknown map\n", id);
+				set_attr(map_id, 0); //set default map, it must be exists
+			}
+			return 0;
+		}
 }
-
-
-
-#endif

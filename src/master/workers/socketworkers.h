@@ -1,6 +1,8 @@
 #ifndef SOCKETWORKERS_HEADER
 #define SOCKETWORKERS_HEADER
 
+#include <map>
+
 #include "../client.h"
 #include "workerbase.h"
 #include "../../share/network/socket.h"

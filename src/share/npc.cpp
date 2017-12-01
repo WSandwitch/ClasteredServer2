@@ -66,10 +66,13 @@ namespace share {
 	
 	void npc::remove(){
 		if (world){
-			for(auto i: cells){
-				auto cell=world->map->cells(i);
-				withLock(cell->m, cell->npcs.erase(id));
-			}
+			do_on_map([&](map* m)->int{
+				for(auto i: cells){
+					auto cell=m->cells(i);
+					withLock(cell->m, cell->npcs.erase(id));
+				}
+				return 0;
+			});
 			if (world->id==0){//on master
 				world->npcs_m.lock();
 					world->old_npcs.insert(id);
@@ -171,6 +174,7 @@ namespace share {
 		packAttr(weapon.next_shot,0,0,1,0,1); //24 //??
 		packAttr(vel,1,0,1,0,0); //25s 
 		packAttr(r,1,0,1,0,0); //26s 
+		packAttr(map_id,0,0,1,0,1); //27s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -182,7 +186,10 @@ namespace share {
 		//else nearest safe zone
 		
 		if (world){
-			position=world->map->nearest_safezone(position).rand_point_in();
+			do_on_map([&](map* m)->int{
+				position=m->nearest_safezone(position).rand_point_in();
+				return 0;
+			});
 //			printf("position %g, %g\n", position.x, position.y);
 		}else{
 			printf("npc %d without world\n", id);
@@ -296,37 +303,39 @@ namespace share {
 	}
 	
 	bool npc::update_cells(){//TODO:improve performance
-		int _cell_id=world->map->to_grid(position.x, position.y);
-		if (cell_id!=_cell_id){//if npc move to another cell
-			std::unordered_map<int, short> e;
-			std::list<int> &&v=world->map->near_cells(_cell_id, r);
-			//set old cells to 2
-			for(auto i: cells){
-				e[i]=2;
-			}
-			//inc new cells
-			for(auto i: v){
-				e[i]++;
-			}
-			for(auto i: e){
-				auto $=world->map->cells(i.first);
-				switch(i.second){
-					case 1: //new
-						withLock($->m, $->npcs[id]=this);
-						break;
-					case 2: //remove
-						withLock($->m, $->npcs.erase(id));
-						break;
-					case 3: //already has
-						break;
+		return do_on_map([&](map* m)->int{
+			int _cell_id=m->to_grid(position.x, position.y);
+			if (cell_id!=_cell_id){//if npc move to another cell
+				std::unordered_map<int, short> e;
+				std::list<int> &&v=m->near_cells(_cell_id, r);
+				//set old cells to 2
+				for(auto i: cells){
+					e[i]=2;
 				}
+				//inc new cells
+				for(auto i: v){
+					e[i]++;
+				}
+				for(auto i: e){
+					auto $=m->cells(i.first);
+					switch(i.second){
+						case 1: //new
+							withLock($->m, $->npcs[id]=this);
+							break;
+						case 2: //remove
+							withLock($->m, $->npcs.erase(id));
+							break;
+						case 3: //already has
+							break;
+					}
+				}
+				//c->npcs.erase(id);
+				cell_id=_cell_id;
+				cells=v;
+				return 1;
 			}
-			//c->npcs.erase(id);
-			cell_id=_cell_id;
-			cells=v;
-			return 1;
-		}
-		return 0;
+			return 0;
+		});
 	}
 	
 	void npc::set_dir(){//TODO:remove
@@ -459,7 +468,6 @@ namespace share {
 		_pack.m.unlock();
 		return &p;
 	}
-
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
 		npc* n=new npc(world, id, type);
@@ -479,28 +487,30 @@ namespace share {
 	
 	//check can npc move to point
 	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
-		point p(x,y);
-		segment ps(position,p);
-		ps.length(r*3);
-		std::list<int> &&ids=world->map->near_cells(x, y, r); //!check this!
-		std::unordered_set<segment*> done;
-		//printf("segments %d \n", world->map->segments.size());
-		for(auto c: ids){//TODO: change to check by map grid
-			share::cell *cell=world->map->cells(c);
-			for(int i=0,end=cell->segments.size();i<end;i++){
-				segment *s=cell->segments[i];
-				if (done.count(s)==0){ //uniq check
-					if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //check for directed segments
-						if(s->distanse(p)<=r){
-							//printf("dist \n");
-							return 0;
+		return do_on_map([&](map* m)->int{
+			point p(x,y);
+			segment ps(position,p);
+			ps.length(r*3);
+			std::list<int> &&ids=m->near_cells(x, y, r); //!check this!
+			std::unordered_set<segment*> done;
+			//printf("segments %d \n", world->map->segments.size());
+			for(auto c: ids){//TODO: change to check by map grid
+				share::cell *cell=m->cells(c);
+				for(int i=0,end=cell->segments.size();i<end;i++){
+					segment *s=cell->segments[i];
+					if (done.count(s)==0){ //uniq check
+						if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //check for directed segments
+							if(s->distanse(p)<=r){
+								//printf("dist \n");
+								return 0;
+							}
 						}
+						done.insert(s);
 					}
-					done.insert(s);
 				}
 			}
-		}
-		return 1;
+			return 1;
+		});
 	}
 
 }

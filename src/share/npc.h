@@ -1,7 +1,5 @@
-#ifndef CLASTERED_SERVER_SHARE_NPC_HEADER
-#define CLASTERED_SERVER_SHARE_NPC_HEADER
+#pragma once
 
-#include <map>
 #include <unordered_map>
 #include <set>
 #include <list>
@@ -35,6 +33,7 @@ namespace share {
 	typedef void (npc:: *shoot_func)(typeof(point::x) x, typeof(point::y) y);
 	typedef void (npc:: *move_func)(typeof(point::x) x, typeof(point::y) y);
 	
+//	typedef std::function<int(map*)> map_func;
 //	#define attr3b_key(b1, b2, b3) ((b1?1:0)|(b2?2:0)|(b3?4:0))
 #define attr3b_key(b1, b2, b3) ((b1)|(b2<<1)|(b3<<2))
 	
@@ -148,13 +147,15 @@ namespace share {
 				bool set_attr(void*, void*);//set attr on addr by type
 			bool set_attr(short type, void *where, void *what);//set attr on addr by type
 			template<class T1, class T2>
-			T1 set_attr(T1 &a, T2 v){
-				T1 $=a;
-				a=v;
-				attrs[attr(&a)]=1;
-				return $;
-			};
-
+				T1 set_attr(T1 &a, T2 v){
+					T1 $=a;
+					a=v;
+					attrs[attr(&a)]=1;
+					return $;
+				};
+			template <class T>
+				int do_on_map(T f); //defined in world.h
+	
 			static std::unordered_map<short, move_func> moves;
 			static std::unordered_map<short, shoot_func> shoots;
 			static set_attr_func set_attr_funcs[6];
@@ -175,6 +176,3 @@ namespace share {
 	
 }
 
-
-
-#endif

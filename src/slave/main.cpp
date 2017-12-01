@@ -17,6 +17,7 @@ extern "C"{
 #include "../share/network/listener.h"
 #include "../share/system/sync.h"
 #include "../share/network/bytes_order.h"
+#include "../share/system/folder.h"
 #include "world.h"
 #include "../share/npc.h"
 
@@ -83,11 +84,11 @@ int slave_main(int argc, char* argv[]){
 	//add log init
 #endif
 	
-	world.map=new map("../maps/map.tmx");
-//	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
-//		auto m=new map(s); 
-//		world.maps[m->id]=m;
-//	});
+	world.maps[0]=new map("../maps/map.tmx");
+	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
+		auto m=new map(s); 
+		world.maps[m->id]=m;
+	});
 
 	
 	//init map

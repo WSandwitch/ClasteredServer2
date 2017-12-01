@@ -1,5 +1,4 @@
-#ifndef CLASTERED_SERVER_SLAVE_MAP_HEADER
-#define CLASTERED_SERVER_SLAVE_MAP_HEADER
+#pragma once
 
 #include <unordered_map>
 #include <list>
@@ -66,7 +65,7 @@ namespace share {
 		private:
 			void clean_segments();
 	};
+	
 }
 
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef CLASTERED_SERVER_SHARE_NPC_MOVES_HEADER
-#define CLASTERED_SERVER_SHARE_NPC_MOVES_HEADER
+#pragma once
 
 #include "../npc.h"
 
@@ -17,4 +16,3 @@ namespace share{
 	};
 }	
 
-#endif
