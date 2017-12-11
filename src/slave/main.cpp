@@ -20,6 +20,7 @@ extern "C"{
 #include "../share/system/folder.h"
 #include "world.h"
 #include "../share/npc.h"
+#include "../share/object.h"
 
 using namespace slave;
 using namespace share;
@@ -83,7 +84,10 @@ int slave_main(int argc, char* argv[]){
 #ifndef DEBUG
 	//add log init
 #endif
-	
+
+	object::all[0]=new object();
+	object::all[1]=new object();//TODO: remove
+
 	world.maps[0]=new map("../maps/map.tmx");
 	folder::forEachFile((char*)"../maps/*.tmx", [](char *s){ 
 		auto m=new map(s); 

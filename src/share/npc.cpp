@@ -8,11 +8,13 @@ extern "C"{
 #include <string.h>
 }
 #include "npc.h"
+#include "object.h"
 #include "system/time.h"
 #include "npc/moves.h"
 #include "world.h"
 #include "messages.h"
 #include "../share/object.h"
+#include "../share/system/log.h"
 
 using namespace share;
 
@@ -40,7 +42,9 @@ namespace share {
 		health(10),
 		_health(10),
 		type(1), //player/bot npc by default 
-		owner_id(0), 
+		weapon_id(1), //TODO:set 
+		bullet_id(2), //TODO:set 
+		owner_id(0),
 		map_id(0), 
 //		bot({0}), 
 		angle(0),
@@ -57,10 +61,10 @@ namespace share {
 		
 		init_attrs();
 		init_position();
-		recalculate_type();
-		
+		recalculate_type();//TODO: move outside
+		restore_attrs();//TODO: move outside
 		//	testing	
-		move_id=t;
+		move_id=0;
 		shoot_id=1;
 	}
 	
@@ -115,6 +119,7 @@ namespace share {
 		}
 		n->init_position();
 		n->recalculate_type();
+		n->restore_attrs();
 		n->damagers.clear();
 		n->bot.dist=0;
 		//TODO:check for other attributes need to be cleared
@@ -175,6 +180,8 @@ namespace share {
 		packAttr(vel,1,0,1,0,0); //25s 
 		packAttr(r,1,0,1,0,0); //26s 
 		packAttr(map_id,0,0,1,0,1); //27s 
+		packAttr(weapon_id,1,1,0,0,0); //28s 
+		packAttr(bullet_id,1,1,0,0,0); //29s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -203,36 +210,105 @@ namespace share {
 		//update dinamic attrs like damage, health from chosen type and other
 		timestamp=time(0);
 		///for testing
-		vel=5;
-		r=23;
-		weapon.r=3;
-		weapon.vel=35;
-		weapon.damage=1;
-		weapon.dist=300;
-		weapon.ang_diap=2;//60;//pdegree
-		weapon.ang_shift=0;//10;//pdegree
-		weapon.attacks=1;//2;//bullets for 1 shot
+//		vel=5;
+//		r=23;
+//		weapon.r=3;
+//		weapon.vel=35;
+//		weapon.damage=1;
+//		weapon.dist=1300;
+//		weapon.ang_diap=2;//60;//degree
+//		weapon.ang_shift=0;//10;//degree
+//		weapon.attacks=1;//2;//bullets for 1 shot
 		if (world){
-			weapon.warmup=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-			weapon.cooldown=0;//NPC_FULL_TEMP/world->tps/1; //set
-			weapon.latency=0.3*world->tps; //tiks
+//			weapon.warmup=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+//			weapon.cooldown=0;//NPC_FULL_TEMP/world->tps/1; //set
+//			weapon.latency=0.3*world->tps; //tiks
+/*
+- id: 3
+  type: 2
+  sprite: assets/images/npc/bullet64.png
+  weapon.dist: 1600
+  weapon.vel: 40
+  weapon.r: 3
+  weapon.ang_diap: 2
+  weapon.ang_shift: 0
+  weapon.attacks: 1
+  weapon.warmup: 0.001
+  weapon.cooldown: 0.001
+  weapon.latency: 0.7
+  weapon.shoot_id: 2
+  weapon.move_id: 1
+  weapon.attackable: 0
+*/		}
+		
+		_health=0;
+//		weapon.damage=o->weapon.damage;
+		vel=0;
+		r=0;
+		weapon.dist=0;
+		weapon.ang_diap=0;//pdegree
+		weapon.ang_shift=0;//pdegree
+		weapon.attacks=0;
+		weapon.warmup=0; // o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
+		weapon.cooldown=0; //o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
+		weapon.latency=0;//o->weapon.latency;
+		
+		try{ apply(object::all.at(weapon_id)); }catch(...){
+			printf("couldn't find weapon with id %d\n", weapon_id);
+			weapon_id=0;
+			//TODO: add clear weapon_id
 		}
+		//apply other objects
 		
-		try{
-			object *o=object::all.at(weapon_id);
-			_health=o->base.health;
-//			weapon.damage=o->weapon.damage;
-			weapon.dist=o->weapon.dist;
-			weapon.ang_diap=o->weapon.ang_diap;//pdegree
-			weapon.ang_shift=o->weapon.ang_shift;//pdegree
-			weapon.attacks=o->weapon.attacks;
-			weapon.warmup=o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
-			weapon.cooldown=o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
-			weapon.latency=o->weapon.latency;
-		}catch(...){}
-		
+		weapon.ang_diap=PPI/360*(weapon.ang_diap);// to pdegree
+		weapon.ang_shift=PPI/360*(weapon.ang_shift);//pdegree
+		weapon.warmup=NPC_FULL_TEMP/(world->tps*weapon.warmup);
+		weapon.cooldown=NPC_FULL_TEMP/(world->tps*weapon.cooldown);
+		weapon.latency=world->tps*weapon.latency;
+	}
+	
+	void npc::restore_attrs(){
 		health=_health;
 	}
+
+	#define update_attrs(a, b)\
+		case a:{\
+			switch(mod.type){\
+				case OMODTYPE::MUL:{\
+					set_attr(b, b*(typeof(b))mod.value);\
+					break;\
+				}\
+				case OMODTYPE::ADD:{\
+					set_attr(b, b+(typeof(b))mod.value);\
+					break;\
+				}\
+				case OMODTYPE::MAX:{\
+					set_attr(b, (b>mod.value)?b:(typeof(b))mod.value);\
+					break;\
+				}\
+			}\
+			/*printf("npc %d %s set %g now %g\n",id,#b,mod.value,(float)b);*/\
+			break;\
+		}
+	void npc::apply(object *o){
+		for (auto &mod:o->mods){
+			switch (mod.attr){
+				update_attrs(OMODATTR::HEALTH, _health)
+//				update_attrs(OMODATTR::DAMAGE, weapon.damage)
+				update_attrs(OMODATTR::R, r)
+				update_attrs(OMODATTR::VEL, vel)
+				update_attrs(OMODATTR::DIST, weapon.dist)
+				update_attrs(OMODATTR::SHOOT_ANG_DIAP, weapon.ang_diap)
+				update_attrs(OMODATTR::SHOOT_ANG_SHIFT, weapon.ang_shift)
+				update_attrs(OMODATTR::SHOOT_ATTACKS, weapon.attacks)
+				update_attrs(OMODATTR::SHOOT_WARMUP, weapon.warmup)
+				update_attrs(OMODATTR::SHOOT_COOLDOWN, weapon.cooldown)
+				update_attrs(OMODATTR::SHOOT_LATENCY, weapon.latency)
+			}
+		}
+	}
+	
+	#undef update_attrs
 	
 	//example - shoot_type, warmup, cooldown, latency, angle_diap, attacks
 	//chainsaw - 0, 0.5, 0.3, 0.21, 0, 10
@@ -242,9 +318,9 @@ namespace share {
 	//minigun - 1, 2, 2, 0.2, 4, 1
 	void npc::attack(){
 		//TODO: check	
-		short warmup=weapon.warmup;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-		short cooldown=weapon.cooldown;//NPC_FULL_TEMP/world->tps/1; //set
-		short latency=weapon.latency;//0.3*world->tps; //tiks
+		register int warmup=weapon.warmup;//NPC_FULL_TEMP/(world->tps*weapon.warmup); //NPC_FULL_TEMP/world->tps/n -> n seconds to max
+		register int cooldown=weapon.cooldown;//NPC_FULL_TEMP/(world->tps*weapon.cooldown);//NPC_FULL_TEMP/world->tps/1; //set
+		register int latency=weapon.latency;//tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
 //			printf("%d warmup %hd/%hd\n", id, weapon.temp,NPC_FULL_TEMP);
@@ -262,7 +338,7 @@ namespace share {
 //				printf("%d  shoot\n", id);
 				shoot();
 				state=STATE_SHOOT;
-				weapon.next_shot=latency;
+				weapon.next_shot=latency>60000 ? 60000 : latency; //max latency 60000 tiks
 			}else{
 				weapon.next_shot--;
 			}

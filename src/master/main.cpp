@@ -191,7 +191,12 @@ int main(int argc,char* argv[]){
 	readConfig();
 	log_config::config=config.log;//log configured
 	master::world.tps=config.tps;
-	
+
+	object_initializer initializer;
+	if (object::all.size()==0){
+		printf("objects init error\n");
+		return 1;
+	}	
 #ifdef _GLIBCXX_PARALLEL
 	omp_set_dynamic(0);
 	omp_set_num_threads((int)(omp_get_max_threads()*2.5f));
@@ -218,7 +223,6 @@ int main(int argc,char* argv[]){
 	}
 
 	storageInit(&config.storage);
-	object_initializer initializer(master::world);
 	//load maps
 	grid=new master::special::grid();
 	///for tests

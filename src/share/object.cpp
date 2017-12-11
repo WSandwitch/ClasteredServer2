@@ -3,7 +3,6 @@
 
 #include "yaml-cpp/yaml.h"
 #include "object.h"
-#include "world.h"
 
 namespace YAML{
 	
@@ -25,6 +24,28 @@ namespace YAML{
 			return v;
 		}
 	
+	template <>
+		share::obj_mod Node::as() const{
+			share::obj_mod $={0};
+			YAML::Node node;
+			if (IsMap()){
+				node=this->operator[]("value");
+				if (node.IsScalar())
+					$.value=node.as<typeof($.value)>();
+				node=this->operator[]("type");
+				if (node.IsScalar())
+					$.type=node.as<typeof($.type)>();
+				node=this->operator[]("attr");
+				if (node.IsScalar())
+					$.attr=node.as<typeof($.attr)>();
+//				printf("got %g %d %d\n", $.value, $.type, $.attr);
+			}
+			return $;
+		}
+	template <>
+		std::vector<share::obj_mod> Node::as() const{
+			return vec_of<share::obj_mod>(*this);
+		}
 	template <>
 		std::vector<char> Node::as() const{
 			return vec_of<char>(*this);
@@ -63,6 +84,7 @@ namespace YAML{
 
 namespace share{
 
+	
 	std::unordered_map<int, object*> object::all;	
 	typeof(object::attr_map) object::attr_map;
 	typeof(object::attr_type) object::attr_type;
@@ -81,6 +103,7 @@ namespace share{
 	int o_type(std::vector<std::vector<short>> &c){return 11;}
 	int o_type(std::vector<std::vector<int>> &c){return 12;}
 	int o_type(std::vector<std::vector<float>> &c){return 13;}
+	int o_type(std::vector<obj_mod> &c){return 14;}
 	
 	object::object(){
 	}
@@ -96,26 +119,12 @@ namespace share{
 		add_attr(kind); 
 		add_attr(type);
 		add_attr(cost); 
-		add_attr(deps); 
-		add_attr(weapon.vel); 
-		add_attr(weapon.dist); 
-		add_attr(weapon.ang_diap); 
-		add_attr(weapon.ang_shift); 
-		add_attr(weapon.attacks); 
-		add_attr(weapon.warmup); 
-		add_attr(weapon.cooldown); 
-		add_attr(weapon.latency); 
-		add_attr(weapon.shoot_id); 
-		add_attr(weapon.move_id); 
-		add_attr(weapon.attackable); 
+		add_attr(deps.weapon); 
+		add_attr(mods); 
 	}
 #undef add_attr
 	
-	void object::apply_to(npc *n){
-		
-	}
-
-	object_initializer::object_initializer(world &w){
+	object_initializer::object_initializer(){
 		object $;
 		$.init_attrs();
 		YAML::Node config = YAML::LoadFile("../data/objects.yml");
@@ -211,6 +220,13 @@ namespace share{
 								}else
 									printf("object %d attr %s type error\n", o->id, am.second.data());
 								break;
+							case 14: 
+								if (attr.IsSequence()){
+									o->attr_on<std::vector<obj_mod>>(am.first)=attr.as<std::vector<obj_mod>>();
+//									printf("%s: %d\n", am.second.data(), o->attr_on<int>(am.first));
+								}else
+									printf("object %d attr %s type error\n", o->id, am.second.data());
+								break;
 						}
 					}
 				}
@@ -222,8 +238,11 @@ namespace share{
 				else
 					delete o;
 			}
+			try{all.at(0);}catch(...){all[0]=new object();} //set empty object
+		}else{
+			printf("couldn't read objects\n");
 		}
-		//convert attrs
+/*		//convert attrs
 		for(auto ei: all){
 			auto e=ei.second;
 			//convert to pdegrees
@@ -234,7 +253,7 @@ namespace share{
 			e->weapon.cooldown=e->weapon.cooldown>0 ? NPC_FULL_TEMP/(w.tps*e->weapon.cooldown) : 0;
 			e->weapon.latency=e->weapon.latency>0 ? NPC_FULL_TEMP/(w.tps*e->weapon.latency) : 0;
 		}
-//		exit(0);
+*///		exit(0);
 	}
 	
 	object_initializer::~object_initializer(){

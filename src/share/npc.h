@@ -25,6 +25,7 @@ extern "C"{
 
 namespace share {
 	class npc;
+	class object;
 	class npc_moves;
 	class npc_shoots;
 	class world;
@@ -71,6 +72,7 @@ namespace share {
 			short move_id;
 			short shoot_id; 
 			int weapon_id; //object_id
+			int bullet_id; //
 			int owner_id; //id of player
 			int map_id; //id of map
 			float vel;
@@ -85,22 +87,22 @@ namespace share {
 				int owner_id;//owner for bullet 
 			} bot;
 			struct{
-				short r;
-				short temp; 
+//				short r;
+				int temp; 
 				short next_shot; //tiks
 				
 				char attackable; //can be attacked
-				short damage; //calculated damage
+				short damage; //calculated damage, move to bullet
 				
 				short ang_diap;//pdegree
 				short ang_shift;//pdegree
 				short attacks;
-				int dist;
-				float vel;
+				int dist; //calculated distance, move to bullet
+//				float vel;
 				
-				short warmup; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-				short cooldown; //set
-				short latency; //tiks
+				float warmup; //temp per tik
+				float cooldown; //temp per tik
+				float latency; //tiks
 			} weapon;
 				
 			map3b<share::packet> packs;
@@ -118,7 +120,7 @@ namespace share {
 			std::unordered_map<int, int> damagers; 
 			
 			npc(){};
-			npc(share::world *w, int id, short type=0);
+			npc(share::world *w, int id, short type=0); //add default attrs (weapon_id and other)
 			void remove();
 //			void operator delete(void *n);
 			npc* clone();
@@ -126,6 +128,8 @@ namespace share {
 			void init_attrs();
 			void init_position();
 			void recalculate_type();
+			void restore_attrs();
+			void apply(object* o);
 			void attack();
 			void attack(bool s);
 			void move();

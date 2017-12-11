@@ -8,6 +8,7 @@
 #include "../client.h"
 #include "../world.h"
 #include "../messageprocessor.h"
+#include "../../object.h"
 #include "../../share/network/packet.h"
 #include "../../share/system/log.h"
 #include "../../share/messages.h"
@@ -117,20 +118,20 @@ namespace master {
 					nn->direction.by_angle(nn->angle, 1); //right dir and full speed
 //					printf("%g %g \n", nn->direction.x, nn->direction.y);
 					nn->position=n->position+point::from_angle(nn->angle, n->r*2);
-					nn->r=n->weapon.r; //set radius of bullet
-					nn->vel=n->weapon.vel;
 					nn->state=STATE_ATTACK;//attacking on every tick
 					nn->bot.owner_id=n->id;
+					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
+					
 					nn->weapon.damage=n->weapon.damage;
 					nn->weapon.dist=n->weapon.dist; //set max move dist
+					nn->weapon.attacks=n->weapon.attacks; //set max targets
 					nn->weapon.next_shot=0;//shoot every tick
 					nn->weapon.latency=0;//shoot every tick
-					nn->weapon.attacks=n->weapon.attacks; //set max targets
 					nn->attackable=n->weapon.attackable;
+					
 					nn->type=2;//TODO: get base type from weapon object
 					nn->move_id=1;//TODO: change to choose bullet move id 
 					nn->shoot_id=2;//TODO: change to choose bullet shoot id 
-				
 				n->m.unlock();
 				master::world.npcs_m.lock();
 					master::world.new_npcs.push_back(nn);
