@@ -61,8 +61,8 @@ namespace share {
 		
 		init_attrs();
 		init_position();
-		recalculate_type();//TODO: move outside
-		restore_attrs();//TODO: move outside
+//		recalculate_type();//TODO: move outside
+//		restore_attrs();//TODO: move outside
 		//	testing	
 		move_id=0;
 		shoot_id=1;
@@ -219,39 +219,11 @@ namespace share {
 //		weapon.ang_diap=2;//60;//degree
 //		weapon.ang_shift=0;//10;//degree
 //		weapon.attacks=1;//2;//bullets for 1 shot
-		if (world){
-//			weapon.warmup=NPC_FULL_TEMP;//NPC_FULL_TEMP/world->tps/1; //NPC_FULL_TEMP/world->tps/n -> n seconds to max
-//			weapon.cooldown=0;//NPC_FULL_TEMP/world->tps/1; //set
-//			weapon.latency=0.3*world->tps; //tiks
-/*
-- id: 3
-  type: 2
-  sprite: assets/images/npc/bullet64.png
-  weapon.dist: 1600
-  weapon.vel: 40
-  weapon.r: 3
-  weapon.ang_diap: 2
-  weapon.ang_shift: 0
-  weapon.attacks: 1
-  weapon.warmup: 0.001
-  weapon.cooldown: 0.001
-  weapon.latency: 0.7
-  weapon.shoot_id: 2
-  weapon.move_id: 1
-  weapon.attackable: 0
-*/		}
-		
 		_health=0;
-//		weapon.damage=o->weapon.damage;
+
 		vel=0;
 		r=0;
-		weapon.dist=0;
-		weapon.ang_diap=0;//pdegree
-		weapon.ang_shift=0;//pdegree
-		weapon.attacks=0;
-		weapon.warmup=0; // o->weapon.warmup ?: NPC_FULL_TEMP; //if 0 must be max
-		weapon.cooldown=0; //o->weapon.cooldown ?: NPC_FULL_TEMP;//if 0 must be max
-		weapon.latency=0;//o->weapon.latency;
+		memset(&weapon,0,sizeof(weapon));
 		
 		try{ apply(object::all.at(weapon_id)); }catch(...){
 			printf("couldn't find weapon with id %d\n", weapon_id);
@@ -262,9 +234,11 @@ namespace share {
 		
 		weapon.ang_diap=PPI/360*(weapon.ang_diap);// to pdegree
 		weapon.ang_shift=PPI/360*(weapon.ang_shift);//pdegree
-		weapon.warmup=NPC_FULL_TEMP/(world->tps*weapon.warmup);
-		weapon.cooldown=NPC_FULL_TEMP/(world->tps*weapon.cooldown);
-		weapon.latency=world->tps*weapon.latency;
+		if (world){
+			weapon.warmup=weapon.warmup>0 ? NPC_FULL_TEMP/(world->tps*weapon.warmup) : NPC_FULL_TEMP;
+			weapon.cooldown=weapon.cooldown>0 ? NPC_FULL_TEMP/(world->tps*weapon.cooldown) : NPC_FULL_TEMP;
+			weapon.latency=world->tps*weapon.latency;
+		}
 	}
 	
 	void npc::restore_attrs(){
@@ -294,10 +268,10 @@ namespace share {
 		for (auto &mod:o->mods){
 			switch (mod.attr){
 				update_attrs(OMODATTR::HEALTH, _health)
-//				update_attrs(OMODATTR::DAMAGE, weapon.damage)
 				update_attrs(OMODATTR::R, r)
 				update_attrs(OMODATTR::VEL, vel)
 				update_attrs(OMODATTR::DIST, weapon.dist)
+				update_attrs(OMODATTR::DAMAGE, weapon.damage)
 				update_attrs(OMODATTR::SHOOT_ANG_DIAP, weapon.ang_diap)
 				update_attrs(OMODATTR::SHOOT_ANG_SHIFT, weapon.ang_shift)
 				update_attrs(OMODATTR::SHOOT_ATTACKS, weapon.attacks)
@@ -361,13 +335,13 @@ namespace share {
 
 	//velocity depends on angle
 	float npc::vel_angle(float max){
-		short $=abs((short)direction.to_angle()-(short)angle);
+		register short $=abs((short)direction.to_angle()-(short)angle);
 		return 1-(1-max)*($>PPI?PPI*2-$:$)/PPI;//decrease vel by max if we go back
 	}
 	
 	void npc::move(){
 		try{
-			float v=vel*vel_angle(0.43f);
+			register float v=vel*vel_angle(0.43f);
 			(this->*(moves.at(move_id)))(direction.x*v, direction.y*v);//TODO:add angle correction
 		}catch(...){}
 	}
@@ -428,13 +402,15 @@ namespace share {
 		direction.normalize(to_1);
 	}
 	
-//hurt for d health
+	//hurt for d health
+	///master
 	bool npc::hurt(short d){
 		set_attr(health, health-d);
 		return health<=0;
 	}
 	
-//hurt by n, tell it to master
+	//hurt by n, tell it to master
+	///slave
 	void npc::hurt(npc* n){
 		packet p;
 		p.setType(MESSAGE_NPC_HURT);
@@ -443,7 +419,8 @@ namespace share {
 		world->sock->send(&p);
 	}
 	
-//tell master want to make shot
+	//tell master want to make shot
+	///slave
 	void npc::make_shot(char a){
 		packet p;
 		p.setType(MESSAGE_NPC_MAKE_SHOT);
@@ -452,7 +429,8 @@ namespace share {
 		world->sock->send(&p);
 	}
 		
-//tell master want to die
+	//tell master want to die
+	///slave
 	bool npc::suicide(){
 		packet p;
 		p.setType(MESSAGE_NPC_SUICIDE);
@@ -461,7 +439,7 @@ namespace share {
 		return 1;
 	}
 	
-//update attrs by income packet
+	//update attrs by income packet
 	void npc::update(packet * p, int update_attrs){
 		for(unsigned i=1;i<p->chanks.size();i++){
 			int index=(int)p->chanks[i++].value.c;
@@ -547,6 +525,9 @@ namespace share {
 	
 	npc* npc::addBot(share::world *world, int id, float x, float y, short type){
 		npc* n=new npc(world, id, type);
+		//set ids
+		n->recalculate_type();
+		n->restore_attrs();
 		n->position.x=x;
 		n->position.y=y;
 		n->direction.y=0.1;

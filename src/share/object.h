@@ -29,6 +29,12 @@ namespace share{
 		};
 	};
 	
+	struct OSPECATTR{
+		enum OBJECT_MOD_ATTR:int{
+			ATTACKABLE=1
+		};
+	};
+	
 	struct OMODTYPE{
 		enum OBJECT_MOD_ATTR:int{ //used in macro in npc apply
 			ADD=1, //increase by value
@@ -54,28 +60,7 @@ namespace share{
 			std::vector<int> weapon; //id of weapon in hands
 		} deps;  //object dependencies
 		std::vector<obj_mod> mods;
-		std::vector<obj_spec> spec;
-/*		struct {
-			short ang_diap; //degrees
-			short ang_shift; //degrees
-			short attacks; //
-
-			float warmup; //sec
-			float cooldown; //sec
-			float latency; //sec
-			
-			short shoot_id;
-			short move_id; //of bullet
-			char attackable; //of bullet
-			int dist; //length of way
-			short r; //radius of bullet
-			float vel; //speed of bullet
-			int bullet_type;
-		} weapon;
-*/		
-//		struct {
-//			short health; //basic health max, of health addition
-//		} base; //common for base, addition for speciales
+		std::vector<obj_spec> specs;
 		///----------
 		object();
 		void init_attrs();

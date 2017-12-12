@@ -129,7 +129,6 @@ namespace share {
 			void init_position();
 			void recalculate_type();
 			void restore_attrs();
-			void apply(object* o);
 			void attack();
 			void attack(bool s);
 			void move();
@@ -167,6 +166,8 @@ namespace share {
 			static npc* addBot(share::world *world, int id, float x, float y, short type=0);
 			
 			friend std::ostream& operator<<(std::ostream &stream, const npc &n);
+		private:
+			void apply(object* o);
 		protected:
 			timestamp_t timestamp;
 			map3b<pack_p> _packs;

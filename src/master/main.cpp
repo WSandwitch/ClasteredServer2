@@ -277,6 +277,8 @@ int main(int argc,char* argv[]){
 	timestamps.start=share::time(0);
 	
 	npc *n=new npc(&master::world, master::world.getId());
+	n->recalculate_type();
+	n->restore_attrs();
 	n->health=5;
 	n->_health=5;
 	n->bot.used=1;

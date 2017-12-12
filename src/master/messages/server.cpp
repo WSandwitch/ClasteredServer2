@@ -120,7 +120,10 @@ namespace master {
 					nn->position=n->position+point::from_angle(nn->angle, n->r*2);
 					nn->state=STATE_ATTACK;//attacking on every tick
 					nn->bot.owner_id=n->id;
-					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
+					nn->weapon_id=n->bullet_id;
+					nn->recalculate_type();
+					nn->restore_attrs();
+//					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
 					
 					nn->weapon.damage=n->weapon.damage;
 					nn->weapon.dist=n->weapon.dist; //set max move dist

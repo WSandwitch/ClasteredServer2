@@ -26,8 +26,8 @@ import openfl.utils.SystemPath;
 
 class CSAssets
 {
-	static inline var _delay:Int = 1; //used for async call
-	static var _host:String = "http://home.wsstudio.tk/";
+	static inline var _delay:Int = 2; //used for async call
+	static var _host:String = "http://disk.wsstudio.tk/";
 	
 #if mobile
 	static var _base:String = SystemPath.applicationStorageDirectory+'/'; 

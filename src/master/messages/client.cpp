@@ -135,6 +135,10 @@ namespace master {
 								npc *n=new npc(&master::world, master::world.getId());
 								cl->npc_id=n->id;
 								n->owner_id=cl->id;
+								//load inventory, other client data
+								//set ids to npc and 
+								n->recalculate_type();
+								n->restore_attrs();
 								master::world.npcs_m.lock();
 									master::world.new_npcs.push_back(n);
 								master::world.npcs_m.unlock();

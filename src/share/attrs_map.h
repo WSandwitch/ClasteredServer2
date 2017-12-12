@@ -43,7 +43,7 @@ namespace share {
 			};
 			char operator()(void* attr){
 				try{
-					return shift_attr.at((size_t)attr-(size_t)base);//TODO:faster cast
+					return shift_attr.at((size_t)attr-(size_t)base);
 				}catch(...){
 					return 0;
 				}

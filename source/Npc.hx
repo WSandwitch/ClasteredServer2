@@ -50,12 +50,14 @@ class Npc extends NpcBase{
 		super.update(elapsed);
 	}
 	
-	private static function addGraficToSprite(s:FlxSprite, gr:FlxGraphic){
+	private static function addGraficToSprite(s:FlxSprite, gr:Null<FlxGraphic>){
+		if (gr == null)
+			return;
 		var w = FlxMath.maxInt(gr.bitmap.width, s.graphic.bitmap.width);
 		var h = FlxMath.maxInt(gr.bitmap.height, s.graphic.bitmap.height);
 		var bm:BitmapData = new BitmapData(w, h, true, 0);
 		//copy current bitmap
-		bm.copyPixels(gr.bitmap, s.graphic.bitmap.rect, new Point((w - s.graphic.bitmap.width) / 2, (h - s.graphic.bitmap.height) / 2));
+		bm.copyPixels(s.graphic.bitmap, s.graphic.bitmap.rect, new Point((w - s.graphic.bitmap.width) / 2, (h - s.graphic.bitmap.height) / 2));
 		//add new bitmap
 		bm.copyPixels(gr.bitmap, gr.bitmap.rect, new Point((w - gr.bitmap.width) / 2, (h - gr.bitmap.height) / 2));
 		s.loadGraphic(bm); //maybe false, "id")
@@ -70,7 +72,7 @@ class Npc extends NpcBase{
 			path = "assets/images/npc/solder_base.png";
 		}
 		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
-		CSAssets.getGraphic(path, function(gr:Null<FlxGraphic> ){
+		CSAssets.getGraphic(path, function(gr:Null<FlxGraphic>){
 			addGraficToSprite(sprite, gr);//recalculate new sprite
 			//add another graphics
 			

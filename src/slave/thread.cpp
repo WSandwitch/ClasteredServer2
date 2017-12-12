@@ -14,7 +14,7 @@ using namespace slave;
 #define world slave::world
 
 static void* threadFunc(void *arg){
-	packet p;
+	thread_local packet p;
 	
 	world.sock->recv(&p);
 	world.id=p.chanks[0].value.i;

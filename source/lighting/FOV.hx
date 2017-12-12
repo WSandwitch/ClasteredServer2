@@ -38,6 +38,10 @@ class FOVSprite extends FlxSprite{
 class FOV extends FlxSpriteGroup{
 	public static inline var BASE_COLOR:Int = 0xEE000000;
 	public static inline var FILL_COLOR:Int = 0xEEEEEEEE;
+	public static inline var DARK_COLOR:Int = 0x66222222;
+	
+	public static inline var HALF_VIEW:Int = 30;
+	public static inline var HALF_VIEW_DARK:Int = 18;
 
 	public var follow:Null<FlxObject> = null;
 
@@ -120,7 +124,7 @@ class FOV extends FlxSpriteGroup{
 					new FlxPoint(x+_tmp.width, y+_tmp.height),
 					new FlxPoint(x, y+_tmp.height)
 				];
-				var halfview = 30; //degrees
+				var halfview = HALF_VIEW; //degrees
 				var rad:Float = Math.PI / 180 * (follow.angle);
 				var rad30:Float = Math.PI / 180 * (follow.angle-halfview);
 				var radm30:Float = Math.PI / 180 * (follow.angle+halfview);
@@ -139,20 +143,44 @@ class FOV extends FlxSpriteGroup{
 				for (p in _vis.output){
 					points.push(p);
 				}
-				var ppoints:Array<Array<FlxPoint>> = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
+				var _ppoints:Array<Array<FlxPoint>> = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
 
-				if (ppoints.length>0){
-					for (_points in ppoints){
+				if (_ppoints.length > 0){
+					//draw dark
+					var ppoints:Array<Array<FlxPoint>>=[];
+					var halfviewext = HALF_VIEW_DARK;
+					if (halfviewext>0){
+						var rad30ext:Float = Math.PI / 180 * (follow.angle-halfview-halfviewext);
+						var radm30ext:Float = Math.PI / 180 * (follow.angle+halfview+halfviewext);
+						var darkview:Array<FlxPoint> = [
+							new FlxPoint(fx, fy),
+							new FlxPoint(fx+l*FlxMath.fastCos(rad30ext), fy+l*FlxMath.fastSin(rad30ext)),
+							new FlxPoint(fx+l*FlxMath.fastCos(radm30ext), fy+l*FlxMath.fastSin(radm30ext))
+						];
+						ppoints = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, darkview)[0]);
+						for (_points in ppoints){
+							for (p in _points){
+								p.x -= x;
+								p.y -= y;
+							}
+							FlxSpriteUtil.drawPolygon(_shadow, _points, DARK_COLOR, {color: DARK_COLOR, thickness: 3}, {smoothing:true});
+						}
+					}
+					//draw view
+					for (_points in _ppoints){
 						for (p in _points){
 							p.x -= x;
 							p.y -= y;
 						}
 						FlxSpriteUtil.drawPolygon(_shadow, _points, FILL_COLOR, {color: FILL_COLOR, thickness: 3}, {smoothing:true});
 					}
-//					blend = openfl.display.BlendMode.MULTIPLY;
+				
+					/////////
+					//////////
+	//				blend = openfl.display.BlendMode.MULTIPLY;
 					FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
-//					_tmp.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, _tmp.graphic.bitmap.rect, zpoint, _filter);
-					
+	//				_tmp.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, _tmp.graphic.bitmap.rect, zpoint, _filter);
+						
 					var bshift = 8;
 					for (i in 0..._cols){
 						for (j in 0..._rows){
@@ -184,6 +212,28 @@ class FOV extends FlxSpriteGroup{
 							var s4 = new FOVSegment(s3.p2, s1.p1);
 							var updated = false;
 							for (_points in ppoints){
+								if (updated)
+										break;
+								for (pi in 0..._points.length){
+									var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
+									if (
+										//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
+										(
+											( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
+											( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
+											s.cross(s1) ||
+											s.cross(s2) ||
+											s.cross(s3) ||
+											s.cross(s4) // add check of in<->out
+		//									false
+										)
+									){
+										updated = true;
+										break;
+									}
+								}
+							}
+							for (_points in _ppoints){
 								if (updated)
 										break;
 								for (pi in 0..._points.length){
