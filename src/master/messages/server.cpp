@@ -121,7 +121,11 @@ namespace master {
 					nn->state=STATE_ATTACK;//attacking on every tick
 					nn->bot.owner_id=n->id;
 					nn->weapon_id=n->bullet_id;
+					
 					nn->recalculate_type();
+					if (nn->_health==0){
+						nn->_health=1;
+					}
 					nn->restore_attrs();
 //					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
 					

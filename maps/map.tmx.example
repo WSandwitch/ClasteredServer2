@@ -6,7 +6,7 @@
   <property name="offset" type="int" value="50"/>
  </properties>
  <tileset firstgid="1" name="FloorTexture" tilewidth="64" tileheight="64" tilecount="4" columns="2">
-  <image source="../../assets/images/FloorTexture.png" width="128" height="128"/>
+  <image source="../assets/images/FloorTexture.png" width="128" height="128"/>
  </tileset>
  <layer name="tiles" width="10" height="10">
   <data encoding="csv">

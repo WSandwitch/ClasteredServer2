@@ -29,7 +29,9 @@ import input.ScreenGamepad;
 using flixel.util.FlxSpriteUtil;
 import flixel.system.macros.FlxMacroUtil;
 
+#if mobile
 import extension.notifications.Notifications;
+#end
 /**
  * 
  */
@@ -433,9 +435,6 @@ class PlayState extends FlxState
 	
 	
 	private static inline var slot:Int = 7;
-	private static var title:String = "App works on background";
-	private static var button:String = "Tap here to open it";
-	private static var message:String = "App still use internet and cpu";
 	//for using custom actions, use with FlxG.autoPause = true;
 	override 
 	public function onFocus():Void{
@@ -451,9 +450,9 @@ class PlayState extends FlxState
 //		super.onFocusLost();
 	//set normal message
 #if android
-	Notifications.scheduleLocalNotification(slot, 0, title, button, message, "", false);
+	Notifications.scheduleLocalNotification(slot, 0, Main.tongue.get("#NOTIFICATION_TITLE"), Main.tongue.get("#NOTIFICATION_BUTTON"), Main.tongue.get("#NOTIFICATION_MESSAGE"), "", false, true);
 #elseif ios
-	Notifications.scheduleLocalNotification(slot, 0, title, message, button, false);
+	Notifications.scheduleLocalNotification(slot, 0, Main.tongue.get("#NOTIFICATION_TITLE"), Main.tongue.get("#NOTIFICATION_MESSAGE"), Main.tongue.get("#NOTIFICATION_BUTTON"), false);
 #end
 //	trace("focus lost");
 	} 

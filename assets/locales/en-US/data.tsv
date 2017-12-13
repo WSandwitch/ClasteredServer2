@@ -1,0 +1,5 @@
+flag	content	
+#LOGIN_BUTTON	connect	
+#NOTIFICATION_TITLE	App works on background	
+#NOTIFICATION_BUTTON	Tap here to open it	
+#NOTIFICATION_MESSAGE	App still use internet and cpu	

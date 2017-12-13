@@ -63,7 +63,7 @@ namespace share {
 		public:
 			int id;
 			char state; //attack state
-			bool non_target; //furniture
+			bool non_target; //furniture, will not sync with slave
 			point position;
 			pointf direction;
 			short health; //curent health

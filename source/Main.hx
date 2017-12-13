@@ -59,8 +59,8 @@ class Main extends Sprite
 	#if (mobile && debug)
 //		FlxG.log.redirectTraces = true;
 		FlxG.debugger.visible = true;
-//		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	#end
+//		trace(openfl.utils.SystemPath.applicationStorageDirectory);
 	}
 	
 	public static function connection_lost(){

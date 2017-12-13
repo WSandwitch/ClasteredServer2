@@ -14,7 +14,7 @@ import flixel.util.FlxColor;
 import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
-import haxe.Timer.delay;
+import haxe.Timer;
 
 using flixel.util.FlxSpriteUtil;
 
@@ -33,12 +33,12 @@ class LoadState extends FlxState
 		//add loading screen
 		
 		try{
-			(new Connection()).connect("172.16.1.40", 8000, false, function(conn:Connection){				
-//			(new Connection()).connect("192.168.1.245", 8000, false, function(conn:Connection){			
-//			(new Connection()).connect("localhost", 8000, false, function(conn:Connection){				
+			(new Connection()).connect("172.16.1.40", 11099, false, function(conn:Connection){				
+//			(new Connection()).connect("192.168.1.171", 11099, false, function(conn:Connection){			
+//			(new Connection()).connect("localhost", 11099, false, function(conn:Connection){				
 	//			conn.connect("localhost", 8000);
 				Main.connection = conn;
-				delay(function(){
+				Timer.delay(function(){
 					if (Main.id == null)
 						Main.connection_lost();
 				}, 10000);//10 seconds for connect and sign in

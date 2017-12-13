@@ -20,7 +20,8 @@ namespace share{
 #undef addShootFunc
 
 #define attackCheck(n)\
-		(n && n->attackable && n->id!=id && n->id!=bot.owner_id)
+		(n->attackable && n->id!=id && n->id!=bot.owner_id)//check if it needs n &&
+//		(n && n->attackable && n->id!=id && n->id!=bot.owner_id)
 
 #define attack(n, n0, a)\
 	do{\
