@@ -54,8 +54,8 @@ class PlayState extends FlxState
 	static var LEVEL_MAX_Y;
 
 	private var actions:AbstractInputManager = new AbstractInputManager();
-	private var hud:HUD;
-	private var hudCam:FlxCamera;
+//	private var hud:HUD;
+//	private var hudCam:FlxCamera;
 
 	///network attrs
 	public var id(get,set):Int;
@@ -80,7 +80,7 @@ class PlayState extends FlxState
 	private var _gamepad:Null<ScreenGamepad>;
 	
 	private var _map_group:FlxGroup = new FlxGroup();
-	private var _hud_group:FlxGroup = new FlxGroup();
+//	private var _hud_group:FlxGroup = new FlxGroup();
 	
 	private function exit(){
 		#if !flash
@@ -150,9 +150,9 @@ class PlayState extends FlxState
 		_map_group.add(_map);
 		
 
-		hud = new HUD();
-		add(_hud_group);
-		_hud_group.add(hud);
+//		hud = new HUD();
+//		add(_hud_group);
+//		_hud_group.add(hud);
 
 	#if !flash
 		FlxG.camera.antialiasing=true;

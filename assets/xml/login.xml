@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data> 
-	<input_text name="login" center_x="true" x="0" y="0" width="100" background="#FFaaaaaa" >
+	<input_text name="login" center_on_x="screen" x="0" y="0" width="100" background="#FFaaaaaa" >
 		<anchor x="screen.center" y="screen.center"/>
 	</input_text>
-	<button name="connect" center_x="true" x="0" y="40" label="#LOGIN_BUTTON" context="data">
+	<button name="connect" center_on_x="login" x="0" y="40" label="#LOGIN_BUTTON" context="data">
 		<anchor x="login.center" y="login.bottom"/>
 		<param type="string" value="connect"/>
 	</button>
