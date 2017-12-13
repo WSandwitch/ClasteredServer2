@@ -235,9 +235,9 @@ namespace share {
 		weapon.ang_diap=PPI/360*(weapon.ang_diap);// to pdegree
 		weapon.ang_shift=PPI/360*(weapon.ang_shift);//pdegree
 		if (world){
-			weapon.warmup=weapon.warmup>0 ? NPC_FULL_TEMP/(world->tps*weapon.warmup) : NPC_FULL_TEMP;
-			weapon.cooldown=weapon.cooldown>0 ? NPC_FULL_TEMP/(world->tps*weapon.cooldown) : NPC_FULL_TEMP;
-			weapon.latency=world->tps*weapon.latency;
+			weapon.warmup=weapon.warmup>0 ? NPC_FULL_TEMP/(world->slave_tps*weapon.warmup) : NPC_FULL_TEMP;
+			weapon.cooldown=weapon.cooldown>0 ? NPC_FULL_TEMP/(world->slave_tps*weapon.cooldown) : NPC_FULL_TEMP;
+			weapon.latency=world->slave_tps*weapon.latency;
 		}
 	}
 	
@@ -290,6 +290,7 @@ namespace share {
 	//axe - 0, 0.8, 0.1, 1.6, 0, 3
 	//bat - 0, 0.2, 0.2, 0.8, 70, 1
 	//minigun - 1, 2, 2, 0.2, 4, 1
+	///slave
 	void npc::attack(){
 		//TODO: check	
 		register int warmup=weapon.warmup;//NPC_FULL_TEMP/(world->tps*weapon.warmup); //NPC_FULL_TEMP/world->tps/n -> n seconds to max
@@ -297,11 +298,11 @@ namespace share {
 		register int latency=weapon.latency;//tiks
 		//add attack prepare
 		if (state==STATE_WARMUP){//preparing
-//			printf("%d warmup %hd/%hd\n", id, weapon.temp,NPC_FULL_TEMP);
-			if(weapon.temp<NPC_FULL_TEMP){
-				weapon.temp+=warmup;
-			}else{
+//			printf("%d warmup %d/%hd | %d\n", id, weapon.temp, NPC_FULL_TEMP, warmup);
+			weapon.temp+=warmup;
+			if(weapon.temp>=NPC_FULL_TEMP){
 				state=STATE_ATTACK;
+//				weapon.next_shot=0;
 			}
 		}
 		if (state==STATE_SHOOT)//state for show that npc do shot
@@ -310,18 +311,18 @@ namespace share {
 //			printf("%d nextshot %hd\n", id, weapon.next_shot);
 			if (weapon.next_shot==0){
 //				printf("%d  shoot\n", id);
-				shoot();
 				state=STATE_SHOOT;
+				shoot();
 				weapon.next_shot=latency>60000 ? 60000 : latency; //max latency 60000 tiks
-			}else{
-				weapon.next_shot--;
 			}
 		}
+		if (weapon.next_shot>0){
+			weapon.next_shot--;
+		}
 		if (state==STATE_COOLDOWN){//after attack			
-//			printf("%d cooldown %hd\n", id, weapon.temp);
-			if(weapon.temp>0){
-				weapon.temp-=cooldown;
-			}else{
+//			printf("%d cooldown %d/0 | \n", id, weapon.temp, cooldown);
+			weapon.temp-=cooldown;
+			if(weapon.temp<=0){
 				weapon.temp=0;
 				state=STATE_IDLE;
 			}
@@ -329,6 +330,7 @@ namespace share {
 	}
 
 	//toggle attack
+	///master
 	void npc::attack(bool s){
 		set_attr(state,s?STATE_WARMUP:STATE_COOLDOWN);
 	}

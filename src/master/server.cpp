@@ -43,12 +43,16 @@ namespace master {
 	
 	server* server::create(std::string host, int port){
 		socket *sock;
+		packet p;
 		if ((sock=socket::connect((char*)host.data(), port))==0){
 			perror("socketConnect");
 			return 0;
 		}
 		storageSlaveSetUnbroken((char*)host.data(), port);//maybe need not here
 		//TODO: add auth 
+		//send init data to slave
+		p.add(master::world.slave_tps); //send tps in 0 chank
+		sock->send(&p);
 		return new server(sock, host, port);
 	}
 

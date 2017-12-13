@@ -28,6 +28,7 @@ using namespace share;
 share::world slave::world;
 
 #define world slave::world
+#define TPS 24
 
 pthread_t startThread();//in thread.cpp
 
@@ -55,7 +56,7 @@ static void segfault_sigaction(int sig){
 
 int slave_main(int argc, char* argv[]){
 	srand(share::time(0));
-	world.tps=24;
+	world.tps=TPS;
 	share::sync syncer;
 	struct sigaction sa;
 	//pthread_t pid;
@@ -98,10 +99,14 @@ int slave_main(int argc, char* argv[]){
 	//init map
 	{
 		//initialize listener
+		packet p;
 		share::listener l(port);
 		printf("Waiting for connection on %d\n", port);
 		world.sock=l.accept();
 		world.sock->blocking(1);
+		world.sock->recv(&p);
+		world.tps=*(typeof(world.tps)*)p.chanks[0].data();//chank 0 -> tps
+		printf("TPS set to %hd\n", world.tps);
 		//pid=
 		startThread();
 	}

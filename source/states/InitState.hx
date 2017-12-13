@@ -12,9 +12,6 @@ class InitState extends FlxState
 	override public function create():Void 
 	{	
 		super.create();
-		trace(Main.tongue.locale);
-		trace(Main.tongue.isLoaded);
-		trace(Main.tongue.get("#login_button"));
 	}
 	
 	override 

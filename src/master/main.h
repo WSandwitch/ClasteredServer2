@@ -11,6 +11,7 @@ namespace master {
 		storage_config storage;
 		short run;
 		short tps;
+		short slave_tps;
 		struct{
 			short total;
 			short tps;

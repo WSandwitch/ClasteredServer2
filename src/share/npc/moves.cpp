@@ -61,6 +61,7 @@ namespace share{
 				suicide();//suicide
 			}
 		}
+//		printf("%d ?< %d\n", bot.dist, weapon.dist);
 	}
 	
 	//stiky move (move to the same position as target npc)

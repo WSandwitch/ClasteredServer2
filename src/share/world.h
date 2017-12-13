@@ -32,6 +32,7 @@ namespace share {
 		bool main_loop;
 		bool pause;
 		short tps;
+		short slave_tps;
 		share::mutex m;
 		share::mutex npcs_m;
 		share::socket* sock;

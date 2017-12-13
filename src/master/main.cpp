@@ -90,6 +90,9 @@ static int readConfig(){
 		if (strcmp(buf, "tps")==0){
 			fscanf(f, "%hd", &config.tps);
 		}else
+		if (strcmp(buf, "slave_tps")==0){
+			fscanf(f, "%hd", &config.slave_tps);
+		}else
 		if (strcmp(buf, "sw_total")==0){
 			fscanf(f, "%hd", &config.serverworkers.total);
 		}else
@@ -184,6 +187,7 @@ int main(int argc,char* argv[]){
 	config.socketworkers.tps=10;
 	config.listenworkers.tps=10;
 	config.tps=28;
+	config.slave_tps=24;
 	config.log.debug=1;
 	config.slaves.total=0;
 	config.slaves.start_port=12300;
@@ -191,6 +195,7 @@ int main(int argc,char* argv[]){
 	readConfig();
 	log_config::config=config.log;//log configured
 	master::world.tps=config.tps;
+	master::world.slave_tps=config.slave_tps;
 
 	object_initializer initializer;
 	if (object::all.size()==0){

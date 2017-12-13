@@ -54,12 +54,8 @@ class PlayState extends FlxState
 	static var LEVEL_MAX_Y;
 
 	private var actions:AbstractInputManager = new AbstractInputManager();
-	private var orb:Npc;
-	private var orbShadow:FlxSprite;
 	private var hud:HUD;
 	private var hudCam:FlxCamera;
-	private var overlayCamera:FlxCamera;
-	private var deadzoneOverlay:FlxSprite;
 
 	///network attrs
 	public var id(get,set):Int;
@@ -158,21 +154,11 @@ class PlayState extends FlxState
 		add(_hud_group);
 		_hud_group.add(hud);
 
-		// Camera Overlay
-		deadzoneOverlay = new FlxSprite(-10000, -10000);
-		deadzoneOverlay.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT, true);
-		//deadzoneOverlay.antialiasing = true;
-
-		overlayCamera = new FlxCamera(0, 0, 640, 720);
-		overlayCamera.bgColor = FlxColor.TRANSPARENT;
-		overlayCamera.follow(deadzoneOverlay);
 	#if !flash
-		overlayCamera.antialiasing=true;
 		FlxG.camera.antialiasing=true;
 	#end
-		FlxG.cameras.add(overlayCamera);
-		add(deadzoneOverlay);
-		
+		//tell screen size to master
+		send_screen_size(FlxG.width, FlxG.height);
 		
 //		FlxG.camera.setScrollBoundsRect(LEVEL_MIN_X, LEVEL_MIN_Y,
 //			LEVEL_MAX_X + Math.abs(LEVEL_MIN_X), LEVEL_MAX_Y + Math.abs(LEVEL_MIN_Y), true);
@@ -283,7 +269,7 @@ class PlayState extends FlxState
 		_map.resize(_w, _h);
 		
 		send_screen_size(_w, _h);
-		
+
 		addGamepad();
 	}
 	
@@ -347,6 +333,7 @@ class PlayState extends FlxState
 		
 		
 		///test 
+		//TODO: remove
 	#if !FLX_NO_KEYBOARD	
 		if (FlxG.keys.justPressed.U)
 			npc.sprite.y+=3;
@@ -434,7 +421,7 @@ class PlayState extends FlxState
 	}
 	
 	
-	private static inline var slot:Int = 7;
+	private static inline var slot:Int = 1;
 	//for using custom actions, use with FlxG.autoPause = true;
 	override 
 	public function onFocus():Void{
