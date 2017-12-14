@@ -93,8 +93,11 @@
 		
 		
 	<!--------------------------------IOS---------------------------------------->
-	<ios deployment="3.2" binaries="fat" devices="universal" if="ios" />
-		
+<!--	<ios deployment="3.2" binaries="fat" devices="universal" if="ios" /> -->
+	<config:ios deployment="8.0" />
+	<haxedef name="source-header" value="" if="ios" />
+<!-- <certificate team-id="" /> -->	
+
 	<!--------------------------------Android---------------------------------------->
 <!--	<template path="templates/android/AndroidManifest.xml" rename="AndroidManifest.xml" if="android" /> -->
 	<android target-sdk-version="16" if="android" />
