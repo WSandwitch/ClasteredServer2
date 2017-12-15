@@ -6,6 +6,7 @@ import openfl.Assets;
 import flixel.FlxG;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.display.PNGEncoderOptions;
 import openfl.events.Event;
 import openfl.events.HTTPStatusEvent;
 import openfl.events.IOErrorEvent;
@@ -68,7 +69,11 @@ class CSAssets
 						}catch (e:Dynamic){
 							trace("[CSAssets] "+e);
 						}
+					#if legacy
 						sys.io.File.saveBytes(_base+id, b.bitmapData.encode("png", 1));
+					#else
+						sys.io.File.saveBytes(_base+id, b.bitmapData.encode(b.bitmapData.rect, new PNGEncoderOptions ()));
+					#end
 					}catch(e:Dynamic){
 						trace("[CSAssets] can't save "+_base+id+": "+e);
 					}

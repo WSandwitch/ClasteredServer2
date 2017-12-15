@@ -83,10 +83,12 @@ class PlayState extends FlxState
 //	private var _hud_group:FlxGroup = new FlxGroup();
 	
 	private function exit(){
-		#if !flash
+	#if !flash
+		#if legacy
 			openfl.Lib.exit();//TODO: check for android
 			openfl.Lib.close();
 		#end
+	#end
 	}
 	
 	private function checkKeyBack(e: openfl.events.KeyboardEvent):Void
@@ -437,7 +439,7 @@ class PlayState extends FlxState
 //		super.onFocusLost();
 	//set normal message
 #if android
-	Notifications.scheduleLocalNotification(slot, 0, Main.tongue.get("#NOTIFICATION_TITLE"), Main.tongue.get("#NOTIFICATION_BUTTON"), Main.tongue.get("#NOTIFICATION_MESSAGE"), "", false, true);
+	Notifications.scheduleLocalNotification(slot, 0, Main.tongue.get("#NOTIFICATION_TITLE"), Main.tongue.get("#NOTIFICATION_BUTTON"), Main.tongue.get("#NOTIFICATION_MESSAGE"), "", false);// , true); //waiting for pull request on samcodes-notifications
 #elseif ios
 	Notifications.scheduleLocalNotification(slot, 0, Main.tongue.get("#NOTIFICATION_TITLE"), Main.tongue.get("#NOTIFICATION_MESSAGE"), Main.tongue.get("#NOTIFICATION_BUTTON"), false);
 #end

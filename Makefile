@@ -7,6 +7,7 @@ CPPFLAGS= -Wall -fsigned-char -std=gnu++0x #-Wextra
 LDFLAGS= -pthread -lpthread -lm -lstdc++
 HEADERS= -Isrc/share/yaml-cpp/include
 SRC=src
+CLIENT_MODE ?= debug
 
 SHARE_SOURCES:=$(wildcard $(SRC)/share/*.cpp) $(wildcard $(SRC)/share/*/*.cpp) $(wildcard $(SRC)/share/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*.cpp) $(wildcard $(SRC)/share/*/*/*/*/*.cpp)
 SHARE_OBJECTS:=$(addprefix $(OBJDIR)/, $(SHARE_SOURCES:.cpp=.o))
@@ -136,10 +137,18 @@ cleanall: clean
 	rm  bin/$(PUBLIC)* bin/$(SLAVE)*
 
 client:
-	lime build neko -debug #-final
+	rm -rf export/*
+	lime build linux -32 -$(CLIENT_MODE)
+	lime build linux -64 -$(CLIENT_MODE)
+	lime build windows -$(CLIENT_MODE)
+	lime build mac -$(CLIENT_MODE)
+	lime build android -$(CLIENT_MODE)
+	lime build ios -$(CLIENT_MODE)
+#	lime build tizen -$(CLIENT_MODE)
+#	lime build blackbery -$(CLIENT_MODE)
 #	lime build ios -debug -simulator
 #	xcrun simctl install booted /path/to/Your.app
-	
+
 gcc5:  # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 	apt-get update
 	apt-get install gcc-5 g++-5 gcc-5-multilib g++-5-multilib build-essential libssl-dev
