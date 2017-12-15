@@ -137,7 +137,7 @@ cleanall: clean
 
 client:
 	lime build neko -debug #-final
-#	lime build ios -debug -Dsource-header=haxe
+#	lime build ios -debug -simulator
 #	xcrun simctl install booted /path/to/Your.app
 	
 gcc5:  # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y

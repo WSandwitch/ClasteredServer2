@@ -340,10 +340,10 @@ class PlayState extends FlxState
 		if (FlxG.keys.justPressed.J)
 			npc.sprite.y-=3;
 			
-		if (FlxG.keys.justPressed.H)
-			npc.sprite.x-=3;
+		if (FlxG.keys.justPressed.I)
+			cast(FlxG.scaleMode, BorderedStageSizeScaleMode).updateScale(FlxG.scaleMode.scale.x+0.05);
 		if (FlxG.keys.justPressed.K)
-			npc.sprite.x+=3;
+			cast(FlxG.scaleMode, BorderedStageSizeScaleMode).updateScale(FlxG.scaleMode.scale.x-0.05);
 			
 		if (FlxG.keys.justPressed.Y){
 			trace(npc.x);

@@ -149,13 +149,15 @@ class FOV extends FlxSpriteGroup{
 					//draw dark
 					var ppoints:Array<Array<FlxPoint>>=[];
 					var halfviewext = HALF_VIEW_DARK;
-					if (halfviewext>0){
+					if (halfviewext > 0){
+						var fxext:Float = follow.x-ushift*0.6*FlxMath.fastCos(rad);
+						var fyext:Float = follow.y-ushift*0.6*FlxMath.fastSin(rad);
 						var rad30ext:Float = Math.PI / 180 * (follow.angle-halfview-halfviewext);
 						var radm30ext:Float = Math.PI / 180 * (follow.angle+halfview+halfviewext);
 						var darkview:Array<FlxPoint> = [
-							new FlxPoint(fx, fy),
-							new FlxPoint(fx+l*FlxMath.fastCos(rad30ext), fy+l*FlxMath.fastSin(rad30ext)),
-							new FlxPoint(fx+l*FlxMath.fastCos(radm30ext), fy+l*FlxMath.fastSin(radm30ext))
+							new FlxPoint(fxext, fyext),
+							new FlxPoint(fxext+l*FlxMath.fastCos(rad30ext), fyext+l*FlxMath.fastSin(rad30ext)),
+							new FlxPoint(fxext+l*FlxMath.fastCos(radm30ext), fyext+l*FlxMath.fastSin(radm30ext))
 						];
 						ppoints = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, darkview)[0]);
 						for (_points in ppoints){

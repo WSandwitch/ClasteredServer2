@@ -41,6 +41,8 @@ class Main extends Sprite
 		
 	#if flash //72 dpi
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);
+	#elseif mobile
+		FlxG.scaleMode = new BorderedStageSizeScaleMode(2); 
 	#else
 		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
 		//TODO: use in future

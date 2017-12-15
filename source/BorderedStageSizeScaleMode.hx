@@ -1,7 +1,9 @@
 package ;
 
 import flixel.FlxG;
+import flixel.math.FlxPoint;
 import flixel.system.scaleModes.BaseScaleMode;
+import openfl.events.Event;
 
 class BorderedStageSizeScaleMode extends BaseScaleMode{
 	
@@ -14,7 +16,8 @@ class BorderedStageSizeScaleMode extends BaseScaleMode{
 	
 	public function updateScale(s:Float){
 		_scale_val = s;
-		onMeasure(FlxG.width, FlxG.height); 
+		FlxG.stage.dispatchEvent(new Event(Event.RESIZE));
+//		onMeasure(FlxG.width, FlxG.height); 
 	}
 	
 	override 
