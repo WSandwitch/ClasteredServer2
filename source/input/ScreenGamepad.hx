@@ -312,11 +312,11 @@ class ScreenGamepad extends FlxSpriteGroup{
 	
 	private function drag_handler(){
 		gamepad.axis_move(
-			analogLeft.acceleration.x/_radius,
-			analogLeft.acceleration.y/_radius,
+			analogLeft.acceleration.x,///_radius,
+			analogLeft.acceleration.y,///_radius,
 			0,
-			analogRight.acceleration.x/_radius,
-			analogRight.acceleration.y/_radius,
+			analogRight.acceleration.x,///_radius,
+			analogRight.acceleration.y,///_radius,
 			0
 		);
 	}

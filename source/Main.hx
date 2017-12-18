@@ -8,6 +8,7 @@ import flixel.FlxGame;
 import flixel.addons.ui.FlxUIState;
 import flixel.system.scaleModes.*;
 import clasteredServerClient.*;
+import util.Settings;
 
 import openfl.system.Capabilities;
 
@@ -28,11 +29,12 @@ class Main extends Sprite
 			Main.tongue.init("en-US");
 			FlxUIState.static_tongue = Main.tongue;
 		}
+		Settings.init();
 	#if mobile
 		addChild(new FlxGame(0, 0, InitState));
 	#else
 		//add load saved screen size
-		addChild(new FlxGame(720, 560, InitState));
+		addChild(new FlxGame(Settings.screenWidth, Settings.screenHeight, InitState));
 		FlxG.resizeWindow(FlxG.width, FlxG.height);
 	#end
 		FlxG.autoPause = false;

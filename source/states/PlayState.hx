@@ -84,10 +84,11 @@ class PlayState extends FlxState
 	
 	private function exit(){
 	#if !flash
-		#if legacy
-			openfl.Lib.exit();//TODO: check for android
-			openfl.Lib.close();
-		#end
+//		#if legacy
+		openfl.system.System.exit(0);
+//			openfl.Lib.exit();//TODO: check for android
+//			openfl.Lib.close();
+//		#end
 	#end
 	}
 	

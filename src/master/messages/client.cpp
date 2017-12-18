@@ -223,11 +223,11 @@ namespace master {
 //							printf("set height %d\n", cl->view_area[1]);
 							break;
 						case 3:
-							cl->view_position[0]=p->chanks[i].value.s;
+							cl->view_position[0]=p->chanks[i].value.s-50;
 //							printf("set pos x %d\n", cl->view_position[0]);
 							break;
 						case 4:
-							cl->view_position[1]=p->chanks[i].value.s;
+							cl->view_position[1]=p->chanks[i].value.s-50;
 //							printf("set pos y %d\n", cl->view_position[1]);
 							break;
 					}
