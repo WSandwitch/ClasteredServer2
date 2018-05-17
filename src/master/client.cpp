@@ -55,6 +55,7 @@ namespace master {
 		sock(sock),
 		npc_id(0),
 		map_id(-1), //it must be updated on first npc check
+		connect_time(master::world.mtime),
 		timestamp(0)
 	{
 		name[0]=0;

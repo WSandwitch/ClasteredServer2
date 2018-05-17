@@ -72,6 +72,8 @@ namespace share {
 			short move_id;
 			short shoot_id; 
 			int weapon_id; //object_id
+			int body_id; //object_id
+			int head_id; //object_id
 			int bullet_id; //
 			int owner_id; //id of player
 			int map_id; //id of map
@@ -142,7 +144,7 @@ namespace share {
 			bool suicide(); 			
 			void update(share::packet * p, int update_attrs=1);
 			bool updated(bool server=0, bool all=0, bool to_slave=0); 
-			share::packet* pack(bool server=0, bool all=0, bool to_slave=0); //threadsafe over packet
+			share::packet* pack(bool server=0, bool all=0, bool to_slave=0, int timestamp=0); //threadsafe over packet
 			bool update_cells() 
 				__attribute__ ((hot));//threadsafe
 			

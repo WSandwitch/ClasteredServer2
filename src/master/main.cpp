@@ -298,10 +298,13 @@ int main(int argc,char* argv[]){
 //		master::world.new_npcs.push_back(n);
 //	}
 	
-	
+	master::world.iteration=0;
 	do{
-		timestamp=share::time(0);
 		tv.timePassed(); //start timer
+		timestamp=share::time(0);
+		
+		master::world.mtime=getTimeMillis(); //set time of current iteration
+		master::world.iteration++;
 		//////
 		master::world.m.lock();
 			master::world.npcs_m.lock();
@@ -396,6 +399,7 @@ int main(int argc,char* argv[]){
 			for(auto &&ci:client::all){
 				client *c=ci.second;
 #endif
+				int ctimestamp=master::world.mtime-c->connect_time;
 				try{
 					npc* cnpc=master::world.npcs.at(c->npc_id);
 					if (cnpc->map_id!=c->map_id){
@@ -445,7 +449,7 @@ int main(int argc,char* argv[]){
 							case 1: {//new npc
 								try{
 									npc *n=master::world.npcs.at(i.first);
-									c->sock->send(n->pack(0,1));//all attrs
+									c->sock->send(n->pack(0,1,0,ctimestamp));//all attrs
 									withLock(c->mutex, c->npcs.insert(i.first));
 //									printf("(client)send new npc\n");
 								}catch(...){}
@@ -455,7 +459,7 @@ int main(int argc,char* argv[]){
 								try{
 									npc *n=master::world.npcs.at(i.first);
 									if (n->updated(0)){
-										c->sock->send(n->pack(0));
+										c->sock->send(n->pack(0,0,0,ctimestamp));
 									}
 									//withLock(c->mutex, c->npcs.insert(i.first));
 								}catch(...){}

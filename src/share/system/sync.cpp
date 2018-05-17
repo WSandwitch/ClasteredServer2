@@ -16,6 +16,10 @@ namespace share {
 		return out;
 	}
 	
+	long long sync::getTime(){
+		return ((t.tv_sec)*1000000 + t.tv_usec);
+	}
+	
 	void sync::syncTPS(int TPS, bool l){
 		int diff=timePassed();
 #ifdef DEBUG

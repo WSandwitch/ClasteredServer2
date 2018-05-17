@@ -49,6 +49,7 @@ namespace master {
 			share::socket* sock;
 			int npc_id;
 			int map_id;
+			int connect_time;
 			share::mutex mutex;
 			std::list<client_message*> messages;
 			std::unordered_set<int> npcs; 

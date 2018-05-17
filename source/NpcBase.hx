@@ -20,13 +20,17 @@ class NpcBase extends FlxSpriteGroup{
 	public var updater:Map<Int, Null<Dynamic->Void>>=new Map<Int, Null<Dynamic->Void>>();
 	public var sprite_update:Bool = false;
 	
+//	
+	
 	function new(x:Float, y:Float){
 		super(x, y);
 		
-		updater[1] = updater_1;
-		updater[2] = updater_2;
-		updater[6] = updater_6;
-		updater[9] = updater_9;
+		updater[1] = updater_pos_x;
+		updater[2] = updater_pos_y;
+		updater[6] = updater_type;
+		updater[9] = updater_angle;
+		updater[0] = updater_timestamp;
+		
 	}
 	
 	public function update_attributes(p:Packet){
@@ -64,24 +68,29 @@ class NpcBase extends FlxSpriteGroup{
 	
 	//updater functions
 	//position.x
-	function updater_1(a:Dynamic){
+	function updater_pos_x(a:Dynamic){
 		this.dest_x = Std.int(a*FlxG.scaleMode.scale.x)/FlxG.scaleMode.scale.x;//screan scale fix, position must be int, for normal map tiles positions
 	};
 	
 	//position.y
-	function updater_2(a:Dynamic){
+	function updater_pos_y(a:Dynamic){
 		this.dest_y = Std.int(a*FlxG.scaleMode.scale.y)/FlxG.scaleMode.scale.y;
 	};
 	
 	//type
-	function updater_6(a:Dynamic){
+	function updater_type(a:Dynamic){
 		this.type = a;
 		this.sprite_update = true;
 	};
 	
 	//angle
-	function updater_9(a:Dynamic){
+	function updater_angle(a:Dynamic){
 		this.angle=Math.round(a / 120.0 * 180); 
+	};
+	
+	//timestamp
+	function updater_timestamp(a:Dynamic){
+		//smth
 	};
 	
 }

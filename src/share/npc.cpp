@@ -43,6 +43,8 @@ namespace share {
 		_health(10),
 		type(1), //player/bot npc by default 
 		weapon_id(1), //TODO:set 
+body_id(0),
+head_id(0),
 		bullet_id(2), //TODO:set 
 		owner_id(0),
 		map_id(0), 
@@ -206,6 +208,14 @@ namespace share {
 		}
 	}
 	
+#define apply_objectM(name)\
+	try{ \
+		apply(object::all.at(name##_id)); \
+	}catch(...){\
+		printf("couldn't find %s with id %d\n", #name, name##_id);\
+		name##_id=0;\
+	}
+
 	void npc::recalculate_type(){
 		//update dinamic attrs like damage, health from chosen type and other
 		timestamp=time(0);
@@ -225,11 +235,9 @@ namespace share {
 		r=0;
 		memset(&weapon,0,sizeof(weapon));
 		
-		try{ apply(object::all.at(weapon_id)); }catch(...){
-			printf("couldn't find weapon with id %d\n", weapon_id);
-			weapon_id=0;
-			//TODO: add clear weapon_id
-		}
+		apply_objectM(weapon)
+		apply_objectM(body)
+		apply_objectM(head)
 		//apply other objects
 		
 		weapon.ang_diap=PPI/360*(weapon.ang_diap);// to pdegree
@@ -499,7 +507,7 @@ namespace share {
 	
 	//create packet with attr that have been changed
 //s - for server, all - pack all attrs for curr type, ts - to slave(only for to server)
-	packet* npc::pack(bool s, bool all, bool ts){
+	packet* npc::pack(bool s, bool all, bool ts, int timestamp){
 		auto _pack=_packs(s,all,ts);
 		packet &p=packs(s,all,ts);
 		_pack.m.lock();//TODO: move mutex to packet
@@ -520,6 +528,10 @@ namespace share {
 					}
 				}
 				_pack.done=1;
+				if (timestamp){
+					p.add((char)0); //zero attr is timestamp
+					p.add(timestamp); //zero attr is timestamp
+				}
 			}
 		_pack.m.unlock();
 		return &p;

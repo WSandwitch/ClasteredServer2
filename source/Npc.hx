@@ -2,6 +2,8 @@ package;
 
 import clasteredServerClient.Lock;
 import clasteredServerClient.Packet;
+import flixel.math.FlxPoint;
+import flixel.system.FlxAssets.FlxGraphicAsset;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import flixel.util.FlxColor;
@@ -9,6 +11,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.graphics.FlxGraphic;
+import flixel.addons.effects.FlxTrail;
 import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 import util.CSAssets;
@@ -17,12 +20,17 @@ import openfl.display.BitmapData;
 /**
  * @author Yarikov Denis
  */
+ 
 class Npc extends NpcBase{
 	
 	public var sprite:Null<FlxSprite> = null;
+	private var _trail:Null<CSTrail> = null;
+	
+	public var show_trail(get, set):Bool;
 	
 	public function new(x:Float, y:Float, type:Int){
 		super(x, y);
+		shown(false);
 		sprite = new FlxSprite(0, 0);// , "assets/images/npc/solder_gun128.png"); //base sprite
 		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
 		add(sprite);
@@ -30,7 +38,9 @@ class Npc extends NpcBase{
 		//must not update sprites in updaters
 		
 		//antialiasing = true;
-		shown(false);
+		_trail = new CSTrail(sprite, null, 6, 1, 0.6, 0.1);
+		add(_trail);
+		show_trail = false;
 	}
 	
 	override 
@@ -81,8 +91,10 @@ class Npc extends NpcBase{
 			sprite.updateHitbox();
 //			sprite.x = -sprite.width / 2;
 //			sprite.y = -sprite.height / 2;
-			sprite.x = x - sprite.width / 2;
-			sprite.y = y - sprite.height / 2;
+			sprite.offset.x = sprite.width / 2;
+			sprite.offset.y = sprite.height / 2;
+			_trail.changeGraphic(sprite.graphic);
+			_trail.setOrigin(sprite.origin);
 			shown(true);
 		});
 	}
@@ -101,4 +113,26 @@ class Npc extends NpcBase{
 		super.destroy();
 	}
 */
+	public function get_show_trail():Bool{
+		return _trail.exists;
+	}
+	
+	public function set_show_trail(v:Bool):Bool{
+		return (_trail.exists = v);
+	}
+}
+
+class CSTrail extends FlxTrail{
+	public function new(Target:FlxSprite, ?Graphic:FlxGraphicAsset, Length:Int = 10, Delay:Int = 3, 
+		Alpha:Float = 0.4, Diff:Float = 0.05):Void{
+		super(Target, Graphic, Length, Delay, Alpha, Diff);
+	}
+	
+	public function setOrigin(target:FlxPoint){
+		_spriteOrigin.copyFrom(target);
+	}
+	
+	public function getOrigin():FlxPoint{
+		return _spriteOrigin;
+	}
 }

@@ -29,6 +29,8 @@ namespace share {
 	struct world {
 		int id;
 		float map_offset;
+		long long mtime;
+		long long iteration;
 		bool main_loop;
 		bool pause;
 		short tps;
