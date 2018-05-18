@@ -40,6 +40,7 @@
 	<assets path="src/share/messages.h" rename="assets/messages.h" embed="true" />
 	
 	<!--------------------------------LIBRARIES------------------------------------->
+	<!--------recommend to use haxe 3.3.0-------->
 
 	<haxelib name="flixel"/>
 	
@@ -51,7 +52,8 @@
 	
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape" />-->
-	<haxelib name="polygonal-ds" version="1.4.1" />
+	<!--<haxelib name="polygonal-ds" version="1.4.1" /> <!--included as source -->
+	<haxelib name="polygonal-printf" />
 	<haxelib name="yaml" />
 	<haxelib name="firetongue" />
 	<haxelib name="samcodes-notifications" if="mobile" />
