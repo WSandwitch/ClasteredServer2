@@ -41,10 +41,10 @@ namespace share {
 		non_target(0),
 		health(10),
 		_health(10),
-		type(1), //player/bot npc by default 
+		type(1), //base id
 		weapon_id(1), //TODO:set 
-body_id(0),
-head_id(0),
+		body_id(0),
+		head_id(0),
 		bullet_id(2), //TODO:set 
 		owner_id(0),
 		map_id(0), 

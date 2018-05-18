@@ -68,7 +68,7 @@ namespace share {
 			pointf direction;
 			short health; //curent health
 			short _health; //max health
-			int type; //base id
+			int type; //base id, used for graphics of npc without additions
 			short move_id;
 			short shoot_id; 
 			int weapon_id; //object_id

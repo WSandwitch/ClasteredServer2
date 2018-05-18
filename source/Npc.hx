@@ -16,17 +16,22 @@ import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 import util.CSAssets;
 import openfl.display.BitmapData;
+import util.CSGraphicUtil;
 
 /**
  * @author Yarikov Denis
  */
  
 class Npc extends NpcBase{
+	private static var _graph:FlxGraphic = FlxG.bitmap.create(1, 1, FlxColor.TRANSPARENT);
 	
-	public var sprite:Null<FlxSprite> = null;
-	private var _trail:Null<CSTrail> = null;
+	private var _trail:Null<CSTrail> = null; //trail works for not animatet sprites
 	
 	public var show_trail(get, set):Bool;
+	
+	public var sprite:Null<FlxSprite> = null; //base sprite get by type
+	public var weapon:Null<FlxSprite> = null; //base sprite get by weapon_id
+	
 	
 	public function new(x:Float, y:Float, type:Int){
 		super(x, y);
@@ -41,6 +46,10 @@ class Npc extends NpcBase{
 		_trail = new CSTrail(sprite, null, 6, 1, 0.6, 0.1);
 		add(_trail);
 		show_trail = false;
+		
+		weapon = new FlxSprite(0, 0);
+		weapon.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+		add(weapon);
 	}
 	
 	override 
@@ -53,50 +62,55 @@ class Npc extends NpcBase{
 			y = dest_y;
 			dest_y = null;
 		}
-		if (sprite_update){
-			update_sprite();
-			sprite_update = false;
-		}
+		update_sprite();
 		super.update(elapsed);
 	}
 	
-	private static function addGraficToSprite(s:FlxSprite, gr:Null<FlxGraphic>){
-		if (gr == null)
-			return;
-		var w = FlxMath.maxInt(gr.bitmap.width, s.graphic.bitmap.width);
-		var h = FlxMath.maxInt(gr.bitmap.height, s.graphic.bitmap.height);
-		var bm:BitmapData = new BitmapData(w, h, true, 0);
-		//copy current bitmap
-		bm.copyPixels(s.graphic.bitmap, s.graphic.bitmap.rect, new Point((w - s.graphic.bitmap.width) / 2, (h - s.graphic.bitmap.height) / 2));
-		//add new bitmap
-		bm.copyPixels(gr.bitmap, gr.bitmap.rect, new Point((w - gr.bitmap.width) / 2, (h - gr.bitmap.height) / 2));
-		s.loadGraphic(bm); //maybe false, "id")
+	private function setSpriteCenter(s:FlxSprite){
+		s.resetSizeFromFrame();
+		s.updateHitbox();
+		s.x = x - s.width / 2;
+		s.y = y - s.height / 2;
 	}
 	
 	public function update_sprite(){
 		//TODO: add loading animation sheets
-		var path:String;
-		try{
-			path = CSObjects.get(type).sprite;
-		}catch (e:Dynamic){
-			path = "assets/images/npc/solder_base.png";
+		var path:Null<String> = null;
+		if (sprite_changed){
+			try{
+				path = CSObjects.get(type).sprite; //path must be without file extention
+			}catch (e:Dynamic){
+				path = null;// "assets/images/npc/solder_base.png";
+			}
+	//		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+			if (path!=null){//if object have its own graphics
+				CSGraphicUtil.loadGraficsToSprite(sprite, path, function(res:Bool, ?_sprite:FlxSprite){
+					setSpriteCenter(sprite);
+					//trail setup for base
+					_trail.changeGraphic(sprite.graphic);
+					_trail.setOrigin(sprite.origin);
+				});
+			}
+			this.sprite_changed = false;
 		}
-		sprite.makeGraphic(1, 1, FlxColor.TRANSPARENT);
-		CSAssets.getGraphic(path, function(gr:Null<FlxGraphic>){
-			addGraficToSprite(sprite, gr);//recalculate new sprite
-			//add another graphics
-			
-//			sprite.resetSize();
-			sprite.resetSizeFromFrame();
-			sprite.updateHitbox();
-//			sprite.x = -sprite.width / 2;
-//			sprite.y = -sprite.height / 2;
-			sprite.offset.x = sprite.width / 2;
-			sprite.offset.y = sprite.height / 2;
-			_trail.changeGraphic(sprite.graphic);
-			_trail.setOrigin(sprite.origin);
-			shown(true);
-		});
+		var names = ["weapon"];
+		for (prop in names) {
+			if (Reflect.getProperty(this, prop+"_id_changed")){
+				try{
+					path = CSObjects.get(Reflect.getProperty(this, prop+"_id")).sprite; //path must be without file extention
+				}catch (e:Dynamic){
+					path = "assets/images/npc/gun128";// "assets/images/npc/solder_base.png";
+				}
+				if (path!=null){
+					CSGraphicUtil.loadGraficsToSprite(Reflect.getProperty(this, prop), path, function(res:Bool, ?sprite:FlxSprite){
+						setSpriteCenter(sprite);
+					});
+				}else{
+					Reflect.getProperty(this, prop).loadGraphic(_graph);
+				}
+				Reflect.setProperty(this, prop + "_id_changed", false);
+			}
+		}
 	}
 /*	
 	override

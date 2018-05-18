@@ -136,7 +136,7 @@ namespace master {
 					nn->weapon.latency=0;//shoot every tick
 					nn->attackable=n->weapon.attackable;
 					
-					nn->type=2;//TODO: get base type from weapon object
+					nn->type=2;//TODO: get bullet base type from weapon object
 					nn->move_id=1;//TODO: change to choose bullet move id 
 					nn->shoot_id=2;//TODO: change to choose bullet shoot id 
 				n->m.unlock();

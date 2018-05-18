@@ -11,14 +11,19 @@ import flixel.FlxG;
  */
 class NpcBase extends FlxSpriteGroup{
 	public var id:Int;
-	public var type:Int = 0;
+	
 //	public var m:Lock=new Lock();
 	public var dest_x:Null<Float> = 0;
 	public var dest_y:Null<Float> = 0;
 	public var dir_x:Null<Float> = 0;
 	public var dir_y:Null<Float> = 0;
 	public var updater:Map<Int, Null<Dynamic->Void>>=new Map<Int, Null<Dynamic->Void>>();
-	public var sprite_update:Bool = false;
+	
+	public var type:Int = 0; //base id, used to get base sprite
+	public var sprite_changed:Bool = false;
+	
+	public var weapon_id:Int = 0;
+	public var weapon_id_changed:Bool = false;
 	
 //	
 	
@@ -30,7 +35,6 @@ class NpcBase extends FlxSpriteGroup{
 		updater[6] = updater_type;
 		updater[9] = updater_angle;
 		updater[0] = updater_timestamp;
-		
 	}
 	
 	public function update_attributes(p:Packet){
@@ -80,7 +84,7 @@ class NpcBase extends FlxSpriteGroup{
 	//type
 	function updater_type(a:Dynamic){
 		this.type = a;
-		this.sprite_update = true;
+		this.sprite_changed = true;
 	};
 	
 	//angle
@@ -91,6 +95,7 @@ class NpcBase extends FlxSpriteGroup{
 	//timestamp
 	function updater_timestamp(a:Dynamic){
 		//smth
+		shown(true);
 	};
 	
 }

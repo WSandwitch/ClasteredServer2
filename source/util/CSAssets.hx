@@ -30,6 +30,9 @@ class CSAssets
 	static inline var _delay:Int = 2; //used for async call
 	static var _host:String = "http://disk.wsstudio.tk/";
 	
+	static var unsuccess:Map<String, Int> = new Map<String, Int>();
+	static inline var _tries:Int = 4;
+	
 #if mobile
 	static var _base:String = SystemPath.applicationStorageDirectory+'/'; 
 #else
@@ -50,6 +53,12 @@ class CSAssets
 	var extPath : String = jGetPath(jFileObj);
 	*/
 
+	private static function setBroken(id:String){
+		if (unsuccess[id] == null )
+			unsuccess[id] = 0;
+		unsuccess[id]++;	
+	}
+	
 	public static function getGraphicWeb(id:String, callback:Null<FlxGraphic>->Void){
 		var loader = new Loader();
 		var status:Int=0;
@@ -82,6 +91,7 @@ class CSAssets
 					trace("[CSAssets] web load parse error: " + e);
 				}
 			} else {
+				setBroken(id);
 				callback(null);
 			}
 		});
@@ -89,11 +99,13 @@ class CSAssets
 			status = event.status; // Hopefully this is 200
 		});
 		loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
-			trace("[CSAssets] load error " +_host+id);
+			trace("[CSAssets] load error "+_host+id);
+			setBroken(id);
 			callback(null);
 		});
 		loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
-			trace("[CSAssets] security error "+_host+id); 
+			trace("[CSAssets] security error "+_host+id);
+			setBroken(id);
 			callback(null);
 		});
 		//loader.contentLoaderInfo.addEventListener( Event.OPEN, onOpen );
@@ -102,11 +114,22 @@ class CSAssets
 			loader.load(new URLRequest(_host + id));
 		}catch (e:Dynamic){
 			trace("[CSAssets] load start error "+_host+id); 
+			setBroken(id);
 			callback(null);
 		}
 	}
 	
 	public static function getGraphic(id:String, ?callback:Null<FlxGraphic>->Void, async:Bool = true):Null<FlxGraphic>{
+		if (unsuccess[id]>_tries){
+			if (callback != null){
+				if (async){
+					delay(callback.bind(null), _delay);
+				}else{
+					callback(null);
+				}
+			}
+			return null;
+		}
 		var g:Null<FlxGraphic>=FlxG.bitmap.get(id);
 		if (g != null){
 			if (callback != null){
@@ -189,10 +212,12 @@ class CSAssets
 		});
 		loader.addEventListener( IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):Void {
 			trace("[CSAssets] load error " +_host+id);
+			setBroken(id);
 			callback(null);
 		});
 		loader.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):Void {
 			trace("[CSAssets] security error "+_host+id); 
+			setBroken(id);
 			callback(null);
 		});
 		loader.addEventListener(Event.COMPLETE, function(event:Event){
@@ -219,6 +244,7 @@ class CSAssets
 					trace("[CSAssets] "+e);
 				}
 			} else {
+				setBroken(id);
 				callback(null);
 			}
 		});
@@ -226,12 +252,26 @@ class CSAssets
 			loader.load(new URLRequest(_host+id));
 		}catch (e:Dynamic){
 			trace("[CSAssets] load start error "+_host+id); 
+			setBroken(id);
 			callback(null);
 		}
 	}
 	
-	public static function getBytes(id:String, ?callback:Null<Bytes>->Void, async:Bool=true):Null<Bytes>{
-		var bd:Null<Bytes> = Assets.getBytes(id);
+	public static function getBytes(id:String, ?callback:Null<Bytes>->Void, async:Bool = true):Null<Bytes>{
+		if (unsuccess[id]>_tries){
+			if (callback != null){
+				if (async){
+					delay(callback.bind(null), _delay);
+				}else{
+					callback(null);
+				}
+			}
+			return null;
+		}
+		var bd:Null<Bytes> = null;
+		try{
+			bd = Assets.getBytes(id);
+		}catch(e:Dynamic){}
 		if (bd != null){ //check if bd exists
 			if (callback != null){
 				if (async){
