@@ -1,9 +1,7 @@
 package input;
 
-//import de.polygonal.ds.Map;
 import flash.display.InteractiveObject;
 import flixel.input.gamepad.FlxGamepad;
-import haxe.ds.EnumValueMap;
 
 import flixel.FlxG;
 
@@ -13,8 +11,8 @@ import flixel.input.keyboard.FlxKey;
 import flixel.system.macros.FlxMacroUtil;
 
 /**
- * abstract input allow you to set custom input ids 
- * and bind it to buttons of keybard, mouse, gamepad 
+ * abstract input allow you to set custom actions 
+ * and bind to them buttons of keyboard, mouse, gamepad 
  * and gamepad axis (positiv and negativ directions)
  * @author Yarikov Denis
  */
@@ -55,11 +53,24 @@ class AbstractInputManager{
 		return actions.remove(name);
 	}
 	
+	/**
+	 * Get value of the action
+	 * 
+	 * @param name	id of action
+	 * @return value in 0..1, for buttons 1 or 0
+	 */
 	public function value(name:KeyType):Float{
 		if (!actions.exists(name))
 			return 0;
 		return actions.get(name).value;
 	}
+	
+	/**
+	 * Check if action was pressed
+	 * 
+	 * @param	name id of action
+	 * @return true/false
+	 */
 	
 	public function justPressed(name:KeyType):Bool{
 		if (!actions.exists(name))
@@ -67,11 +78,25 @@ class AbstractInputManager{
 		return actions.get(name).justPressed;
 	}
 	
+	/**
+	 * Check if action was released
+	 * 
+	 * @param	name id of action
+	 * @return true/false
+	 */
+	
 	public function justReleased(name:KeyType):Bool{
 		if (!actions.exists(name))
 			return false;
 		return actions.get(name).justReleased;
 	}
+	
+	/**
+	 * Check if any of actions was fired
+	 * 
+	 * @param names	ids of action
+	 * @return true/false
+	 */
 	
 	public function anyChanged(names:Array<KeyType>):Bool{
 		for (name in names)
@@ -80,11 +105,24 @@ class AbstractInputManager{
 		return false;
 	}
 	
+	/**
+	 * Check if action is firing
+	 * 
+	 * @param name	id of action
+	 * @return true/false
+	 */
+	
 	public function pressed(name:KeyType):Bool{
 		if (!actions.exists(name))
 			return false;
 		return actions.get(name).pressed;
 	}
+	
+	/**
+	 * Update values of actions
+	 * 
+	 * @return nothing
+	 */
 	
 	public function update(){
 		for(action in actions){
@@ -97,6 +135,42 @@ class AbstractInputManager{
 			id.update();
 		}
 	}
+	
+	/**
+	 * Get action by source id
+	 * 
+	 * @param	id id of abstract input source
+	 * @return AbstractInputAction of source or null
+	 */
+	
+	public function getActionBySource(id:AbstractInputID):Null<AbstractInputAction>{
+		try{
+			switch(id.type){
+				case KEY:
+					var cid:AbstractInputKeyboardID = cast id;
+					return getAction(key_ids.get(cid.key).actions[0]);
+				case MOUSE:
+					var cid:AbstractInputMouseID = cast id;
+					return getAction(mouse_ids.get(cid.key).actions[0]);
+				case GAMEPADKEY:
+					var cid:AbstractInputGamepadKeyID = cast id;
+					return getAction(gamepad_key_ids.get(cid.key).actions[0]);
+				case GAMEPADAXIS:
+					var cid:AbstractInputGamepadAxisID = cast id;
+					return getAction(gamepad_axis_ids.get(cid.key).actions[0]);
+				default:
+					
+			}
+		}catch(e:Dynamic){}
+		return null;
+	}
+	
+	/**
+	 * Remove source from all actions
+	 * 
+	 * @param	id id of abstract input source
+	 * @return nothing
+	 */
 	
 	public function removeSource(id:AbstractInputID){
 		switch(id.type){
@@ -118,6 +192,13 @@ class AbstractInputManager{
 		ids.remove(id);
 	}
 	
+	/**
+	 * Get abstract sources of action
+	 * 
+	 * @param	name id of action
+	 * @return array of abstract input source ids
+	 */
+	
 	public function getSources(name:KeyType):Array<AbstractInputID>{
 		var a:Array<AbstractInputID> = [];
 		for (s in ids){
@@ -127,6 +208,12 @@ class AbstractInputManager{
 		return a;
 	}
 
+	/**
+	 * Remove sourses of action
+	 * 
+	 * @param	name id of action
+	 * @return nothing
+	 */
 	public function clearSources(name:KeyType){
 		var ss:Array<AbstractInputID> = getSources(name);
 		for (s in ss){
@@ -134,6 +221,11 @@ class AbstractInputManager{
 		}
 	}
 
+	/**
+	 * remove all actions
+	 * 
+	 * @return nothing
+	 */
 	public function clear(){
 		while (ids.length>0){
 			removeSource(ids[0]);
@@ -152,10 +244,26 @@ class AbstractInputManager{
 		FlxGamepadInputID.RIGHT_ANALOG_STICK=> [RIGHT_STICK_X_PLUS, RIGHT_STICK_X_MINUS, RIGHT_STICK_Y_PLUS, RIGHT_STICK_Y_MINUS]
 	];
 
-	/*
-	 * TRIGGERS don't work yet
+
+	/**
+	 * Get first pressed source, forces to return null if source preset in cancel array
+	 * example:
 	 * AbstractInputManager.firstPressed([],[],[MouseID.MOUSE_LEFT],[],[],[],[],[]); //example
-	*/
+	 * 
+	 * TRIGGERS don't work yet
+	 * @param	keys_ignore ids of keyboard buttons that will be ignored, null for all
+	 * @param	keys_cancel ids of keyboard buttons that will cancel checking, null for all
+	 * @param	mouse_ignore ids of mouse buttons that will be ignored, null for all
+	 * @param	mouse_cancel ids of mouse buttons that will cancel checking, null for all
+	 * @param	gkeys_ignore ids of gamepad buttons that will be ignored, null for all
+	 * @param	gkeys_cancel ids of gamepad buttons that will cancel checking, null for all
+	 * @param	gaxis_ignore ids of gamepad axis that will be ignored, null for all
+	 * @param	gaxis_cancel ids of gamepad axis that will cancel checking, null for all
+	 * @param	any_gamepad if true, source key will be chaked on any gamepad in future, else only on what was pressed
+	 * @param	treshhold treshhold of axis values to trigger
+	 * 
+	 * @return AbstractInputKeyboardID, AbstractInputMouseID, AbstractInputGamepadKeyID or AbstractInputGamepadAxisID
+	 */
 	public static function firstPressed(
 		?keys_ignore:Array<FlxKey>, 
 		?keys_cancel:Array<FlxKey>, 
@@ -171,40 +279,40 @@ class AbstractInputManager{
 	#if !FLX_NO_KEYBOARD
 		if (keys_ignore != null){
 			var key:FlxKey = FlxG.keys.firstJustPressed();
-			if (keys_cancel != null && keys_cancel.indexOf(key)!=-1)
+			if (keys_cancel==null || keys_cancel != null && keys_cancel.indexOf(key)!=-1)
 				return null;
-			if (key != -1 && keys_ignore.indexOf(key)==-1)
+			if (key != FlxKey.NONE && key != FlxKey.ANY && keys_ignore.indexOf(key)==-1)
 				return new AbstractInputKeyboardID(null, key);
 		}
 	#end
 	#if !FLX_NO_MOUSE
 		if (mouse_ignore != null){
 			if (FlxG.mouse.justPressed){
-				if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_LEFT) !=-1)
+				if (mouse_cancel == null || mouse_cancel != null && mouse_cancel.indexOf(MOUSE_LEFT) !=-1)
 					return null;
 				if (mouse_ignore.indexOf(MOUSE_LEFT)==-1)
 					return new AbstractInputMouseID(null, MOUSE_LEFT);
 			}
 			if (FlxG.mouse.justPressedRight){
-				if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_RIGHT) !=-1)
+				if (mouse_cancel == null || mouse_cancel != null && mouse_cancel.indexOf(MOUSE_RIGHT) !=-1)
 					return null;
 				if (mouse_ignore.indexOf(MOUSE_RIGHT)==-1)
 					return new AbstractInputMouseID(null, MOUSE_RIGHT);
 			}
 			if (FlxG.mouse.justPressedMiddle){
-				if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_MIDDLE) !=-1)
+				if (mouse_cancel == null || mouse_cancel != null && mouse_cancel.indexOf(MOUSE_MIDDLE) !=-1)
 					return null;
 				if (mouse_ignore.indexOf(MOUSE_MIDDLE)==-1)
 					return new AbstractInputMouseID(null, MOUSE_MIDDLE);
 			}
 			if (FlxG.mouse.wheel != 0){
 				if (FlxG.mouse.wheel>0){
-					if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_WEEL_UP) !=-1)
+					if (mouse_cancel == null || mouse_cancel != null && mouse_cancel.indexOf(MOUSE_WEEL_UP) !=-1)
 						return null;
 					if (mouse_ignore.indexOf(MOUSE_WEEL_UP)==-1)
 						return new AbstractInputMouseID(null, MOUSE_WEEL_UP);
 				}else{
-					if (mouse_cancel != null && mouse_cancel.indexOf(MOUSE_WEEL_DOWN) !=-1)
+					if (mouse_cancel == null || mouse_cancel != null && mouse_cancel.indexOf(MOUSE_WEEL_DOWN) !=-1)
 						return null;
 					if (mouse_ignore.indexOf(MOUSE_WEEL_DOWN)==-1)
 						return new AbstractInputMouseID(null, MOUSE_WEEL_DOWN);
@@ -221,7 +329,7 @@ class AbstractInputManager{
 					if (gkeys_cancel != null && gkeys_cancel.indexOf(gkey)!=-1)
 						return null;
 					if (gkey != -1 && gkeys_ignore.indexOf(gkey)==-1)
-						return new AbstractInputGamepadKeyID(null, gkey, gamepad.id);
+						return new AbstractInputGamepadKeyID(null, gkey, any_gamepad?null:gamepad.id);
 				}
 				if (gaxis_ignore != null){
 					var axis:Float;
@@ -306,6 +414,7 @@ class AbstractInputAction{
 	}
 
 	public function removeKey(key:FlxKey){
+
 		if (manager.key_ids.exists(key)){
 			var key_id = manager.key_ids[key];
 			key_id.removeAction(name);
@@ -457,7 +566,9 @@ class AbstractInputAction{
 }
 
 ////////////////////////////////////////////////////////////////
-
+/**
+ * Do not use directly
+ */
 class AbstractInputGamepadAxisID extends AbstractInputID{
 
 	public var key:GamepadAxisID;
@@ -863,16 +974,15 @@ enum AbstractSource{
 }
 
 
-/* example basic usage
 
 //enum for bindings
 @:enum
-abstract ActionID(Int) from Int to Int{
-	public static var fromStringMap(default, null):Map<String, ActionID>
-		= FlxMacroUtil.buildMap("PlayState.ActionID");
+abstract AbstractActionID(Int) from Int to Int{
+	public static var fromStringMap(default, null):Map<String, AbstractActionID>
+		= FlxMacroUtil.buildMap("AbstractInputManager.AbstractActionID");
 		
-	public static var toStringMap(default, null):Map<ActionID, String>
-		= FlxMacroUtil.buildMap("PlayState.ActionID", true);
+	public static var toStringMap(default, null):Map<AbstractActionID, String>
+		= FlxMacroUtil.buildMap("AbstractInputManager.AbstractActionID", true);
 
 	var NONE = -1;	
 	var GO_UP = 1;
@@ -880,6 +990,25 @@ abstract ActionID(Int) from Int to Int{
 	var GO_LEFT = 3;
 	var GO_RIGHT = 4;
 	var ATTACK = 5;
+	var GRENAGE = 6;
+	var FLASHLIGHT = 7;
+	var JUMP = 8;
+	var NEXT_W = 9;
+	var PREV_W = 10;
+	var SLOT_1 = 11;
+	var SLOT_2 = 12;
+	var SLOT_3 = 13;
+	var SLOT_4 = 14;
+	var SLOT_5 = 15;
+	var SLOT_6 = 16;
+	var SLOT_7 = 17;
+	var SLOT_8 = 18;
+	var SLOT_9 = 19;
+	var USE = 20;
+	var USE_ITEM = 21;
+	var NEXT_ITEM = 22;
+	var PREV_ITEM = 23;
+	
 	
 	@:from
 	public static inline function fromString(s:String)
@@ -896,6 +1025,8 @@ abstract ActionID(Int) from Int to Int{
 		
 }
 
+/* example basic usage
+ * 
 	//in create
 	var actions:AbstractInputManager = new AbstractInputManager();
 	var a = actions.addAction(GO_UP);
@@ -916,14 +1047,14 @@ abstract ActionID(Int) from Int to Int{
 	a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_PLUS);
 	a=actions.addAction(ATTACK);
 	a.addMouseKey(MouseID.MOUSE_LEFT);
+	a.addMouseKey(FlxGamepadInputID.A);
 	
 	///in update 	
 	actions.update();
 	if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
-		//some actions on actions.value(GO_RIGHT) or other
+		//some actions on actions.value(GO_RIGHT) ==1 or other
 	}
   
  * */
-
 
 
