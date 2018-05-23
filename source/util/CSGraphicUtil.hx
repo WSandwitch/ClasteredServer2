@@ -26,7 +26,7 @@ class CSGraphicUtil{
 		s.loadGraphic(bm); //maybe false, "id")
 	}
 	
-	public static function loadGraficsToSprite(s:FlxSprite, path:String, ?callback:Bool->?FlxSprite->Void){
+	public static function loadGraficsToSprite(s:FlxSprite, path:String, ?callback:Bool->?FlxSprite->Void, call_in_the_middle=true){
 		//try to open path+".yml"
 		/*
 		 * grafic conf format [{name: "a", frames:[1,2], rate:30}]
@@ -36,6 +36,8 @@ class CSGraphicUtil{
 				//now check if there animation
 				var gsize = FlxMath.minInt(gr.bitmap.height, gr.bitmap.width);
 				s.loadGraphic(gr, true, gsize, gsize);//frame width must be equal to height //TODO: update
+				if (call_in_the_middle && callback != null)
+					callback(false, s);
 				CSAssets.getText(path+".yml", function(data:Null<String>){
 					try{	
 						var raw:Array<Dynamic> = cast Yaml.parse(data, Parser.options().useObjects()); //animation grafics conf file						
