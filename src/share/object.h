@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "math/point.h"
+
 #define OBJECT_BASE 1
 #define OBJECT_WEAPON 2
 #define OBJECT_BULLET 3
@@ -56,6 +58,7 @@ namespace share{
 		short kind;
 		short type;
 		int cost;
+		pointi offset;
 		struct {
 			std::vector<int> weapon; //id of weapon in hands
 		} deps;  //object dependencies

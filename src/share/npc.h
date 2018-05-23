@@ -105,6 +105,8 @@ namespace share {
 				float warmup; //temp per tik
 				float cooldown; //temp per tik
 				float latency; //tiks
+				
+				point bullet_offset;
 			} weapon;
 				
 			map3b<share::packet> packs;

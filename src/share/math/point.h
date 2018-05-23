@@ -14,6 +14,8 @@ namespace share {
 				point_(T _x, T _y);
 				void normalize(bool _const=1);
 				char to_angle();
+				point_& rotate(char angle);
+				point_ copy();
 				template <class T1>
 					void by_angle(char angle, T1 l=1);
 				template<class T1>
@@ -24,6 +26,16 @@ namespace share {
 					point_ operator+(point_<T1> &&b);
 				template<class T1>
 					point_ operator-(point_<T1> &&b);
+				template<class T1>
+					point_ operator+(point_<T1> &b);
+				template<class T1>
+					point_ operator-(point_<T1> &b);
+				template<class T1>
+					point_& operator+=(point_<T1> &b);
+				template<class T1>
+					point_& operator-=(point_<T1> &b);
+				template<class T1>
+					point_& operator=(point_<T1> &b);
 			
 				template <class T1>
 					static point_ from_angle(char angle, T1 l);//l is length of vector

@@ -11,6 +11,7 @@
 #include "../../object.h"
 #include "../../share/network/packet.h"
 #include "../../share/system/log.h"
+#include "../../share/system/copy.h"
 #include "../../share/messages.h"
 
 
@@ -117,7 +118,12 @@ namespace master {
 					nn->angle=p->chanks[1].value.c;
 					nn->direction.by_angle(nn->angle, 1); //right dir and full speed
 //					printf("%g %g \n", nn->direction.x, nn->direction.y);
-					nn->position=n->position+point::from_angle(nn->angle, n->r*2);
+					nn->position=n->position+point::from_angle(nn->angle, n->r*2);//+copy(n->weapon.bullet_offset).rotate(nn->angle);
+					//correction for gun offset
+					point bpoint=n->weapon.bullet_offset;
+					bpoint.rotate(nn->angle);
+				//	printf("bullet offset %g %g -> %g %g\n", n->weapon.bullet_offset.x, n->weapon.bullet_offset.y, bpoint.x, bpoint.y);
+					nn->position+=bpoint;
 					nn->state=STATE_ATTACK;//attacking on every tick
 					nn->bot.owner_id=n->id;
 					nn->weapon_id=n->bullet_id;

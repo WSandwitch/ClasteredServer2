@@ -273,6 +273,7 @@ namespace share {
 			break;\
 		}
 	void npc::apply(object *o){
+		weapon.bullet_offset+=o->offset;
 		for (auto &mod:o->mods){
 			switch (mod.attr){
 				update_attrs(OMODATTR::HEALTH, _health)

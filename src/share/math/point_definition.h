@@ -28,6 +28,21 @@ namespace share {
 			return to_pdegrees(atan2f(y,x));  //pseudo radians [-120, 120]
 		}
 
+	template<class T>		
+		point_<T>& point_<T>::rotate(char angle){
+			float rad=from_pdegrees(angle);
+			T x$=x*cosf(rad)-y*sinf(rad);
+			T y$=x*sinf(rad)+y*cosf(rad);
+			x=x$;
+			y=y$;
+			return *this;
+		}
+
+	template<class T>		
+		point_<T> point_<T>::copy(){
+			return point_<T>(x, y);
+		}
+
 	template<class T>
 		template<class T1>
 			void point_<T>::by_angle(char angle, T1 l){ //vector by angle
@@ -77,6 +92,42 @@ namespace share {
 	template<class T1>
 		point_<T> point_<T>::operator-(point_<T1> &&b){
 			return point_<T>(x-b.x,y-b.y);
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T> point_<T>::operator+(point_<T1> &b){
+			return point_<T>(x+b.x,y+b.y);
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T> point_<T>::operator-(point_<T1> &b){
+			return point_<T>(x-b.x,y-b.y);
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T>& point_<T>::operator+=(point_<T1> &b){
+			x+=b.x;
+			y+=b.y;
+			return *this;
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T>& point_<T>::operator-=(point_<T1> &b){
+			x-=b.x;
+			y-=b.y;
+			return *this;
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T>& point_<T>::operator=(point_<T1> &b){
+			x=b.x;
+			y=b.y;
+			return *this;
 		}
 
 	template<class T>

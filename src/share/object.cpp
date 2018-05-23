@@ -121,6 +121,8 @@ namespace share{
 		add_attr(cost); 
 		add_attr(deps.weapon); 
 		add_attr(mods); 
+		add_attr(offset.x); 
+		add_attr(offset.y); 
 	}
 #undef add_attr
 	
