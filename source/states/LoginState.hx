@@ -23,8 +23,8 @@ import haxe.CallStack;
 using flixel.util.FlxSpriteUtil;
 
 import flixel.input.keyboard.FlxKey;
-import input.AbstractInputManager;
-import input.AbstractInputManager.*;
+import flixel.input.AbstractInputManager;
+import flixel.input.AbstractInputManager.*;
 
 import util.CSAssets;
 

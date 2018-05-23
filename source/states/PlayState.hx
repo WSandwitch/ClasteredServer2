@@ -22,8 +22,9 @@ import clasteredServerClient.*;
 import haxe.CallStack;
 
 import flixel.input.keyboard.FlxKey;
-import input.AbstractInputManager;
-import input.AbstractInputManager.*;
+import flixel.input.AbstractInputManager;
+import flixel.input.AbstractInputManager.*;
+
 import input.ScreenGamepad;
 
 using flixel.util.FlxSpriteUtil;
