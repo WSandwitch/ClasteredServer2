@@ -41,17 +41,8 @@ class Main extends Sprite
 		//FlxG.fixedTimestep = false;
 		trace('screen dpi ' + Capabilities.screenDPI);
 		
-	#if flash //72 dpi
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(1);
-	#elseif mobile
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(2); 
-	#else
-		FlxG.scaleMode = new BorderedStageSizeScaleMode(1); 
-		//TODO: use in future
-//		FlxG.scaleMode = new BorderedStageSizeScaleMode(Capabilities.screenDPI/96.0);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
-//		FlxG.scaleMode = new BorderedStageSizeScaleMode(1.4);//BorderedStageSizeScaleMode(1920, 1080); //StageSizeScaleMode();// 
-//		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
-	#end
+	FlxG.scaleMode = new BorderedStageSizeScaleMode(Settings.screenScale);
+	//		FlxG.scaleMode.onMeasure(FlxG.width, FlxG.height); 
 //		FlxG.camera.zoom = 1.1;
 	//read config and setup
 	#if desktop

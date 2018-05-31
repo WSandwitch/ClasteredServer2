@@ -20,6 +20,7 @@ import flixel.util.FlxDestroyUtil;
 import openfl.Assets;
 import clasteredServerClient.*;
 import haxe.CallStack;
+import util.Settings;
 
 import flixel.input.keyboard.FlxKey;
 import flixel.input.AbstractInputManager;
@@ -175,6 +176,10 @@ class PlayState extends FlxState
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
 */
+		
+		Settings.useMouseCallback = function(v:Bool){
+			trace("useMouse = ", v);
+		};
 		//add gamepad to screen
 		addGamepad();
 		//change to normal mapping
