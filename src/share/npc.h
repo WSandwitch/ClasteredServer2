@@ -9,6 +9,7 @@
 #include "../share/system/mutex.h"
 #include "../share/network/packet.h"
 #include "math/point.h"
+#include "math/segment.h"
 #include "attrs_map.h"
 
 #define NPC_FULL_TEMP 30000
@@ -100,6 +101,7 @@ namespace share {
 				short ang_diap;//pdegree
 				short ang_shift;//pdegree
 				short attacks;
+				float richochet; //
 				int dist; //calculated distance, move to bullet
 //				float vel;
 				
@@ -169,6 +171,7 @@ namespace share {
 			static set_attr_func set_attr_funcs[6];
 			
 			static npc* addBot(share::world *world, int id, float x, float y, short type=0);
+			static bool randInPercent(float p);
 			
 			friend std::ostream& operator<<(std::ostream &stream, const npc &n);
 		private:
@@ -177,7 +180,7 @@ namespace share {
 			timestamp_t timestamp;
 			map3b<pack_p> _packs;
 			
-			bool check_point(typeof(point::x) x, typeof(point::y) y);
+			bool check_point(typeof(point::x) x, typeof(point::y) y, segment** s=0);
 		
 			static npc_moves _moves;
 			static npc_shoots _shoots;

@@ -185,6 +185,7 @@ namespace share {
 		packAttr(weapon_id,1,1,0,0,0); //28s 
 		packAttr(bullet_id,1,1,0,0,0); //29s 
 		packAttr(portalled,0,0,1,1,1); //30s 
+		packAttr(weapon.richochet,0,0,1,0,1); //31s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -579,7 +580,7 @@ namespace share {
 	}
 	
 	//check can npc move to point
-	bool npc::check_point(typeof(point::x) x, typeof(point::y) y){
+	bool npc::check_point(typeof(point::x) x, typeof(point::y) y, segment **s){
 		return do_on_map([&](map* m)->int{
 			point p(x,y);
 			segment ps(position,p);
@@ -606,4 +607,8 @@ namespace share {
 		});
 	}
 
+	#define RAND_VALUE 100
+	bool npc::randInPercent(float p){
+		return (rand()%RAND_VALUE)<(int)(p*RAND_VALUE);
+	}
 }

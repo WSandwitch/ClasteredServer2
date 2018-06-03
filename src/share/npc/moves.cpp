@@ -52,36 +52,26 @@ namespace share{
 	void npc_moves::move1(typeof(point::x) x, typeof(point::y) y){
 		//it is not bot (for disable respawn)
 		if (x!=0 || y!=0){
-			if (check_point(position.x+x,position.y+y) && (bot.dist<weapon.dist || weapon.dist<=0)){
-//				point p=position;
-				set_attr(position.x, position.x+x);
-				set_attr(position.y, position.y+y);
-				bot.dist+=vel;//usualy in full speed//p.distanse(position);
-			} else {
-				suicide();//suicide
+			if ((bot.dist<weapon.dist || weapon.dist<=0)){
+				segment* s; 
+				if (check_point(position.x+x,position.y+y, &s)){
+	//				point p=position; 
+					set_attr(position.x, position.x+x);
+					set_attr(position.y, position.y+y);
+					bot.dist+=vel;//usualy in full speed//p.distanse(position);
+					return;
+				} else if (randInPercent(weapon.richochet)){
+					//add richochet move
+					return;
+				}
 			}
-		}
-//		printf("%d ?< %d\n", bot.dist, weapon.dist);
-	}
-	
-	//bullet move recoshet, go straight for dist, enemy or wall, than suicide
-	void npc_moves::move2(typeof(point::x) x, typeof(point::y) y){
-		//it is not bot (for disable respawn)
-		if (x!=0 || y!=0){
-			if (check_point(position.x+x,position.y+y) && (bot.dist<weapon.dist || weapon.dist<=0)){
-//				point p=position;
-				set_attr(position.x, position.x+x);
-				set_attr(position.y, position.y+y);
-				bot.dist+=vel;//usualy in full speed//p.distanse(position);
-			} else {
-				suicide();//suicide
-			}
+			suicide();//suicide
 		}
 //		printf("%d ?< %d\n", bot.dist, weapon.dist);
 	}
 	
 	//stiky move (move to the same position as target npc)
-	void npc_moves::move3(typeof(point::x) x, typeof(point::y) y){
+	void npc_moves::move2(typeof(point::x) x, typeof(point::y) y){
 		//char angle=point(1,2).to_angle();
 		//can't move independently
 		if (bot.target){
