@@ -176,10 +176,8 @@ class PlayState extends FlxState
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
 */
-		
-		Settings.useMouseCallback = function(v:Bool){
-			trace("useMouse = ", v);
-		};
+		actions.disable_mouse = !Settings.useMouse;
+		Settings.useMouseCallback = function(v:Bool){ actions.disable_mouse = !v; };
 		//add gamepad to screen
 		addGamepad();
 		//change to normal mapping
@@ -290,6 +288,9 @@ class PlayState extends FlxState
 		}
 		_gamepad = new ScreenGamepad();
 		add(_gamepad);
+		//setup visibility
+		_gamepad.exists = Settings.useScreenGamepad;
+		Settings.useScreenGamepadCallback = function(v:Bool){ _gamepad.exists = v; };
 	#end
 	}
 	
@@ -319,7 +320,7 @@ class PlayState extends FlxState
 				}
 			}
 		#if !FLX_NO_MOUSE
-			{
+			if (Settings.useMouse){
 				var angle = Math.atan2(FlxG.mouse.y - npc.y, FlxG.mouse.x - npc.x);	
 				if (Math.abs(_angle-angle) >= _d_angle){
 					_angle = angle;

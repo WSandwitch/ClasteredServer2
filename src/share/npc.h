@@ -79,6 +79,7 @@ namespace share {
 			int map_id; //id of map
 			float vel;
 			char angle; //angle of view in pdegrees
+			char portalled;
 			share::world *world;
 			share::mutex m;
 			struct{

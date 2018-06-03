@@ -184,6 +184,7 @@ namespace share {
 		packAttr(map_id,0,0,1,0,1); //27s 
 		packAttr(weapon_id,1,1,0,0,0); //28s 
 		packAttr(bullet_id,1,1,0,0,0); //29s 
+		packAttr(portalled,0,0,1,1,1); //30s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -351,6 +352,26 @@ namespace share {
 	}
 	
 	void npc::move(){
+		//teleport if needed
+		set_attr(portalled, do_on_map([&](map* m)->int{
+			auto &&c=m->cells(position);
+			for(auto &&p:c->portals){
+				if(p->area.contains(position)){
+					if (!portalled){
+						point shift=position-p->area.a;
+						printf("teleport! (%g %g)[%g %g] %g %g\n", position.x, position.y, p->area.a.x, p->area.a.y, shift.x, shift.y);
+						try{
+							auto &&$=m->portals.at(p->target)->area.a+shift;
+							set_attr(position.x, $.x);
+							set_attr(position.y, $.y);
+						}catch(...){}
+					}
+					return 1;
+				}
+			}
+			return 0;
+		}));
+		
 		try{
 			register float v=vel*vel_angle(0.43f);
 			(this->*(moves.at(move_id)))(direction.x*v, direction.y*v);//TODO:add angle correction

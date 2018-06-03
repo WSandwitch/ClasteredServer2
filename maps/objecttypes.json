@@ -1,0 +1,29 @@
+[
+    {
+        "color": "#ff08b5be",
+        "name": "portal",
+        "properties": [
+            {
+                "name": "map",
+                "type": "file",
+                "value": ""
+            },
+            {
+                "name": "target",
+                "type": "string",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "color": "#ffa4782d",
+        "name": "v",
+        "properties": [
+            {
+                "name": "directed",
+                "type": "bool",
+                "value": false
+            }
+        ]
+    }
+]

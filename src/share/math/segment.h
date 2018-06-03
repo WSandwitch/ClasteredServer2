@@ -22,11 +22,17 @@ namespace share {
 			char cross(segment *b);
 			typeof(point::x) vector(point &p); //vector mul
 			typeof(segment::a) to_vector(); 
+			//quad
 			typeof(segment::a) rand_point_in();
+			template<class T>
+				bool contains(point_<T> p){
+					return a.x<=p.x && a.y<=p.y && a.x+b.x>=p.x && a.y+b.y>=p.y;
+				};
 		
 			friend std::ostream& operator<<(std::ostream &stream, const segment &s);
 	};
 	
+	//TODO: move to another class
 	typedef segment quad;
 }
 

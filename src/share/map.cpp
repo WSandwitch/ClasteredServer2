@@ -91,6 +91,18 @@ namespace share{
 								safezones[obj->gid]=quad(obj->x, obj->y, obj->width, obj->height);
 							}
 						}
+					}else if (group->name==std::string("portals")){
+						for(auto obj: group->objects){
+							if (obj->type==OBJECT_QUAD){
+								portal* p=new portal();
+								p->name=obj->name;
+								p->id=getId((char*)p->name.c_str());
+								p->area=quad(obj->x, obj->y, obj->width, obj->height);
+								p->target=getId((char*)obj->properties["target"].c_str());
+								try{p->map_id=getId((char*)obj->properties.at("map").c_str());}catch(...){}
+								portals[p->id]=p;
+							}
+						}
 					}// add teleport zones with id fix
 				}
 				delete map;
@@ -134,6 +146,21 @@ namespace share{
 					}
 				}
 			}
+			auto &&q=cell_quad(id);
+			for(auto &&pi: portals){
+				portal *p=pi.second;
+				if (
+					p->area.contains(borders[0].a) || //0 - left top 2 - right bottom
+					p->area.contains(borders[0].b) ||
+					p->area.contains(borders[2].a) ||
+					p->area.contains(borders[2].a) ||
+					q.contains(p->area.a) ||
+					q.contains(p->area.b) 
+				){
+						grid[i].portals.push_back(p);
+				}
+			}
+			
 //			printf("\n");
 		}
 		near_cells(35, 5);
@@ -199,8 +226,8 @@ namespace share{
 	
 	std::vector<segment> map::cell_borders(int id){
 		vector<segment> v;
-		int x=id%size.y;
-		int y=id/size.y;
+		int x=id_to_x(id);
+		int y=id_to_y(id);
 		point p1(x*cell.x, y*cell.y);
 		point p2(x*cell.x, y*cell.y+cell.y);
 		point p3(x*cell.x+cell.x, y*cell.y+cell.y);
@@ -214,6 +241,12 @@ namespace share{
 		v.push_back(s3);
 		v.push_back(s4);
 		return v;
+	}
+	
+	quad map::cell_quad(int id){
+		int x=id_to_x(id);
+		int y=id_to_y(id);
+		return quad(point(x*cell.x, y*cell.y), point((x+1)*cell.x, (y+1)*cell.y));
 	}
 	
 	std::list<int> map::near_cells(int id, typeof(npc::r) r){

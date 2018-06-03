@@ -20,6 +20,7 @@ import flixel.util.FlxSave;
 #end
 @:build(SettingsFunction.build("useMouse", #if(mobile) false #else true #end ))
 @:build(SettingsFunction.build("useTouch", #if(!mobile) false #else true #end ))
+@:build(SettingsFunction.build("useScreenGamepad", #if(!mobile) false #else true #end ))
 @:build(SettingsFunction.build("screenWidth", 720))
 @:build(SettingsFunction.build("screenHeight", 560))
 
