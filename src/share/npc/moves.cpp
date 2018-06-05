@@ -53,17 +53,34 @@ namespace share{
 		//it is not bot (for disable respawn)
 		if (x!=0 || y!=0){
 			if ((bot.dist<weapon.dist || weapon.dist<=0)){
-				segment* s; 
-				if (check_point(position.x+x,position.y+y, &s)){
+				if (check_point(position.x+x,position.y+y, [&](point &p, segment *s)->bool{//we don't check for bullet radius
+					if (segment(position, p).cross(s)!=0){
+						if (randInPercent(weapon.ricochet)){
+							//add richochet move
+							char half_angle=0;
+							auto $=segment(position,position+point(x,y)).mirror_by(*s, half_angle);
+							if (half_angle){
+								set_attr(position.x, $.x);
+								set_attr(position.y, $.y);
+								direction.rotate(half_angle).rotate(half_angle);
+								set_attr(direction.x, direction.x);
+								set_attr(direction.y, direction.y);
+								set_attr(angle, direction.to_angle());
+								bot.dist+=vel;
+							}
+						}else{
+							suicide();
+						}
+						return 1;//if cross need to return false from check_point
+					}
+					return 0;
+				})){
 	//				point p=position; 
 					set_attr(position.x, position.x+x);
 					set_attr(position.y, position.y+y);
 					bot.dist+=vel;//usualy in full speed//p.distanse(position);
-					return;
-				} else if (randInPercent(weapon.richochet)){
-					//add richochet move
-					return;
-				}
+				} 
+				return;
 			}
 			suicide();//suicide
 		}

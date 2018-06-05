@@ -35,8 +35,8 @@ namespace share{
 	map::map(char* path): offset(50){
 		name=std::string(strrchr(path,'/')+1,strlen(path)-(int)(strrchr(path,'.')-path)-1);
 		id=getId((char*)name.data());
-		cell.x=25;
-		cell.y=25;
+		cell.x=30;//25;
+		cell.y=30;//25;
 //		grid=0;
 		map_size[0]=200;
 		map_size[1]=200;
@@ -141,7 +141,7 @@ namespace share{
 				for(int b=0;b<4;b++){
 					if (borders[b].cross(segments[j])){
 						grid[i].segments.push_back(segments[j]);
-//						printf("%d|%d[%g,%g %g,%g](%g,%g %g,%g) ", j, b,segments[j]->a.x,segments[j]->a.y,segments[j]->b.x,segments[j]->b.y,borders[b].a.x,borders[b].a.y,borders[b].b.x,borders[b].b.y);
+						//printf("%d|%d[%g,%g %g,%g](%g,%g %g,%g) \n", j, b,segments[j]->a.x,segments[j]->a.y,segments[j]->b.x,segments[j]->b.y,borders[b].a.x,borders[b].a.y,borders[b].b.x,borders[b].b.y);
 						break;
 					}
 				}

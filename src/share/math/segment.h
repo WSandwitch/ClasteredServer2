@@ -20,12 +20,16 @@ namespace share {
 			float length(float l);
 			float mul(float l);
 			char cross(segment *b);
+			bool has_inside(point &p); 
 			typeof(point::x) vector(point &p); //vector mul
 			typeof(segment::a) to_vector(); 
+			typeof(segment::a) cross_point(segment s);
+			typeof(segment::a) mirror_by(segment s, char &a);
+			segment to_quad();
 			//quad
 			typeof(segment::a) rand_point_in();
 			template<class T>
-				bool contains(point_<T> p){
+				bool contains(point_<T> &p){
 					return a.x<=p.x && a.y<=p.y && a.x+b.x>=p.x && a.y+b.y>=p.y;
 				};
 		

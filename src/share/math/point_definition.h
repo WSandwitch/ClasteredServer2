@@ -84,7 +84,19 @@ namespace share {
 
 	template<class T>
 	template<class T1>
+		point_<T> point_<T>::operator*(T1 b){
+			return point_<T>(x*b,y*b);
+		}
+
+	template<class T>
+	template<class T1>
 		point_<T> point_<T>::operator+(point_<T1> &&b){
+			return point_<T>(x+b.x,y+b.y);
+		}
+
+	template<class T>
+	template<class T1>
+		point_<T> point_<T>::operator+(point_<T1> &b){
 			return point_<T>(x+b.x,y+b.y);
 		}
 
@@ -92,12 +104,6 @@ namespace share {
 	template<class T1>
 		point_<T> point_<T>::operator-(point_<T1> &&b){
 			return point_<T>(x-b.x,y-b.y);
-		}
-
-	template<class T>
-	template<class T1>
-		point_<T> point_<T>::operator+(point_<T1> &b){
-			return point_<T>(x+b.x,y+b.y);
 		}
 
 	template<class T>

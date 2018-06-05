@@ -135,6 +135,7 @@ namespace master {
 					nn->restore_attrs();
 //					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
 					
+					nn->weapon.ricochet=n->weapon.ricochet;
 					nn->weapon.damage=n->weapon.damage;
 					nn->weapon.dist=n->weapon.dist; //set max move dist
 					nn->weapon.attacks=n->weapon.attacks; //set max targets

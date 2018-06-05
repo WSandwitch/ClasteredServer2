@@ -5,6 +5,7 @@
 #include <list>
 #include <array>
 #include <vector>
+#include <functional>
 #include "../share/system/time.h"
 #include "../share/system/mutex.h"
 #include "../share/network/packet.h"
@@ -101,7 +102,7 @@ namespace share {
 				short ang_diap;//pdegree
 				short ang_shift;//pdegree
 				short attacks;
-				float richochet; //
+				float ricochet; //
 				int dist; //calculated distance, move to bullet
 //				float vel;
 				
@@ -180,7 +181,7 @@ namespace share {
 			timestamp_t timestamp;
 			map3b<pack_p> _packs;
 			
-			bool check_point(typeof(point::x) x, typeof(point::y) y, segment** s=0);
+			bool check_point(typeof(point::x) x, typeof(point::y) y, std::function<bool(point&,segment*)> &&f=std::function<bool(point&,segment*)>());
 		
 			static npc_moves _moves;
 			static npc_shoots _shoots;

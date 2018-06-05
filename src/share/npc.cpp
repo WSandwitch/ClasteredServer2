@@ -185,7 +185,7 @@ namespace share {
 		packAttr(weapon_id,1,1,0,0,0); //28s 
 		packAttr(bullet_id,1,1,0,0,0); //29s 
 		packAttr(portalled,0,0,1,1,1); //30s 
-		packAttr(weapon.richochet,0,0,1,0,1); //31s 
+		packAttr(weapon.ricochet,0,0,1,0,1); //31s 
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -289,6 +289,7 @@ namespace share {
 				update_attrs(OMODATTR::SHOOT_WARMUP, weapon.warmup)
 				update_attrs(OMODATTR::SHOOT_COOLDOWN, weapon.cooldown)
 				update_attrs(OMODATTR::SHOOT_LATENCY, weapon.latency)
+				update_attrs(OMODATTR::WEAPON_RICOCHET, weapon.ricochet)
 			}
 		}
 	}
@@ -360,7 +361,7 @@ namespace share {
 				if(p->area.contains(position)){
 					if (!portalled){
 						point shift=position-p->area.a;
-						printf("teleport! (%g %g)[%g %g] %g %g\n", position.x, position.y, p->area.a.x, p->area.a.y, shift.x, shift.y);
+						//printf("teleport! (%g %g)[%g %g] %g %g\n", position.x, position.y, p->area.a.x, p->area.a.y, shift.x, shift.y);
 						try{
 							auto &&$=m->portals.at(p->target)->area.a+shift;
 							set_attr(position.x, $.x);
@@ -580,12 +581,17 @@ namespace share {
 	}
 	
 	//check can npc move to point
-	bool npc::check_point(typeof(point::x) x, typeof(point::y) y, segment **s){
+	bool npc::check_point(typeof(point::x) x, typeof(point::y) y, std::function<bool(point&,segment*)> &&callback){
 		return do_on_map([&](map* m)->int{
 			point p(x,y);
 			segment ps(position,p);
-			ps.length(r*3);
-			std::list<int> &&ids=m->near_cells(x, y, r); //!check this!
+			//ps.length(ps.length()+r*2);
+			segment pshalf(ps);
+			float halfl=pshalf.length()/2.0f;
+			pshalf.length(halfl);
+			//printf("[%g %g | %g %g] [%g %g %g]\n", ps.a.x, ps.a.y, ps.b.x, ps.b.y, pshalf.b.x, pshalf.b.y, halfl+r);
+			std::list<int> &&ids=m->near_cells(pshalf.b.x, pshalf.b.y, halfl+r); //!check this!
+			//std::list<int> &&ids=m->near_cells(x, y, r); //!check this!
 			std::unordered_set<segment*> done;
 			//printf("segments %d \n", world->map->segments.size());
 			for(auto c: ids){//TODO: change to check by map grid
@@ -594,9 +600,15 @@ namespace share {
 					segment *s=cell->segments[i];
 					if (done.count(s)==0){ //uniq check
 						if(!s->directed || (s->directed && s->vector(position)<0 && s->cross(&ps)>0)){ //check for directed segments
-							if(s->distanse(p)<=r){
-								//printf("dist \n");
-								return 0;
+							try{
+								if (callback(p, s)){
+									return 0;
+								}
+							}catch(...){
+								if(s->distanse(p)<=r){
+									//printf("dist \n");
+									return 0;
+								}
 							}
 						}
 						done.insert(s);

@@ -23,11 +23,13 @@ namespace share {
 				template<class T1>
 					T distanse2(point_<T1> &b);
 				template<class T1>
+					point_ operator*(T1 b);
+				template<class T1>
 					point_ operator+(point_<T1> &&b);
 				template<class T1>
-					point_ operator-(point_<T1> &&b);
-				template<class T1>
 					point_ operator+(point_<T1> &b);
+				template<class T1>
+					point_ operator-(point_<T1> &&b);
 				template<class T1>
 					point_ operator-(point_<T1> &b);
 				template<class T1>

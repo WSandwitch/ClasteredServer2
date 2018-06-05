@@ -9,8 +9,16 @@
 	_x>_y?_y:_x;\
 })
 
+#define max_of(x, y) ({\
+	typeof(x) _x=x;\
+	typeof(y) _y=y;\
+	_x<_y?_y:_x;\
+})
+
 #define PPI 120
 #define to_pdegrees(a) (PPI/3.14f*(a))
 #define from_pdegrees(a) (3.14f/PPI*(a))
+#define to_degrees(a) (180/3.14f*(a))
+#define from_degrees(a) (3.14f/180*(a))
 
 #endif
