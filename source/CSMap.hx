@@ -194,12 +194,12 @@ class CSMap extends FlxGroup{
 		return _npcs.get(id);
 	}
 
-	public function remove_npc(id:Int, clear:Bool=false):Null<Npc>{
+	public function remove_npc(id:Int, clear:Bool=true):Null<Npc>{
 		var n:Null<Npc> = get_npc(id);
 		if (n != null){
-			n.shown(false);
+			//n.shown(false);
 			if (clear){
-				_npcs_group.remove(n, true);
+				_npcs_group.remove(n);// , true);
 				_npcs.remove(id);
 			}
 		}

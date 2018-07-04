@@ -66,7 +66,7 @@ namespace share{
 								set_attr(direction.x, direction.x);
 								set_attr(direction.y, direction.y);
 								set_attr(angle, direction.to_angle());
-								bot.dist+=vel;
+								bot.dist+=vel*2;
 							}
 						}else{
 							suicide();

@@ -281,17 +281,17 @@ class PlayState extends FlxState
 	}
 	
 	public function addGamepad(){
-	#if mobile
-		if (_gamepad != null){
-			remove(_gamepad);
-			FlxDestroyUtil.destroy(_gamepad);
+		if (Settings.useScreenGamepad){
+			if (_gamepad != null){
+				remove(_gamepad);
+				FlxDestroyUtil.destroy(_gamepad);
+			}
+			_gamepad = new ScreenGamepad();
+			add(_gamepad);
+			//setup visibility
+			_gamepad.exists = Settings.useScreenGamepad;
+			Settings.useScreenGamepadCallback = function(v:Bool){ _gamepad.exists = v; };
 		}
-		_gamepad = new ScreenGamepad();
-		add(_gamepad);
-		//setup visibility
-		_gamepad.exists = Settings.useScreenGamepad;
-		Settings.useScreenGamepadCallback = function(v:Bool){ _gamepad.exists = v; };
-	#end
 	}
 	
 	private function checkInput(elapsed:Float) {
@@ -390,7 +390,7 @@ class PlayState extends FlxState
 						if (npc_id==nid){
 							//player npc add screen you are died
 						}else{
-							var n:Null<Npc> = _map.remove_npc(nid, false);
+							var n:Null<Npc> = _map.remove_npc(nid, true);
 							if (n != null){
 //								trace("remove npc " + nid);
 //								FlxDestroyUtil.destroy(n); //don't need
