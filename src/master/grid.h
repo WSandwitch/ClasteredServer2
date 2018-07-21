@@ -1,7 +1,7 @@
 #ifndef CLASTERED_SERVER_GRID_HEADER
 #define CLASTERED_SERVER_GRID_HEADER
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 extern "C" {
@@ -28,7 +28,7 @@ namespace master {
 		class grid_ {
 			public:
 				float cell[2]; //size of cell in units
-				std::map<int, grid_server> servers;
+				std::unordered_map<int, grid_server> servers;
 
 				grid_(int s[2], int o);
 				~grid_();
@@ -45,7 +45,7 @@ namespace master {
 				int grid_size[2]; //size of grid in cells
 				data_cell** data; //grid
 				std::vector<int> server_ids; //ids of server, sorted
-				std::map<data_cell, data_cell*> cells; //all cells used in grid
+				std::unordered_map<data_cell, data_cell*> cells; //all cells used in grid
 				
 				int to_grid(int x, int y);
 		};
@@ -57,7 +57,7 @@ namespace master {
 		class grid {
 			public:
 				float cell[2]; //size of cell in units
-				std::map<int, grid_*> grids;
+				std::unordered_map<int, grid_*> grids;
 
 				grid();
 				~grid();

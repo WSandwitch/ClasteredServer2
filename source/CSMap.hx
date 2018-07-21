@@ -51,7 +51,7 @@ class CSMap extends FlxGroup{
 		super();
 		add(tilemap);
 		add(_npcs_group);
-		fov = new FOV(FlxG.width, FlxG.height, vis, 5, 5);
+		fov = new FOV(FlxG.width, FlxG.height, vis, 6, 6);
 		add(fov);
 	}
 	

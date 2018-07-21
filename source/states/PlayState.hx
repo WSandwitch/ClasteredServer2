@@ -10,7 +10,7 @@ import flixel.FlxSprite;
 import flixel.FlxObject;
 import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup;
-import flixel.FlxState;
+import flixel.addons.ui.FlxUIState;
 import flixel.math.FlxPoint;
 import flixel.system.scaleModes.*;
 import flixel.math.FlxMath;
@@ -39,7 +39,7 @@ import extension.notifications.Notifications;
  */
 
  
-class PlayState extends FlxState
+class PlayState extends FlxUIState
 {
 	//message ids
 	public var MESSAGE_SET_ACTIONS:Int;
@@ -138,6 +138,9 @@ class PlayState extends FlxState
 		MessageIds.build(this);
 		CSObjects.init();
 		
+		_xml_id = "play";
+		reload_ui_on_resize = true;
+		
 		super.create();
 		trace("play state");
 		
@@ -208,10 +211,15 @@ class PlayState extends FlxState
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_MINUS);
 		a=actions.addAction(LOOK_RIGHT);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_PLUS);
+		
+		reloadUI();//set ui on top of screen
 	}
 	
 	override 
-	public function draw(){	
+	public function draw() {
+		_ui.x = FlxG.camera.scroll.x;
+		_ui.y = FlxG.camera.scroll.y;
+	
 		super.draw();
 	}
 	
