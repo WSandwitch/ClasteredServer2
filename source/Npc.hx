@@ -23,7 +23,7 @@ import util.CSGraphicUtil;
  */
  
 class Npc extends NpcBase{
-	private static var _graph:FlxGraphic = FlxG.bitmap.create(1, 1, FlxColor.TRANSPARENT);
+	private var _graph:FlxGraphic = FlxG.bitmap.create(1, 1, FlxColor.TRANSPARENT);
 	
 	private var _trail:Null<CSTrail> = null; //trail works for not animatet sprites
 	

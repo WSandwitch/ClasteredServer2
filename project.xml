@@ -104,7 +104,7 @@
 
 	<!--------------------------------Android---------------------------------------->
 <!--	<template path="templates/android/AndroidManifest.xml" rename="AndroidManifest.xml" if="android" /> -->
-	<android target-sdk-version="16" if="android" />
+	<android minimum-sdk-version="16" target-sdk-version="19" if="android" />
 	<!--<android install-location="preferExternal" />-->
 	<!--<android permission="android.permission.WRITE_EXTERNAL_STORAGE" />-->
 	<!--<android permission="android.permission.INTERNET" />-->
