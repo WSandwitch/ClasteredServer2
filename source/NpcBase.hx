@@ -33,6 +33,7 @@ class NpcBase extends FlxSpriteGroup{
 		updater[1] = updater_pos_x;
 		updater[2] = updater_pos_y;
 		updater[6] = updater_type;
+		updater[8] = updater_health;
 		updater[9] = updater_angle;
 		updater[0] = updater_timestamp;
 	}
@@ -90,6 +91,11 @@ class NpcBase extends FlxSpriteGroup{
 	//angle
 	function updater_angle(a:Dynamic){
 		this.angle=Math.round(a / 120.0 * 180); 
+	};
+	
+	//health
+	function updater_health(a:Dynamic){
+		this.health = a;
 	};
 	
 	//timestamp

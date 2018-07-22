@@ -6,29 +6,20 @@ import flash.display.BlendMode;
 import flash.media.ID3Info;
 import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.FlxObject;
-import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup;
 import flixel.addons.ui.FlxUIState;
 import flixel.math.FlxPoint;
-import flixel.system.scaleModes.*;
-import flixel.math.FlxMath;
-import flixel.math.FlxRect;
-import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
-import openfl.Assets;
 import clasteredServerClient.*;
-import haxe.CallStack;
+import openfl.events.Event;
 import util.Settings;
+import ui.CSUIPlay;
 
 import flixel.input.keyboard.FlxKey;
 import flixel.input.AbstractInputManager;
-import flixel.input.AbstractInputManager.*;
 
 import input.ScreenGamepad;
 
-using flixel.util.FlxSpriteUtil;
 import flixel.system.macros.FlxMacroUtil;
 
 #if mobile
@@ -55,7 +46,8 @@ class PlayState extends FlxUIState
 	static var LEVEL_MIN_Y;
 	static var LEVEL_MAX_Y;
 
-	private var actions:AbstractInputManager = new AbstractInputManager();
+	private var _actions:AbstractInputManager = new AbstractInputManager();
+	private var _hud:Null<CSUIPlay>;
 //	private var hud:HUD;
 //	private var hudCam:FlxCamera;
 
@@ -139,7 +131,7 @@ class PlayState extends FlxUIState
 		CSObjects.init();
 		
 		_xml_id = "play";
-		reload_ui_on_resize = true;
+		//reload_ui_on_resize = true;
 		
 		super.create();
 		trace("play state");
@@ -162,7 +154,7 @@ class PlayState extends FlxUIState
 //		add(_hud_group);
 //		_hud_group.add(hud);
 
-	#if !flash
+	#if (!flash && !mobile) 
 		FlxG.camera.antialiasing=true;
 	#end
 		//tell screen size to master
@@ -179,37 +171,37 @@ class PlayState extends FlxUIState
 		hudCam.alpha = .5;
 		FlxG.cameras.add(hudCam);
 */
-		actions.disable_mouse = !Settings.useMouse;
-		Settings.useMouseCallback = function(v:Bool){ actions.disable_mouse = !v; };
+		_actions.disable_mouse = !Settings.useMouse;
+		Settings.useMouseCallback = function(v:Bool){ _actions.disable_mouse = !v; };
 		//add gamepad to screen
 		addGamepad();
 		//change to normal mapping
-		var a = actions.addAction(GO_UP);
+		var a = _actions.addAction(GO_UP);
 		a.addKey(FlxKey.W);
 		a.addKey(FlxKey.UP);
 		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_MINUS);
-		a=actions.addAction(GO_DOWN);
+		a=_actions.addAction(GO_DOWN);
 		a.addKey(FlxKey.S);
 		a.addKey(FlxKey.DOWN);
 		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_Y_PLUS);
-		a=actions.addAction(GO_LEFT);
+		a=_actions.addAction(GO_LEFT);
 		a.addKey(FlxKey.A);
 		a.addKey(FlxKey.LEFT);
 		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_MINUS);
-		a=actions.addAction(GO_RIGHT);
+		a=_actions.addAction(GO_RIGHT);
 		a.addKey(FlxKey.D);
 		a.addKey(FlxKey.RIGHT);
 		a.addGamepadAxis(GamepadAxisID.LEFT_STICK_X_PLUS);
-		a=actions.addAction(ATTACK);
+		a=_actions.addAction(ATTACK);
 		a.addMouseKey(MouseID.MOUSE_LEFT);
 		
-		a=actions.addAction(LOOK_UP);
+		a=_actions.addAction(LOOK_UP);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_Y_MINUS);
-		a=actions.addAction(LOOK_DOWN);
+		a=_actions.addAction(LOOK_DOWN);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_Y_PLUS);
-		a=actions.addAction(LOOK_LEFT);
+		a=_actions.addAction(LOOK_LEFT);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_MINUS);
-		a=actions.addAction(LOOK_RIGHT);
+		a=_actions.addAction(LOOK_RIGHT);
 		a.addGamepadAxis(GamepadAxisID.RIGHT_STICK_X_PLUS);
 		
 		reloadUI();//set ui on top of screen
@@ -231,7 +223,8 @@ class PlayState extends FlxUIState
 		send_screen_position();
 		checkInput(elapsed);
 		checkPackets(elapsed);
-
+		if (_hud!=null)
+			_hud.update(elapsed);
 		super.update(elapsed);
 	}
 	
@@ -276,6 +269,17 @@ class PlayState extends FlxUIState
 	}
 	
 	override
+	private function reloadUI(?e:Event) {
+		//TODO" Add destroy hud
+		if (_hud != null) {
+			_hud.destroy();
+			_hud = null;
+		}
+		super.reloadUI(e);
+		_hud = new CSUIPlay(_ui);
+	}
+	
+	override
 	public function onResize(w:Int, h:Int){
 //		trace(w);
 		super.onResize(w, h);
@@ -305,22 +309,22 @@ class PlayState extends FlxUIState
 	private function checkInput(elapsed:Float) {
 		var p:Packet = new Packet();
 		var keys_changed:Bool = false;
-		actions.update();
-		if (actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
+		_actions.update();
+		if (_actions.anyChanged([GO_UP, GO_DOWN, GO_LEFT, GO_RIGHT])){
 			p.addChar(0);
-			p.addChar(Math.round((actions.value(GO_RIGHT)-actions.value(GO_LEFT))*100));
+			p.addChar(Math.round((_actions.value(GO_RIGHT)-_actions.value(GO_LEFT))*100));
 			p.addChar(1);
-			p.addChar(Math.round((actions.value(GO_DOWN)-actions.value(GO_UP))*100));
+			p.addChar(Math.round((_actions.value(GO_DOWN)-_actions.value(GO_UP))*100));
 		}
-		if (actions.anyChanged([ATTACK])){
+		if (_actions.anyChanged([ATTACK])){
 			p.addChar(3);
-			p.addChar(Math.round(actions.value(ATTACK)));
+			p.addChar(Math.round(_actions.value(ATTACK)));
 		}
 		if (npc != null){
 			var angle_send:Bool = false;
 			var angle:Float = 0;
-			if (actions.anyChanged([LOOK_UP, LOOK_DOWN, LOOK_LEFT, LOOK_RIGHT])){
-				 var angle = Math.atan2(actions.value(LOOK_DOWN) - actions.value(LOOK_UP), actions.value(LOOK_RIGHT) - actions.value(LOOK_LEFT)); 
+			if (_actions.anyChanged([LOOK_UP, LOOK_DOWN, LOOK_LEFT, LOOK_RIGHT])){
+				 var angle = Math.atan2(_actions.value(LOOK_DOWN) - _actions.value(LOOK_UP), _actions.value(LOOK_RIGHT) - _actions.value(LOOK_LEFT)); 
 				 if (Math.abs(_angle-angle) >= _d_angle){
 					_angle = angle;
 					angle_send = true;
@@ -426,6 +430,8 @@ class PlayState extends FlxUIState
 								npc = _map.get_npc(npc_id);
 								FlxG.camera.follow(npc, FlxCameraFollowStyle.NO_DEAD_ZONE);
 								_map.fov.follow = npc;
+								if (_hud != null)
+									_hud.npc = npc;
 								i++;
 							case 2:
 								trace("map id updated");
