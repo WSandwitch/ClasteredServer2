@@ -11,6 +11,7 @@
 #define MESSAGE_SET_ATTRS 3
 #define MESSAGE_GET_NPC_INFO 4
 #define MESSAGE_GET_MAP_INFO 5
+#define MESSAGE_APPLY_ITEM 6
 
 ///master -> slave
 #define MESSAGE_PAUSE 1

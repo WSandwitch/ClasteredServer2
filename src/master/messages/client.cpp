@@ -15,6 +15,7 @@
 #include "../../share/crypt/base64.h"
 #include "../../share/crypt/md5.h"
 #include "../../share/messages.h"
+#include "../../share/object.h"
 
 /*
 ╔══════════════════════════════════════════════════════════════╗
@@ -275,6 +276,30 @@ namespace master {
 		return 0;
 	}
 
+	///[oid,pos]
+	static void *message_MESSAGE_APPLY_ITEM(client *cl, packet* p){
+		clientCheckAuth(cl);//client must have id already
+		int oid=p->chanks[0].value.i;
+		master::world.m.lock();
+			master::world.npcs_m.lock();
+				try{
+					auto o=object::all.at(oid);
+					auto n=master::world.npcs.at(cl->npc_id);
+					switch (o->type){
+						case OBJECT_WEAPON:{
+							n->set_attr(n->weapon_id, oid);
+							n->recalculate_type();
+							break;
+						}
+					}
+				}catch(...){
+					printf("client %d try to apply object %d\n", cl->id, oid);
+				}
+			master::world.npcs_m.unlock();
+		master::world.m.unlock();
+		return 0;
+	}
+
 	voidMessageProcessor(25)
 
 	void clientMessageProcessorInit(){
@@ -283,6 +308,7 @@ namespace master {
 		messageprocessorClientAdd(MESSAGE_SET_ATTRS, (void*)&message_MESSAGE_SET_ATTRS);
 		messageprocessorClientAdd(MESSAGE_GET_NPC_INFO, (void*)&message_MESSAGE_GET_NPC_INFO);
 		messageprocessorClientAdd(MESSAGE_GET_MAP_INFO, (void*)&message_MESSAGE_GET_MAP_INFO);
+		messageprocessorClientAdd(MESSAGE_APPLY_ITEM, (void*)&message_MESSAGE_APPLY_ITEM);
 
 		clientMessageProcessor(25);
 	}

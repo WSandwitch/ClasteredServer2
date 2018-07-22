@@ -1,6 +1,7 @@
 #ifndef CLASTERED_SERVER_GRID_HEADER
 #define CLASTERED_SERVER_GRID_HEADER
 
+#include <map>
 #include <unordered_map>
 #include <vector>
 
@@ -45,7 +46,7 @@ namespace master {
 				int grid_size[2]; //size of grid in cells
 				data_cell** data; //grid
 				std::vector<int> server_ids; //ids of server, sorted
-				std::unordered_map<data_cell, data_cell*> cells; //all cells used in grid
+				std::map<data_cell, data_cell*> cells; //all cells used in grid
 				
 				int to_grid(int x, int y);
 		};
