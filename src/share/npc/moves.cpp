@@ -52,7 +52,18 @@ namespace share{
 	void npc_moves::move1(typeof(point::x) x, typeof(point::y) y){
 		//it is not bot (for disable respawn)
 		if (x!=0 || y!=0){
-			if ((bot.dist<weapon.dist || weapon.dist<=0)){
+			if (
+				(bot.dist<weapon.dist || weapon.dist<=0) &&
+				[&]()->bool{
+					try{
+						for(auto&& sf:world->maps.at(map_id)->cells(position)->safezones){
+							if (sf->contains(position))
+								return 0;
+						}
+					}catch(...){}
+					return 1;
+				}()//if bullet in safezone it must be removed
+			){
 				if (check_point(position.x+x,position.y+y, [&](point &p, segment *s)->bool{//we don't check for bullet radius
 					if (segment(position, p).cross(s)!=0){
 						if (randInPercent(weapon.ricochet)){

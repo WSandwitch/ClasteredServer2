@@ -28,6 +28,7 @@ namespace share {
 			segment to_quad();
 			//quad
 			typeof(segment::a) rand_point_in();
+			float qdistanse(point &p);
 			template<class T>
 				bool contains(point_<T> &p){
 					return a.x<=p.x && a.y<=p.y && a.x+b.x>=p.x && a.y+b.y>=p.y;

@@ -134,7 +134,7 @@ NLTmxMap* NLLoadTmxMap( char *xml )
             if ( nameattr ) {
                 object->name = nameattr->value();
             }
-            auto gidattr = objectnode->first_attribute( "gid" );
+            auto gidattr = objectnode->first_attribute( "id" );//updated
             if ( gidattr ) {
                 object->gid = atoi( gidattr->value() );
             }

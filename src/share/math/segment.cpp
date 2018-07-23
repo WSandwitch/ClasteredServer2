@@ -145,6 +145,23 @@ namespace share {
 		return out;
 	}
 	
+	float segment::qdistanse(point &p){
+		float $$,$=-1;
+		if (contains(p))
+			return 0;
+		for (auto &&s:{
+			segment(a, point(a.x,a.y+b.y)),
+			segment(point(a.x,a.y+b.y), a+b),
+			segment(a+b, point(a.x+b.x,a.y)),
+			segment(point(a.x+b.x,a.y), a)
+		}){
+			if ($>($$=((segment)s).distanse(p)) || $<0){
+				$=$$;
+			}
+		}
+		return $;
+	}
+
 }
 
 namespace std {

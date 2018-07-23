@@ -30,8 +30,11 @@ class FOVSprite extends FlxSprite{
 //	public var next_update:Bool = true;
 	public function new(){
 		super();
-		for (i in 0...4)
+		for (i in 0...3)
 			need_update.add(true);
+		#if mobile
+			antialiasing = false;
+		#end
 	}
 }
 
@@ -189,7 +192,7 @@ class FOV extends FlxSpriteGroup{
 							var bij = _bases[i][j];
 							var nu:Bool = false;
 							for (_nu in bij.need_update){
-								if (_nu){
+								if (_nu || Std.random(10)<2){
 									nu = true;
 									break;
 								}

@@ -160,6 +160,19 @@ namespace share{
 						grid[i].portals.push_back(p);
 				}
 			}
+			for(auto &&pi: safezones){
+				quad *p=&std::get<1>(pi);
+				if (
+					p->contains(borders[0].a) || //0 - left top 2 - right bottom
+					p->contains(borders[0].b) ||
+					p->contains(borders[2].a) ||
+					p->contains(borders[2].a) ||
+					q.contains(p->a) ||
+					q.contains(p->b) 
+				){
+						grid[i].safezones.push_back(p);
+				}
+			}
 			
 //			printf("\n");
 		}
@@ -262,7 +275,8 @@ namespace share{
 		int out=-1;
 		float d=0;
 		for (auto &&i: safezones){
-			float $=i.second.distanse(p);
+			float $=i.second.qdistanse(p);
+			//printf("{%g %g %g %g} <-> [%g %g] = %g\n", i.second.a.x,i.second.a.y,i.second.b.x,i.second.b.y,p.x,p.y,$);
 			if (out<0 || $<d){
 				d=$;
 				out=i.first;
@@ -277,6 +291,10 @@ namespace share{
 	}
 	
 	quad& map::nearest_safezone(point& p){
+		return safezones.at(nearest_safezone_id(p));
+	}
+	
+	quad& map::nearest_safezone(point&& p){
 		return safezones.at(nearest_safezone_id(p));
 	}
 	

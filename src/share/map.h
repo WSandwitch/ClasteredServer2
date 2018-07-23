@@ -32,6 +32,7 @@ namespace share {
 		std::unordered_map<int, npc*> npcs;
 		std::vector<segment*> segments;
 		std::vector<portal*> portals;
+		std::vector<quad*> safezones;
 	};
 
 	class map {
@@ -70,6 +71,7 @@ namespace share {
 			int nearest_safezone_id(point& p);
 			quad& nearest_safezone(typeof(point::x) x, typeof(point::y) y);
 			quad& nearest_safezone(point& p);
+			quad& nearest_safezone(point&& p);
 			
 			static int getId(char* s);
 			

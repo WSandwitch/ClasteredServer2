@@ -8,7 +8,7 @@
 #include "../client.h"
 #include "../world.h"
 #include "../messageprocessor.h"
-#include "../../object.h"
+#include "../../share/object.h"
 #include "../../share/network/packet.h"
 #include "../../share/system/log.h"
 #include "../../share/system/copy.h"
@@ -112,44 +112,55 @@ namespace master {
 		master::world.m.lock();
 			try{
 				npc *n=master::world.npcs.at(p->chanks[0].value.i);
-				n->m.lock();
-					npc *nn = new npc(n->world, n->world->getId());
-					//set params
-					nn->angle=p->chanks[1].value.c;
-					nn->direction.by_angle(nn->angle, 1); //right dir and full speed
-//					printf("%g %g \n", nn->direction.x, nn->direction.y);
-					nn->position=n->position+point::from_angle(nn->angle, n->r*2);//+copy(n->weapon.bullet_offset).rotate(nn->angle);
-					//correction for gun offset
-					point bpoint=n->weapon.bullet_offset;
-					bpoint.rotate(nn->angle);
-				//	printf("bullet offset %g %g -> %g %g\n", n->weapon.bullet_offset.x, n->weapon.bullet_offset.y, bpoint.x, bpoint.y);
-					nn->position+=bpoint;
-					nn->state=STATE_ATTACK;//attacking on every tick
-					nn->bot.owner_id=n->id;
-					nn->weapon_id=n->bullet_id;
-					
-					nn->recalculate_type();
-					if (nn->_health==0){
-						nn->_health=1;
+				auto c=master::world.maps.at(n->map_id)->cells(n->position);
+				if ([&]()->bool{
+					for(auto&& sf:c->safezones){
+						if (sf->contains(n->position))
+							return 0;
 					}
-					nn->restore_attrs();
-//					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
-					
-					nn->weapon.ricochet=n->weapon.ricochet;
-					nn->weapon.damage=n->weapon.damage;
-					nn->weapon.dist=n->weapon.dist; //set max move dist
-					nn->weapon.attacks=n->weapon.attacks; //set max targets
-					nn->weapon.next_shot=0;//shoot every tick
-					nn->weapon.latency=0;//shoot every tick
-					nn->attackable=n->weapon.attackable;
-					
-					nn->type=2;//TODO: get bullet base type from weapon object
-					nn->move_id=1;//TODO: change to choose bullet move id 
-					nn->shoot_id=2;//TODO: change to choose bullet shoot id 
-				n->m.unlock();
-				master::world.npcs_m.lock();
-					master::world.new_npcs.push_back(nn);
-				master::world.npcs_m.unlock();
+					return 1;
+				}()){//can't shoot in safezones
+					n->m.lock();
+						npc *nn = new npc(n->world, n->world->getId());
+						//set params
+						nn->angle=p->chanks[1].value.c;
+						nn->direction.by_angle(nn->angle, 1); //right dir and full speed
+	//					printf("%g %g \n", nn->direction.x, nn->direction.y);
+						nn->position=n->position+point::from_angle(nn->angle, n->r*2);//+copy(n->weapon.bullet_offset).rotate(nn->angle);
+						//correction for gun offset
+						point bpoint=n->weapon.bullet_offset;
+						bpoint.rotate(nn->angle);
+					//	printf("bullet offset %g %g -> %g %g\n", n->weapon.bullet_offset.x, n->weapon.bullet_offset.y, bpoint.x, bpoint.y);
+						nn->position+=bpoint;
+						nn->state=STATE_ATTACK;//attacking on every tick
+						nn->bot.owner_id=n->id;
+						nn->weapon_id=n->bullet_id;
+						
+						nn->recalculate_type();
+						if (nn->_health==0){
+							nn->_health=1;
+						}
+						nn->restore_attrs();
+	//					try{ nn->apply(share::object::all.at(n->bullet_id)); }catch(...){}
+						
+						nn->weapon.ricochet=n->weapon.ricochet;
+						nn->weapon.damage=n->weapon.damage;
+						nn->weapon.dist=n->weapon.dist; //set max move dist
+						nn->weapon.attacks=n->weapon.attacks; //set max targets
+						nn->weapon.next_shot=0;//shoot every tick
+						nn->weapon.latency=0;//shoot every tick
+						nn->attackable=n->weapon.attackable;
+						
+						nn->type=2;//TODO: get bullet base type from weapon object
+						nn->move_id=1;//TODO: change to choose bullet move id 
+						nn->shoot_id=2;//TODO: change to choose bullet shoot id 
+					n->m.unlock();
+					master::world.npcs_m.lock();
+						master::world.new_npcs.push_back(nn);
+					master::world.npcs_m.unlock();
+				}else{
+					printf("npc %d try to shoot in safezone\n", n->id);
+				}
 			}catch(...){}
 		master::world.m.unlock();
 		return 0;
