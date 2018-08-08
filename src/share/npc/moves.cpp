@@ -22,13 +22,16 @@ namespace share{
 	//common move
 	void npc_moves::move0(typeof(point::x) x, typeof(point::y) y){
 		char moved=0;
+		auto $=[&](point &p, segment *s)->bool{//stronger check
+			return (s->distanse(p)<=r || segment(position, p).cross(s));//if cross need to return false from check_point
+		};
 		if (x!=0)
-			if (check_point(position.x+x,position.y)){
+			if (check_point(position.x+x, position.y, $)){
 				set_attr(position.x, position.x+x);
 				moved++;
 			}
 		if (y!=0)
-			if (check_point(position.x,position.y+y)){
+			if (check_point(position.x, position.y+y, $)){
 				set_attr(position.y, position.y+y);
 				moved++;
 			}
@@ -77,7 +80,7 @@ namespace share{
 								set_attr(direction.x, direction.x);
 								set_attr(direction.y, direction.y);
 								set_attr(angle, direction.to_angle());
-								bot.dist+=vel*2;
+								set_attr(bot.dist, bot.dist+vel*2);//richochet needed more energy
 							}
 						}else{
 							suicide();
@@ -89,7 +92,7 @@ namespace share{
 	//				point p=position; 
 					set_attr(position.x, position.x+x);
 					set_attr(position.y, position.y+y);
-					bot.dist+=vel;//usualy in full speed//p.distanse(position);
+					set_attr(bot.dist, bot.dist+vel);//usually in full speed//p.distanse(position);
 				} 
 				return;
 			}

@@ -186,6 +186,7 @@ namespace share {
 		packAttr(bullet_id,1,1,0,0,0); //29s 
 		packAttr(portalled,0,0,1,1,1); //30s 
 		packAttr(weapon.ricochet,0,0,1,0,1); //31s 
+		packAttr(bot.dist,0,0,1,1,1); //32
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
