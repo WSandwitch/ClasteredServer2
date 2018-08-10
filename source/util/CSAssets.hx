@@ -286,7 +286,7 @@ class CSAssets
 		try{
 			var data:Bytes = File.getBytes(_base+id);
 		#if debug
-			trace("[CSAssets] loaded from disk");
+			trace("[CSAssets] loaded from disk " + id);
 		#end
 			if (callback != null){
 				if (async){
@@ -296,8 +296,10 @@ class CSAssets
 				}
 			}
 			return data;
-		}catch(e:Dynamic){
-//			trace("[CSAssets] no file");
+		}catch (e:Dynamic){
+			#if debug
+				trace("[CSAssets] no file " + id);
+			#end
 		}
 	#end	
 		if (callback != null){
