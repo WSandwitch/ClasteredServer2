@@ -134,7 +134,8 @@ namespace master {
 						nn->position+=bpoint;
 						nn->state=STATE_ATTACK;//attacking on every tick
 						nn->bot.owner_id=n->id;
-						nn->weapon_id=n->bullet_id;
+						nn->weapon_id=n->bullet_id;//TODO:change to base id
+						nn->body_id=0;//TODO:change
 						
 						nn->recalculate_type();
 						if (nn->_health==0){
@@ -151,7 +152,7 @@ namespace master {
 						nn->weapon.latency=0;//shoot every tick
 						nn->attackable=n->weapon.attackable;
 						
-						nn->type=2;//TODO: get bullet base type from weapon object
+						nn->type=2;//TODO: do not use for srite
 						nn->move_id=1;//TODO: change to choose bullet move id 
 						nn->shoot_id=2;//TODO: change to choose bullet shoot id 
 					n->m.unlock();

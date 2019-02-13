@@ -88,15 +88,14 @@ namespace share{
 		short ang_diap=weapon.ang_diap; //pdegree
 		short ang_shift=weapon.ang_shift; //pdegree
 		short attacks=weapon.attacks;
-
-		short ang_=ang_diap?((rand()%ang_diap)-ang_diap/2):0; //calc random angle in diap
-		short ang=((short)angle+ang_shift)+ang_;
-		while(ang<-PPI)
-			ang=PPI*2+ang;
-		while(ang>PPI)
-			ang=PPI*2-ang;
-//		printf("angle %d (%d %d) shot %d\n", angle, (short)angle+ang_shift, ang_, ang);
 		for (auto i=0;i<attacks;i++){
+			short ang_=ang_diap?((rand()%ang_diap)-ang_diap/2):0; //calc random angle in diap
+			short ang=((short)angle+ang_shift)+ang_;
+			while(ang<-PPI)
+				ang=PPI*2+ang;
+			while(ang>PPI)
+				ang=PPI*2-ang;
+//			printf("angle %d (%d %d) shot %d\n", angle, (short)angle+ang_shift, ang_, ang);
 			make_shot((char)(ang)); //TODO: check 
 		}
 	}

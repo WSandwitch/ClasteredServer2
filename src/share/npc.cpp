@@ -42,10 +42,10 @@ namespace share {
 		health(10),
 		_health(10),
 		type(1), //base id
-		weapon_id(1), //TODO:set 
-		body_id(0),
+		weapon_id(2), //TODO:set 
+		body_id(1),
 		head_id(0),
-		bullet_id(2), //TODO:set 
+		bullet_id(3), //TODO:set 
 		owner_id(0),
 		map_id(0), 
 //		bot({0}), 
@@ -114,6 +114,9 @@ namespace share {
 		//set health and position
 		n->health=n->_health;
 		n->spawn_wait=100;
+		n->slaves.clear();
+		n->damagers.clear();
+		n->portalled=0;
 		//cleanup and init
 		n->clear();
 		for(auto i:n->attr){
@@ -124,9 +127,10 @@ namespace share {
 		n->restore_attrs();
 		n->damagers.clear();
 		n->bot.dist=0;
-		//TODO:check for other attributes need to be cleared
+		//TODO:!!check for other attributes need to be cleared!!
 		printf("%d reused\n", id);
 //	*((int*)(0))=5;
+		printf("npc%d: vel after clone = %g\n",id, vel);
 		return n;
 	}
 
@@ -187,6 +191,7 @@ namespace share {
 		packAttr(portalled,0,0,1,1,1); //30s 
 		packAttr(weapon.ricochet,0,0,1,0,1); //31s 
 		packAttr(bot.dist,0,0,1,1,1); //32
+		packAttr(body_id,1,1,0,0,0); //33
 		for(auto i:attr){
 			attrs[i.first]=1;
 		}
@@ -243,13 +248,15 @@ namespace share {
 		apply_objectM(head)
 		//apply other objects
 		
-		weapon.ang_diap=PPI/360*(weapon.ang_diap);// to pdegree
-		weapon.ang_shift=PPI/360*(weapon.ang_shift);//pdegree
+		printf("weapon.ang_diap = %d\n", weapon.ang_diap);
+		weapon.ang_diap=PPI/180.0*(weapon.ang_diap);// to pdegree
+		weapon.ang_shift=PPI/180.0*(weapon.ang_shift);//pdegree
+		printf("weapon.ang_diap = %d\n", weapon.ang_diap);
 		if (world){
 			weapon.warmup=weapon.warmup>0 ? NPC_FULL_TEMP/(world->slave_tps*weapon.warmup) : NPC_FULL_TEMP;
 			weapon.cooldown=weapon.cooldown>0 ? NPC_FULL_TEMP/(world->slave_tps*weapon.cooldown) : NPC_FULL_TEMP;
 			weapon.latency=world->slave_tps*weapon.latency;
-		}
+		}		
 	}
 	
 	void npc::restore_attrs(){
@@ -374,7 +381,7 @@ namespace share {
 			}
 			return 0;
 		}));
-		
+//		printf("vel %g\n", vel);
 		try{
 			register float v=vel*vel_angle(0.43f);
 			(this->*(moves.at(move_id)))(direction.x*v, direction.y*v);//TODO:add angle correction

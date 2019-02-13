@@ -31,7 +31,9 @@ class Npc extends NpcBase{
 	
 	public var sprite:Null<FlxSprite> = null; //base sprite get by type
 	public var weapon:Null<FlxSprite> = null; //base sprite get by weapon_id
+	public var body:Null<FlxSprite> = null; //base sprite get by body_id
 	
+	static public var sprite_names = ["body", "weapon"];
 	
 	public function new(x:Float, y:Float, type:Int){
 		super(x, y);
@@ -47,9 +49,17 @@ class Npc extends NpcBase{
 		add(_trail);
 		show_trail = false;
 		
+		for (prop in sprite_names) {
+			var _s = new FlxSprite(0, 0);
+			_s.makeGraphic(1, 1, FlxColor.TRANSPARENT);
+			Reflect.setProperty(this, prop, _s);
+			add(Reflect.getProperty(this, prop));
+		}
+/*		
 		weapon = new FlxSprite(0, 0);
 		weapon.makeGraphic(1, 1, FlxColor.TRANSPARENT);
 		add(weapon);
+*/
 	}
 	
 	override 
@@ -76,7 +86,7 @@ class Npc extends NpcBase{
 	public function update_sprite(){
 		//TODO: add loading animation sheets
 		var path:Null<String> = null;
-		if (sprite_changed){
+/*		if (sprite_changed){
 			try{
 				path = CSObjects.get(type).sprite; //path must be without file extention
 			}catch (e:Dynamic){
@@ -93,20 +103,24 @@ class Npc extends NpcBase{
 			}
 			this.sprite_changed = false;
 		}
-		var names = ["weapon"];
-		for (prop in names) {
+*/		
+		for (prop in sprite_names) {
 			if (Reflect.getProperty(this, prop+"_id_changed")){
 				try{
 					path = CSObjects.get(Reflect.getProperty(this, prop+"_id")).sprite; //path must be without file extention
 				}catch (e:Dynamic){
-					path = "assets/images/npc/gun128";// "assets/images/npc/solder_base.png";
+//					trace("can't load sprite for "+prop);
+					path = null;// "assets/images/Orb";// "assets/images/npc/solder_base.png";
 				}
 				if (path!=null){
 					CSGraphicUtil.loadGraficsToSprite(Reflect.getProperty(this, prop), path, function(res:Bool, ?sprite:FlxSprite){
 						setSpriteCenter(sprite);
 					});
 				}else{
-					Reflect.getProperty(this, prop).loadGraphic(_graph);
+					var _s:Null<FlxSprite> = Reflect.getProperty(this, prop);
+					if (_s!=null){//Neko works only in this way
+						_s.loadGraphic(_graph);
+					}
 				}
 				Reflect.setProperty(this, prop + "_id_changed", false);
 			}

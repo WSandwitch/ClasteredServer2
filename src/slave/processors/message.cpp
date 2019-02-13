@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <algorithm>
+
 extern "C"{
 }
 #include "../world.h"
@@ -23,15 +25,19 @@ namespace slave {
 			try{
 				n=slave::world.npcs.at(id);
 			}catch(...){
-				n=new npc(&slave::world, id); //TODO: check get from new_npcs
-				slave::world.npcs_m.lock();
-					slave::world.new_npcs.push_back(n);
-				slave::world.npcs_m.unlock();
-				printf("added npc %d\n", id);
+				auto ni=std::find_if(std::begin(slave::world.new_npcs), std::end(slave::world.new_npcs), [&](const npc* _n){return _n->id==id;});
+				if (ni!=slave::world.new_npcs.end()){
+					n=*ni;
+				}else{
+					n=new npc(&slave::world, id);
+					slave::world.npcs_m.lock();
+						slave::world.new_npcs.push_back(n);
+					slave::world.npcs_m.unlock();
+					printf("added npc %d\n", id);
+				}
 			}
 			n->m.lock();
 				n->update(p, 0);
-//				n->attrs[8]=1;//TODO: update this dirty hack, why it needs to be marked
 			n->m.unlock();
 		slave::world.m.unlock();
 //		printf("%g %g\n", n->direction.x, n->direction.y);

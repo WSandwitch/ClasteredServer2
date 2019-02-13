@@ -372,7 +372,7 @@ int main(int argc,char* argv[]){
 								case 1: //new npc
 									s->sock->send(n->pack(1,1));
 									n->slaves.insert(slave.first);
-	//									printf("(slave)send new npc\n");
+//									printf("(slave)send new npc\n");
 									break;
 								case 3: //already had npc
 									if (n->updated(1,0,1)){

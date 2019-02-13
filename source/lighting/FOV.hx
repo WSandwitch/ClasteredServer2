@@ -93,6 +93,7 @@ class FOV extends FlxSpriteGroup{
 	
 	static var _off:Int = 5;
 	public static inline var edges:Int = 16;
+	var zpoint = new Point(0, 0);
 	
 	override
 	public function draw(){//update(elapsed){
@@ -106,8 +107,6 @@ class FOV extends FlxSpriteGroup{
 //			_segment.p2.x = x+200;
 ///			_segment.p2.y = y+200;
 			//calculate shadows
-			_vis.setLightLocation(follow.x, follow.y);
-			_vis.sweep();
 			
 //			_shadow.graphic.bitmap.lock();
 //			_shadow.graphic.bitmap.fillRect(new Rectangle(0, 0, width, height), FlxColor.TRANSPARENT);
@@ -116,10 +115,10 @@ class FOV extends FlxSpriteGroup{
 			FlxSpriteUtil.fill(_shadow, FlxColor.TRANSPARENT);
 //			blend = openfl.display.BlendMode.SCREEN;
 //			trace(_vis.output);
-	
-			if (_vis.output.length > 0){
 
-				var zpoint = new Point(0, 0);
+			_vis.setLightLocation(follow.x, follow.y);
+			_vis.sweep();
+			if (_vis.output.length > 0){
 				var points:Array<FlxPoint> = [];
 				var screen:Array<FlxPoint> = [
 					new FlxPoint(x, y),
@@ -148,11 +147,11 @@ class FOV extends FlxSpriteGroup{
 				}
 				var _ppoints:Array<Array<FlxPoint>> = FOVCrosser.getCross(points, FOVCrosser.getCross(screen, FOVCrosser.getUnion(circle, view)[0])[0]);
 
+				var ppoints:Array<Array<FlxPoint>>=[];
 				if (_ppoints.length > 0){
 					//draw dark
-					var ppoints:Array<Array<FlxPoint>>=[];
 					var halfviewext = HALF_VIEW_DARK;
-					if (halfviewext > 0){
+					if (halfviewext > 0){//draw triangle of dark view
 						var fxext:Float = follow.x-ushift*0.6*FlxMath.fastCos(rad);
 						var fyext:Float = follow.y-ushift*0.6*FlxMath.fastSin(rad);
 						var rad30ext:Float = Math.PI / 180 * (follow.angle-halfview-halfviewext);
@@ -179,89 +178,96 @@ class FOV extends FlxSpriteGroup{
 						}
 						FlxSpriteUtil.drawPolygon(_shadow, _points, FILL_COLOR, {color: FILL_COLOR, thickness: 3}, {smoothing:true});
 					}
-				
-					/////////
-					//////////
-	//				blend = openfl.display.BlendMode.MULTIPLY;
-					FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
-	//				_tmp.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, _tmp.graphic.bitmap.rect, zpoint, _filter);
+				}
+				//try to draw other lights
+				for (l in getLights()){
+					if (l == follow)
+						continue;
+					_vis.setLightLocation(l.x, l.y);
+					_vis.sweep();
+					//draw other lights
+				}
+				/////////
+				//////////
+//				blend = openfl.display.BlendMode.MULTIPLY;
+				FlxSpriteUtil.alphaMaskFlxSprite(_shadow, _tmp, _tmp);
+//				_tmp.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, _tmp.graphic.bitmap.rect, zpoint, _filter);
+					
+				var bshift = 8;
+				for (i in 0..._cols){
+					for (j in 0..._rows){
+						var bij = _bases[i][j];
+						var nu:Bool = false;
+						for (_nu in bij.need_update){
+							if (_nu || Std.random(10)<2){
+								nu = true;
+								break;
+							}
+						}
+						bij.need_update.pop();
 						
-					var bshift = 8;
-					for (i in 0..._cols){
-						for (j in 0..._rows){
-							var bij = _bases[i][j];
-							var nu:Bool = false;
-							for (_nu in bij.need_update){
-								if (_nu || Std.random(10)<2){
-									nu = true;
+						if ( nu ){
+							var bm = bij.graphic.bitmap;
+							if (use_blur){
+								bij.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint, _filter);
+							}else{
+								bij.graphic.bitmap.copyPixels(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint);
+							}
+							bij.dirty = true;
+						}else{
+							bij.dirty = false;
+						}
+						
+						var s1 = new FOVSegment(new FlxPoint(i * _width - _off, j * _height - _off), new FlxPoint((i + 1) * _width + _off, (j) * _height - _off));
+						var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + _off, (j + 1) * _height + _off));
+						var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - _off, (j + 1) * _height + _off));
+						var s4 = new FOVSegment(s3.p2, s1.p1);
+						var updated = false;
+						for (_points in ppoints){
+							if (updated)
+									break;
+							for (pi in 0..._points.length){
+								var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
+								if (
+									//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
+									(
+										( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
+										( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
+										s.cross(s1) ||
+										s.cross(s2) ||
+										s.cross(s3) ||
+										s.cross(s4) // add check of in<->out
+	//									false
+									)
+								){
+									updated = true;
 									break;
 								}
 							}
-							bij.need_update.pop();
-							
-							if ( nu ){
-								var bm = bij.graphic.bitmap;
-								if (use_blur){
-									bij.graphic.bitmap.applyFilter(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint, _filter);
-								}else{
-									bij.graphic.bitmap.copyPixels(_tmp.graphic.bitmap, new Rectangle(i * bm.width, j * bm.height, bm.width, bm.height), zpoint);
-								}
-								bij.dirty = true;
-							}else{
-								bij.dirty = false;
-							}
-							
-							var s1 = new FOVSegment(new FlxPoint(i * _width - _off, j * _height - _off), new FlxPoint((i + 1) * _width + _off, (j) * _height - _off));
-							var s2 = new FOVSegment(s1.p2, new FlxPoint((i + 1) * _width + _off, (j + 1) * _height + _off));
-							var s3 = new FOVSegment(s2.p2, new FlxPoint((i) * _width - _off, (j + 1) * _height + _off));
-							var s4 = new FOVSegment(s3.p2, s1.p1);
-							var updated = false;
-							for (_points in ppoints){
-								if (updated)
-										break;
-								for (pi in 0..._points.length){
-									var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
-									if (
-										//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
-										(
-											( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
-											( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
-											s.cross(s1) ||
-											s.cross(s2) ||
-											s.cross(s3) ||
-											s.cross(s4) // add check of in<->out
-		//									false
-										)
-									){
-										updated = true;
-										break;
-									}
-								}
-							}
-							for (_points in _ppoints){
-								if (updated)
-										break;
-								for (pi in 0..._points.length){
-									var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
-									if (
-										//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
-										(
-											( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
-											( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
-											s.cross(s1) ||
-											s.cross(s2) ||
-											s.cross(s3) ||
-											s.cross(s4) // add check of in<->out
-		//									false
-										)
-									){
-										updated = true;
-										break;
-									}
-								}
-							}
-							bij.need_update.add(updated);
 						}
+						for (_points in _ppoints){
+							if (updated)
+									break;
+							for (pi in 0..._points.length){
+								var s = new FOVSegment(_points[pi], _points[ pi == _points.length - 1 ? 0 : pi + 1 ]);
+								if (
+									//( s.p1.x >= 0 && s.p1.x <= _tmp.width ||s.p2.x >= 0 && s.p2.x <= _tmp.width || s.p1.y >= 0 && s.p1.y <= _tmp.height || s.p2.y >= 0 && s.p2.y <= _tmp.height ) && 
+									(
+										( s1.p1.x<s.p1.x && s2.p2.x>s.p1.x && s1.p1.y<s.p1.y && s2.p2.y>s.p1.y ) || //rather faster 
+										( s1.p1.x<s.p2.x && s2.p2.x>s.p2.x && s1.p1.y<s.p2.y && s2.p2.y>s.p2.y ) || 
+										s.cross(s1) ||
+										s.cross(s2) ||
+										s.cross(s3) ||
+										s.cross(s4) // add check of in<->out
+	//									false
+									)
+								){
+									updated = true;
+									break;
+								}
+							}
+						}
+						bij.need_update.add(updated);
 					}
 				}
 			} 
@@ -287,5 +293,9 @@ class FOV extends FlxSpriteGroup{
 		}
 		_tmp.makeGraphic(_width*_cols, _height*_rows, BASE_COLOR);
 		_shadow.makeGraphic(_width*_cols, _height*_rows, FlxColor.TRANSPARENT);
+	}
+	
+	private function getLights():Array<FlxObject>{
+		return [];
 	}
 }
